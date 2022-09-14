@@ -1,0 +1,18 @@
+{
+   "type" : "record",
+   "namespace" : "TableFaker",
+   "name" : "Employee",
+   "fields" : [
+      { "name" : "Id" , "type" : "int" },
+      { "name" : "FirstName" , "type" : "string" },
+      { "name" : "LastName" , "type" : "string" },
+      { "name" : "Age" , "type" : "int" },
+      { "name" : "Address" , "type" : "string" },
+      { "name" : "City" , "type" : "string" },
+      { "name" : "State" , "type" : "string" },
+      { "name" : "ZipCode" , "type" : "string" },
+      { "name" : "Country" , "type" : "string" },
+      { "name" : "Address" , "type" : "string" },
+      { "name" : "Gender" , "type" : "string" }
+   ]
+}
