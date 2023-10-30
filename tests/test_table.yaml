@@ -1,0 +1,44 @@
+version:1
+general:
+  localication: en_US
+tables:
+  - table_name: person
+    row_count: 100
+    columns:
+      - column_name: id
+        type: int
+        is_null: false
+        fake: incremental
+      - column_name: first_name
+        type: string
+        is_null: false
+        fake: name
+      - column_name: last_name
+        type: string
+        is_null: false
+        fake: last_name
+      - column_name: age
+        type: int
+        is_null: true
+        null_percentage: .1
+        fake: randint(0, 90)
+      - column_name: dob
+        type: date
+        is_null: true
+        null_percentage: .1
+        fake: date_time
+      - column_name: left_handed
+        type: boolean
+        is_null: true
+        null_percentage: .2
+        values: [true, false]
+  - table_name: student
+    row_count:  100
+    columns:
+      - column_name: person_id
+        foreign_key: person.id
+      - column_name: grade
+        type: int
+        values: [1,2,3,4,5]
+         
+

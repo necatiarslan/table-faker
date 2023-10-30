@@ -1,0 +1,12 @@
+[requires]
+python_version = "3.12"
+
+[packages]
+faker = "*"
+pyyaml = "*"
+pandas = "*" 
+pytest = "*"
+pytest-cov = "*"
+
+[dev-packages]
+

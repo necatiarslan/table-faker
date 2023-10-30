@@ -18,3 +18,6 @@ This project will be a command line tool and python package.
 
 Thanks,
 Necati ARSLAN
+
+### Fake List
+https://faker.readthedocs.io/en/master/providers.html#

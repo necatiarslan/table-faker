@@ -4,14 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tablefaker"
-version = "0.0.1"
+version = "1.0.0"
 authors = [
   { name="Necati Arslan", email="necatia@gmail.com" },
 ]
-description = "This is a package to generate fake table/tabular data for a given schema."
+description = "This is a package to generate fake table/tabular data for a given schema in a yaml file."
 readme = "README.md"
 license = { file="LICENSE" }
-requires-python = ">=3.7"
+requires-python = ">=3.11"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
