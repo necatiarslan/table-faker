@@ -6,22 +6,26 @@ tables:
     row_count: 10
     columns:
       - column_name: id
-        fake: random_int(1, 1000)
+        data: row_id
       - column_name: first_name
-        fake: first_name()
+        data: fake.first_name()
       - column_name: last_name
-        fake: last_name()
+        data: fake.last_name()
       - column_name: age
-        fake: random_int(18, 90)
+        data: fake.random_int(18, 90)
       - column_name: dob
-        fake: date_of_birth()
+        data: fake.date_of_birth()
       - column_name: street_address
-        fake: street_address()
+        data: fake.street_address()
       - column_name: city
-        fake: city()
+        data: fake.city()
       - column_name: state_abbr
-        fake: state_abbr()
+        data: fake.state_abbr()
       - column_name: postcode
-        fake: postcode()
+        data: fake.postcode()
+      - column_name: gender
+        data: random.choice(["male", "female"])
+      - column_name: left_handed
+        data: fake.pybool()
          
 

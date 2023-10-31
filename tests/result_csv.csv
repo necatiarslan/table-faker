@@ -1,11 +1,11 @@
-,id,first_name,last_name,age,dob,street_address,city,state_abbr,postcode
-0,825,Michael,Phillips,64,1930-03-26,19259 Cline Common,Lake Kathleenland,UT,11352
-1,809,Mary,Henry,75,1966-07-22,030 Kenneth Trafficway,Tinaborough,OR,54948
-2,222,Debbie,Miller,73,1929-02-24,308 Wright Station,Lake Markfort,MS,24645
-3,311,Matthew,Brown,82,1920-11-30,99085 Moreno Manors,South Bradleyside,WV,11332
-4,117,Kellie,Rodriguez,74,2014-01-08,415 Anderson Tunnel Suite 889,Derekton,RI,36814
-5,65,Norma,Sloan,28,1963-10-13,137 Hansen Burgs Suite 781,Port Erikaview,OK,84574
-6,557,Robert,Bush,56,1935-08-27,2760 Howard Loaf Suite 678,Port Danielleton,KY,44767
-7,583,Alexandra,Sanchez,31,1986-02-15,288 Gentry Spur Apt. 583,Powellberg,OH,18727
-8,157,Sara,Richards,63,2021-03-18,54471 Ivan Heights Suite 400,West Kennethburgh,WY,73412
-9,728,Richard,Williamson,48,1956-07-04,4818 Scott Harbor Suite 527,Lake Pamelachester,MO,31120
+,id,first_name,last_name,age,dob,street_address,city,state_abbr,postcode,gender,left_handed
+0,1,Tiffany,Jackson,35,2016-07-01,3598 Brennan Forks Apt. 726,Lake Zachary,CT,48818,male,True
+1,2,Nancy,Vaughn,61,2001-06-22,4860 Craig Forest Suite 771,Jennifermouth,AZ,52894,female,False
+2,3,William,Jones,62,1928-03-28,16110 Brooke Port Suite 128,South Hunterberg,VT,19942,male,False
+3,4,Samantha,Johnson,19,1976-01-29,85275 Malone Walk Apt. 441,East Christineton,WA,11046,female,False
+4,5,Cassidy,Greene,42,1937-01-01,996 William Rue,Millerview,NC,65672,female,False
+5,6,Vanessa,Wells,81,2011-02-06,15733 Samantha Throughway,Port Ryanfort,SD,33521,female,True
+6,7,Holly,Coleman,76,1964-06-25,69987 Thompson Brooks Apt. 269,Melissabury,NY,68355,male,False
+7,8,Alicia,Morrison,26,1974-08-26,4467 Peter Courts,New Joshua,HI,65012,female,False
+8,9,Jenna,Johnson,84,2016-07-13,84771 Christopher Heights Apt. 424,Ericaborough,NE,20679,male,True
+9,10,Eric,Goodman,90,2021-05-07,350 Chapman Ferry,Jefferystad,IA,15629,male,False

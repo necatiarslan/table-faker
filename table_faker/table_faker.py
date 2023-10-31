@@ -2,6 +2,7 @@ from . import config_parser
 from . import util
 import pandas as pd
 from faker import Faker
+import random
 
 def to_csv(config_file_path, target_file_path, table_name=None):
     result = to_pandas(config_file_path)
@@ -11,6 +12,7 @@ def to_csv(config_file_path, target_file_path, table_name=None):
 
     df = result[table_name]
     df.to_csv(target_file_path)
+    util.log(f"data is exported to {target_file_path} as csv")
 
 def to_json(config_file_path, target_file_path, table_name=None):
     result = to_pandas(config_file_path)
@@ -20,6 +22,7 @@ def to_json(config_file_path, target_file_path, table_name=None):
 
     df = result[table_name]
     df.to_json(target_file_path)
+    util.log(f"data is exported to {target_file_path} as json")
 
 def to_excel(config_file_path, target_file_path, table_name=None):
     result = to_pandas(config_file_path)
@@ -29,6 +32,7 @@ def to_excel(config_file_path, target_file_path, table_name=None):
 
     df = result[table_name]
     df.to_excel(target_file_path)
+    util.log(f"data is exported to {target_file_path} as excel")
 
 def to_parquet(config_file_path, target_file_path, table_name=None):
     result = to_pandas(config_file_path)
@@ -38,6 +42,7 @@ def to_parquet(config_file_path, target_file_path, table_name=None):
 
     df = result[table_name]
     df.to_parquet(target_file_path)
+    util.log(f"data is exported to {target_file_path} as parquet")
 
 def to_pandas(config_file_path:str) -> pd.DataFrame:
     parser = config_parser.ConfigParser(config_file_path)
@@ -49,6 +54,7 @@ def to_pandas(config_file_path:str) -> pd.DataFrame:
         df = generate_table(table)
         result[table['table_name']] = df
     
+    util.log(f"{len(result)} pandas dataframe(s) created")
     return result
 
 def generate_table(table):
@@ -63,22 +69,29 @@ def generate_table(table):
 
     for column in columns:
         column_name = column['column_name']
-        faker_command = column['fake']
-        fake_data = generate_fake_data(faker, faker_command, row_count)
+        data_command = column['data']
+        fake_data = generate_fake_data(faker, data_command, row_count)
         table_data[column_name] = fake_data
         #print(f"fake_data={fake_data}")
 
     df = pd.DataFrame(table_data)
-
+    util.log(f"{table_name} pandas dataframe created")
     return df
 
-def generate_fake_data(faker: Faker, command, row_count, **kwargs):
+def generate_fake_data(fake: Faker, command, row_count, **kwargs):
     result = None
     
     fake_data = []
-    for _ in range(row_count):
-        variables = {"faker": faker, "result": result, "command": command}
-        exec(f"result = faker.{command}", variables)
+    for row_id in range(1, row_count+1):
+        variables = {
+            "random": random,
+            "fake": fake,
+            "result": result,
+            "command": command,
+            "row_id": row_id
+            }
+        
+        exec(f"result = {command}", variables)
         result = variables["result"]
         fake_data.append(result)
 
