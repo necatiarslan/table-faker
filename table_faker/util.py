@@ -6,4 +6,4 @@ def log(message):
         if func.function is not "log":
             caller_function = func.function
 
-    print(f"[table-faker][{caller_function} - {message}]")
+    print(f"[table-faker][{caller_function}] - {message}")
