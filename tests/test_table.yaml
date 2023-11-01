@@ -27,5 +27,16 @@ tables:
         data: random.choice(["male", "female"])
       - column_name: left_handed
         data: fake.pybool()
+  - table_name: employee
+    row_count: 5
+    columns:
+      - column_name: id
+        data: row_id
+      - column_name: person_id
+        data: fake.random_int(1, 10)
+      - column_name: hire_date
+        data: fake.date_between()
+      - column_name: title
+        data: random.choice(["engineer", "senior engineer", "principal engineer", "director", "senior director", "manager", "vice president", "president"])
          
 

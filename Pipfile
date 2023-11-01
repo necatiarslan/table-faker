@@ -5,8 +5,10 @@ python_version = "3.12"
 faker = "*"
 pyyaml = "*"
 pandas = "*" 
-pytest = "*"
-pytest-cov = "*"
+
 
 [dev-packages]
-
+pytest = "*"
+pytest-cov = "*"
+wheel = "*"
+build = "*"

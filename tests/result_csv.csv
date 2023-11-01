@@ -1,11 +1,11 @@
 ,id,first_name,last_name,age,dob,street_address,city,state_abbr,postcode,gender,left_handed
-0,1,Tiffany,Jackson,35,2016-07-01,3598 Brennan Forks Apt. 726,Lake Zachary,CT,48818,male,True
-1,2,Nancy,Vaughn,61,2001-06-22,4860 Craig Forest Suite 771,Jennifermouth,AZ,52894,female,False
-2,3,William,Jones,62,1928-03-28,16110 Brooke Port Suite 128,South Hunterberg,VT,19942,male,False
-3,4,Samantha,Johnson,19,1976-01-29,85275 Malone Walk Apt. 441,East Christineton,WA,11046,female,False
-4,5,Cassidy,Greene,42,1937-01-01,996 William Rue,Millerview,NC,65672,female,False
-5,6,Vanessa,Wells,81,2011-02-06,15733 Samantha Throughway,Port Ryanfort,SD,33521,female,True
-6,7,Holly,Coleman,76,1964-06-25,69987 Thompson Brooks Apt. 269,Melissabury,NY,68355,male,False
-7,8,Alicia,Morrison,26,1974-08-26,4467 Peter Courts,New Joshua,HI,65012,female,False
-8,9,Jenna,Johnson,84,2016-07-13,84771 Christopher Heights Apt. 424,Ericaborough,NE,20679,male,True
-9,10,Eric,Goodman,90,2021-05-07,350 Chapman Ferry,Jefferystad,IA,15629,male,False
+0,1,Chelsea,Cabrera,65,2001-07-01,0326 Wyatt Garden,West Justinshire,MT,76300,female,True
+1,2,Kenneth,Perez,84,1970-06-01,96004 Schmidt Fall,Stoneside,KY,10843,male,False
+2,3,Michael,Stanton,37,1926-11-03,7406 Robert Motorway,West Amyfurt,MS,45539,female,True
+3,4,Nicole,Mccullough,36,1997-12-04,437 Devon Rapids,New Veronicachester,SD,34135,male,False
+4,5,Joy,Allen,63,1962-11-11,04976 Robert Station Apt. 564,Tyroneville,SC,52944,male,True
+5,6,Seth,Adams,46,1969-12-25,7757 Ellison Circles Apt. 679,Williamton,ME,93406,male,False
+6,7,Sally,Morales,35,1912-03-26,8834 Christina Ports Apt. 710,Port Erinview,SD,67564,male,False
+7,8,Alyssa,Hobbs,43,1916-09-28,170 Small Manors,Shermanmouth,MD,78245,female,False
+8,9,Joshua,Manning,51,1911-04-03,01381 Maureen Ridge Apt. 399,New Donaldberg,AK,96380,male,False
+9,10,James,Lee,52,2019-02-15,0736 Herman Creek Suite 157,South Gene,CA,76087,male,False
