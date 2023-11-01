@@ -2,7 +2,7 @@ import yaml
 from os import path
 from . import util
 
-class ConfigParser:
+class Config:
     def __init__(self, file_path):
         self.file_path = file_path
         self.load_config_file()

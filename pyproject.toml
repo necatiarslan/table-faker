@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "table_faker"
+name = "tablefaker"
 version = "1.0.0"
 authors = [
   { name="Necati Arslan", email="necatia@gmail.com" },

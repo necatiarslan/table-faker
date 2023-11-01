@@ -1,4 +1,4 @@
-from . import config_parser
+from . import config
 from . import util
 import pandas as pd
 from faker import Faker
@@ -57,7 +57,7 @@ def to_parquet(config_file_path, target_file_path, table_name=None) -> {} :
     return to_target("parquet", config_file_path, target_file_path, table_name)
 
 def to_pandas(config_file_path:str) -> pd.DataFrame:
-    parser = config_parser.ConfigParser(config_file_path)
+    parser = config.Config(config_file_path)
     tables = parser.config["tables"]
     util.log(f"table count={len(tables)}")
 

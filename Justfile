@@ -64,14 +64,14 @@ pyenv-current-virtualenv:
     pyenv version
 
 test:
-    pipenv run pytest --junit-xml=junit_xml_test_report.xml --cov-branch --cov=table_faker tests
+    pipenv run pytest --junit-xml=junit_xml_test_report.xml --cov-branch --cov=tablefaker tests
     pipenv run coverage xml -i
 
 build-sdist:
-    python3 -m build --sdist table_faker
+    python -m build --sdist tablefaker
 
 build-wheel:
-    python3 -m build --wheel table_faker
+    python -m build --wheel tablefaker
 
 deploy:
     twine upload dist/package-name-version.tar.gz dist/package-name-version-py3-none-any.whl

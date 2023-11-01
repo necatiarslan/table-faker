@@ -1,5 +1,5 @@
 # Table Faker
-table_faker is a versatile Python package that empowers you to effortlessly create realistic but synthetic table data for a wide range of applications. If you need to generate test data for software development, this tool simplifies the process with an intuitive schema definition in YAML format.
+tablefaker is a versatile Python package that empowers you to effortlessly create realistic but synthetic table data for a wide range of applications. If you need to generate test data for software development, this tool simplifies the process with an intuitive schema definition in YAML format.
 
 ### Key Features
 **Schema Definition:** Define your target schema using a simple YAML file. Specify the structure of your tables, column names, fake data generation function, and relationships.
@@ -47,11 +47,11 @@ tables:
 
 ### Sample Code
 ```python
-import table_faker
+import tablefaker
 
 yaml_file = "tests/test_table.yaml"
 destination_folder = "tests"
-result = table_faker.to_csv(yaml_file, destination_folder)
+result = tablefaker.to_csv(yaml_file, destination_folder)
 ```
 ### Sample CSV Output
 ```
@@ -71,11 +71,13 @@ https://faker.readthedocs.io/en/master/providers.html#
 - Foreign key
 - Nullable Column
 - CLI
-- Custom Faker Provider
+- Custom Faker Provider support
 - Export To PostgreSQL
 - Parquet Column Types
+- Inline schema definition
+- Json schema file
 
-Thanks,
+Thanks, \
 Necati ARSLAN
 
 
