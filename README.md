@@ -33,6 +33,7 @@ tables:
         data: fake.random_int(18, 90)
       - column_name: dob
         data: fake.date_of_birth()
+        null_percentage: 0.20
   - table_name: employee
     row_count: 5
     columns:
@@ -58,7 +59,7 @@ result = tablefaker.to_csv(yaml_file, destination_folder)
 id,first_name,last_name,age,dob
 1,John,Smith,35,1992-01-11
 2,Charles,Shepherd,27,1987-01-02
-3,Troy,Johnson,42,1980-01-24
+3,Troy,Johnson,42,
 4,Joshua,Hill,86,1985-07-11
 5,Matthew,Johnson,31,1940-03-31
 ```
@@ -69,7 +70,6 @@ https://faker.readthedocs.io/en/master/providers.html#
 
 ### TODO
 - Foreign key
-- Nullable Column
 - CLI
 - Custom Faker Provider support
 - Export To PostgreSQL

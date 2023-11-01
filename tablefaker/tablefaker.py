@@ -82,7 +82,7 @@ def generate_table(table) -> pd.DataFrame:
     for column in columns:
         column_name = column['column_name']
         data_command = column['data']
-        fake_data = generate_fake_data(faker, data_command, row_count)
+        fake_data = generate_fake_data(faker, data_command, row_count, column)
         table_data[column_name] = fake_data
         #print(f"fake_data={fake_data}")
 
@@ -90,11 +90,40 @@ def generate_table(table) -> pd.DataFrame:
     util.log(f"{table_name} pandas dataframe created")
     return df
 
-def generate_fake_data(fake: Faker, command, row_count, **kwargs) -> []:
+def parse_null_percentge(null_percentage):
+    if isinstance(null_percentage, str) and null_percentage[-1] == "%":
+        null_percentage = float(null_percentage[0:-1])
+    
+    if isinstance(null_percentage, str) and null_percentage[0] == "%":
+        null_percentage = float(null_percentage[1:])
+
+    if isinstance(null_percentage, int) or isinstance(null_percentage, float):
+        if null_percentage >= 0 and null_percentage <= 1:
+            return float(null_percentage)
+        elif null_percentage >= 0 and null_percentage<= 100:
+            return float(null_percentage / 100)
+
+    return float(0)
+
+
+def generate_fake_data(fake: Faker, command, row_count, column_config, **kwargs) -> []:
     result = None
     
+    null_percentge = 0
+    null_indexies = []
+    if "null_percentage" in column_config:
+        null_percentge = parse_null_percentge(column_config["null_percentage"])
+        for _ in range(1, int(row_count * null_percentge)+1):
+            random_num = random.randint(1, row_count)
+            null_indexies.append(random_num)
+
+
     fake_data = []
     for row_id in range(1, row_count+1):
+        if row_id in null_indexies:
+            fake_data.append(None) #add null data
+            continue
+
         variables = {
             "random": random,
             "fake": fake,
