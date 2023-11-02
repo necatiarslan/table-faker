@@ -67,17 +67,11 @@ test:
     pipenv run pytest --junit-xml=junit_xml_test_report.xml --cov-branch --cov=tablefaker tests
     pipenv run coverage xml -i
 
-build-sdist:
-    /Users/necatiarslan/.pyenv/versions/table-faker/bin/python -m build --sdist tablefaker
-
-build-wheel:
-    /Users/necatiarslan/.pyenv/versions/table-faker/bin/python -m build --wheel tablefaker
-
 publish:
-	#brew install twine
 	python setup.py sdist bdist_wheel
 	twine upload dist/* 
-	#rm -fr build dist .egg tablefaker.egg-info
+    #Set your username to __token__
+    #Set your password to the token value, including the pypi- prefix
 
 flake8:
 	python -m flake8 tablefaker
