@@ -14,11 +14,14 @@ tablefaker is a versatile Python package that empowers you to effortlessly creat
 - JSON File
 - Excel File
 
+### Installation
+```bash 
+pip install tablefaker
+```
+
 ### Sample Yaml File
 ```
 version: 1
-general:
-  localication: en_US
 tables:
   - table_name: person
     row_count: 10
@@ -50,10 +53,16 @@ tables:
 ```python
 import tablefaker
 
-yaml_file = "tests/test_table.yaml"
-destination_folder = "tests"
+yaml_file = "test_table.yaml"
+destination_folder = "."
 result = tablefaker.to_csv(yaml_file, destination_folder)
 ```
+
+### Sample CLI Command
+```bash
+tablefaker --file_type csv --config test_table.yaml 
+```
+
 ### Sample CSV Output
 ```
 id,first_name,last_name,age,dob
@@ -70,7 +79,6 @@ https://faker.readthedocs.io/en/master/providers.html#
 
 ### TODO
 - Foreign key
-- CLI
 - Custom Faker Provider support
 - Export To PostgreSQL
 - Parquet Column Types

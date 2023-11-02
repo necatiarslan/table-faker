@@ -1,6 +1,4 @@
 version: 1
-general:
-  localication: en_US
 tables:
   - table_name: person
     row_count: 10

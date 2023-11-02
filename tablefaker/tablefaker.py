@@ -5,7 +5,10 @@ from faker import Faker
 import random
 from os import path
 
-def to_target(target_type, config_file_path, target_file_path, table_name=None) -> {} :
+def to_target(file_type, config_file_path, target_file_path, table_name=None) -> {} :
+    if file_type not in ["csv", "json", "excel", "parquet"]:
+        raise Exception(f"Wrong file_type = {file_type}")
+    
     result = {}
     df_dict = to_pandas(config_file_path)
     
@@ -16,33 +19,33 @@ def to_target(target_type, config_file_path, target_file_path, table_name=None) 
 
             df = df_dict[key_table_name]
             temp_file_path = path.join(target_file_path, util.get_temp_filename(key_table_name)+".csv")
-            call_export_function(df, target_type, temp_file_path)
-            util.log(f"data is exported to {temp_file_path} as {target_type}")
+            call_export_function(df, file_type, temp_file_path)
+            util.log(f"data is exported to {temp_file_path} as {file_type}")
             result[key_table_name] = temp_file_path 
     elif path.isfile(target_file_path):
         if table_name is None:
             table_name = list(df_dict.keys())[0]
         df = df_dict[table_name]
         df.to_csv(target_file_path)
-        call_export_function(df, target_type, target_file_path)
-        util.log(f"data is exported to {target_file_path} as {target_type}")
+        call_export_function(df, file_type, target_file_path)
+        util.log(f"data is exported to {target_file_path} as {file_type}")
         result[table_name] = target_file_path
     else:
         raise Exception(f"target_file_path={target_file_path} is not valid")
     
     return result
 
-def call_export_function(data_frame: pd.DataFrame, target_type, target_file_path):
-    if target_type == "csv":
+def call_export_function(data_frame: pd.DataFrame, file_type, target_file_path):
+    if file_type == "csv":
         data_frame.to_csv(target_file_path)
-    elif target_type == "json":
+    elif file_type == "json":
         data_frame.to_json(target_file_path)
-    elif target_type == "excel":
+    elif file_type == "excel":
         data_frame.to_excel(target_file_path)
-    elif target_type == "parquet":
+    elif file_type == "parquet":
         data_frame.to_parquet(target_file_path)
     else:
-        raise Exception(f"Wrong target_type = {target_type}")
+        raise Exception(f"Wrong file_type = {file_type}")
 
 def to_csv(config_file_path, target_file_path, table_name=None) -> {} :
     return to_target("csv", config_file_path, target_file_path, table_name)
@@ -104,7 +107,6 @@ def parse_null_percentge(null_percentage):
             return float(null_percentage / 100)
 
     return float(0)
-
 
 def generate_fake_data(fake: Faker, command, row_count, column_config, **kwargs) -> []:
     result = None

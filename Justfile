@@ -68,10 +68,25 @@ test:
     pipenv run coverage xml -i
 
 build-sdist:
-    python -m build --sdist tablefaker
+    /Users/necatiarslan/.pyenv/versions/table-faker/bin/python -m build --sdist tablefaker
 
 build-wheel:
-    python -m build --wheel tablefaker
+    /Users/necatiarslan/.pyenv/versions/table-faker/bin/python -m build --wheel tablefaker
 
-deploy:
-    twine upload dist/package-name-version.tar.gz dist/package-name-version-py3-none-any.whl
+publish:
+	#brew install twine
+	python setup.py sdist bdist_wheel
+	twine upload dist/* 
+	#rm -fr build dist .egg tablefaker.egg-info
+
+flake8:
+	python -m flake8 tablefaker
+
+pip-install:
+    pip install /Users/necatiarslan/GitHub/table-faker/dist/tablefaker-1.0.0-py3-none-any.whl --force-reinstall
+
+clean-files:
+    find . -type f -name "*.csv" -exec rm {} \;
+
+test-cli:
+    tablefaker --config /Users/necatiarslan/GitHub/table-faker/tests/test_table.yaml
