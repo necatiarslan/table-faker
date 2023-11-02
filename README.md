@@ -53,14 +53,18 @@ tables:
 ```python
 import tablefaker
 
-yaml_file = "test_table.yaml"
-destination_folder = "."
-result = tablefaker.to_csv(yaml_file, destination_folder)
+tablefaker.to_csv("test_table.yaml") # exports to current folder in csv format
+tablefaker.to_json("test_table.yaml", "./target_folder") # exports all tables in json format
+tablefaker.to_parquet("test_table.yaml", "./target_folder") # exports all tables in parquet format
+tablefaker.to_excel("test_table.yaml", "./target_folder/target_file.csv") # exports only the first table in excel format
 ```
 
 ### Sample CLI Command
 ```bash
-tablefaker --file_type csv --config test_table.yaml 
+tablefaker --config test_table.yaml # exports to current folder in csv format
+tablefaker --config test_table.yaml --file_type excel # exports to current folder in excel format
+tablefaker --config test_table.yaml --file_type json --target ./target_folder # exports all tables in json format
+tablefaker --config test_table.yaml --file_type parquet --target ./target_folder/target_file.parquet # exports only the first table
 ```
 
 ### Sample CSV Output
@@ -76,6 +80,9 @@ id,first_name,last_name,age,dob
 ### Faker Functions List
 https://faker.readthedocs.io/en/master/providers.html#
 
+### Bug Report & New Feature Request
+https://github.com/necatiarslan/table-faker/issues/new 
+
 
 ### TODO
 - Foreign key
@@ -84,8 +91,14 @@ https://faker.readthedocs.io/en/master/providers.html#
 - Parquet Column Types
 - Inline schema definition
 - Json schema file
+- Pyarrow table
+- Custom fake data creation function
+
+Follow me on linkedin to get latest news \
+https://www.linkedin.com/in/necati-arslan/
 
 Thanks, \
-Necati ARSLAN
+Necati ARSLAN \
+necatia@gmail.com
 
 

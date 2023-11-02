@@ -82,7 +82,7 @@ publish:
 flake8:
 	python -m flake8 tablefaker
 
-pip-install:
+pip-install-tablefaker:
     pip install /Users/necatiarslan/GitHub/table-faker/dist/tablefaker-1.0.0-py3-none-any.whl --force-reinstall
 
 clean-files:

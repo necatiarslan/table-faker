@@ -22,7 +22,7 @@ def to_target(file_type, config_file_path, target_file_path, table_name=None) ->
             call_export_function(df, file_type, temp_file_path)
             util.log(f"data is exported to {temp_file_path} as {file_type}")
             result[key_table_name] = temp_file_path 
-    elif path.isfile(target_file_path):
+    else:
         if table_name is None:
             table_name = list(df_dict.keys())[0]
         df = df_dict[table_name]
@@ -30,33 +30,39 @@ def to_target(file_type, config_file_path, target_file_path, table_name=None) ->
         call_export_function(df, file_type, target_file_path)
         util.log(f"data is exported to {target_file_path} as {file_type}")
         result[table_name] = target_file_path
-    else:
-        raise Exception(f"target_file_path={target_file_path} is not valid")
     
     return result
 
 def call_export_function(data_frame: pd.DataFrame, file_type, target_file_path):
     if file_type == "csv":
-        data_frame.to_csv(target_file_path)
+        data_frame.to_csv(target_file_path, index=False)
     elif file_type == "json":
-        data_frame.to_json(target_file_path)
+        data_frame.to_json(target_file_path, index=False)
     elif file_type == "excel":
-        data_frame.to_excel(target_file_path)
+        data_frame.to_excel(target_file_path, index=False)
     elif file_type == "parquet":
-        data_frame.to_parquet(target_file_path)
+        data_frame.to_parquet(target_file_path, index=False)
     else:
         raise Exception(f"Wrong file_type = {file_type}")
 
-def to_csv(config_file_path, target_file_path, table_name=None) -> {} :
+def to_csv(config_file_path, target_file_path=None, table_name=None) -> {} :
+    if target_file_path is None:
+        target_file_path = "."
     return to_target("csv", config_file_path, target_file_path, table_name)
 
-def to_json(config_file_path, target_file_path, table_name=None) -> {} :
+def to_json(config_file_path, target_file_path=None, table_name=None) -> {} :
+    if target_file_path is None:
+        target_file_path = "."
     return to_target("json", config_file_path, target_file_path, table_name)
 
-def to_excel(config_file_path, target_file_path, table_name=None) -> {} :
+def to_excel(config_file_path, target_file_path=None, table_name=None) -> {} :
+    if target_file_path is None:
+        target_file_path = "."
     return to_target("excel", config_file_path, target_file_path, table_name)
 
-def to_parquet(config_file_path, target_file_path, table_name=None) -> {} :
+def to_parquet(config_file_path, target_file_path=None, table_name=None) -> {} :
+    if target_file_path is None:
+        target_file_path = "."
     return to_target("parquet", config_file_path, target_file_path, table_name)
 
 def to_pandas(config_file_path:str) -> pd.DataFrame:
