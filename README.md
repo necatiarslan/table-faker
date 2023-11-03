@@ -22,6 +22,8 @@ pip install tablefaker
 ### Sample Yaml File
 ```
 version: 1
+config:
+  locale: en_US
 tables:
   - table_name: person
     row_count: 10
@@ -37,6 +39,12 @@ tables:
       - column_name: dob
         data: fake.date_of_birth()
         null_percentage: 0.20
+      - column_name: salary
+        data: None                # NULL
+      - column_name: height
+        data: "\"170 cm\""        # string
+      - column_name: weight
+        data: 150                 # number
   - table_name: employee
     row_count: 5
     columns:
@@ -46,6 +54,8 @@ tables:
         data: fake.random_int(1, 10)
       - column_name: hire_date
         data: fake.date_between()
+      - column_name: school
+        data: fake.school_name()  # custom provider
 ```
 [full yml example](tests/test_table.yaml)
 
@@ -57,6 +67,11 @@ tablefaker.to_csv("test_table.yaml") # exports to current folder in csv format
 tablefaker.to_json("test_table.yaml", "./target_folder") # exports all tables in json format
 tablefaker.to_parquet("test_table.yaml", "./target_folder") # exports all tables in parquet format
 tablefaker.to_excel("test_table.yaml", "./target_folder/target_file.csv") # exports only the first table in excel format
+
+#you can use customer faker provider
+from faker_education import SchoolProvider
+
+tablefaker.to_csv("tests/test_table.yaml", "./tests/exports", fake_provider=SchoolProvider)
 ```
 
 ### Sample CLI Command
@@ -69,12 +84,12 @@ tablefaker --config test_table.yaml --file_type parquet --target ./target_folder
 
 ### Sample CSV Output
 ```
-id,first_name,last_name,age,dob
-1,John,Smith,35,1992-01-11
-2,Charles,Shepherd,27,1987-01-02
-3,Troy,Johnson,42,
-4,Joshua,Hill,86,1985-07-11
-5,Matthew,Johnson,31,1940-03-31
+id,first_name,last_name,age,dob,salary,height,weight
+1,John,Smith,35,1992-01-11,,170 cm,150
+2,Charles,Shepherd,27,1987-01-02,,170 cm,150
+3,Troy,Johnson,42,,170 cm,150
+4,Joshua,Hill,86,1985-07-11,,170 cm,150
+5,Matthew,Johnson,31,1940-03-31,,170 cm,150
 ```
 
 ### Faker Functions List
@@ -86,9 +101,7 @@ https://github.com/necatiarslan/table-faker/issues/new
 
 ### TODO
 - Custom fake data creation function
-- Exception Management
 - Foreign key
-- Custom Faker Provider support
 - Parquet Column Types
 
 
@@ -98,6 +111,7 @@ https://github.com/necatiarslan/table-faker/issues/new
 - Json schema file
 - Pyarrow table
 - Use Logging package
+- Exception Management
 
 Follow me on linkedin to get latest news \
 https://www.linkedin.com/in/necati-arslan/

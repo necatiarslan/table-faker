@@ -5,12 +5,12 @@ from faker import Faker
 import random
 from os import path
 
-def to_target(file_type, config_file_path, target_file_path, table_name=None) -> {} :
+def to_target(file_type, config_file_path, target_file_path, table_name=None, **kwargs) -> {} :
     if file_type not in ["csv", "json", "excel", "parquet"]:
         raise Exception(f"Wrong file_type = {file_type}")
     
     result = {}
-    df_dict = to_pandas(config_file_path)
+    df_dict = to_pandas(config_file_path, **kwargs)
     
     if path.isdir(target_file_path):
         for key_table_name in df_dict.keys():
@@ -57,45 +57,52 @@ def call_export_function(data_frame: pd.DataFrame, file_type, target_file_path):
     else:
         raise Exception(f"Wrong file_type = {file_type}")
 
-def to_csv(config_file_path, target_file_path=None, table_name=None) -> {} :
+def to_csv(config_file_path, target_file_path=None, table_name=None, **kwargs) -> {} :
     if target_file_path is None:
         target_file_path = "."
-    return to_target("csv", config_file_path, target_file_path, table_name)
+    return to_target("csv", config_file_path, target_file_path, table_name, **kwargs)
 
-def to_json(config_file_path, target_file_path=None, table_name=None) -> {} :
+def to_json(config_file_path, target_file_path=None, table_name=None, **kwargs) -> {} :
     if target_file_path is None:
         target_file_path = "."
-    return to_target("json", config_file_path, target_file_path, table_name)
+    return to_target("json", config_file_path, target_file_path, table_name, **kwargs)
 
-def to_excel(config_file_path, target_file_path=None, table_name=None) -> {} :
+def to_excel(config_file_path, target_file_path=None, table_name=None, **kwargs) -> {} :
     if target_file_path is None:
         target_file_path = "."
-    return to_target("excel", config_file_path, target_file_path, table_name)
+    return to_target("excel", config_file_path, target_file_path, table_name, **kwargs)
 
-def to_parquet(config_file_path, target_file_path=None, table_name=None) -> {} :
+def to_parquet(config_file_path, target_file_path=None, table_name=None, **kwargs) -> {} :
     if target_file_path is None:
         target_file_path = "."
-    return to_target("parquet", config_file_path, target_file_path, table_name)
+    return to_target("parquet", config_file_path, target_file_path, table_name, **kwargs)
 
-def to_pandas(config_file_path:str) -> pd.DataFrame:
+def to_pandas(config_file_path:str, **kwargs) -> pd.DataFrame:
     configurator = config.Config(config_file_path)
     tables = configurator.config["tables"]
     util.log(f"table count={len(tables)}")
 
     result = {}
     for table in tables:
-        df = generate_table(table, configurator)
+        df = generate_table(table, configurator, **kwargs)
         result[table['table_name']] = df
     
     util.log(f"{len(result)} pandas dataframe(s) created")
     return result
 
-def generate_table(table, configurator) -> pd.DataFrame:
+def generate_table(table, configurator, **kwargs) -> pd.DataFrame:
     locale = None
     if "config" in configurator.config and "locale" in configurator.config["config"]:
         locale = configurator.config["config"]["locale"]
 
     faker = Faker(locale)
+
+    if "fake_provider" in kwargs:
+        if not isinstance(kwargs["fake_provider"], list):
+            faker.add_provider(kwargs["fake_provider"])
+        else:
+            for provider in kwargs["fake_provider"]:
+                faker.add_provider(provider)
 
     table_name = table['table_name']
     row_count = table['row_count']

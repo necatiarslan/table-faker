@@ -40,10 +40,12 @@ tables:
       - column_name: title
         data: random.choice(["engineer", "senior engineer", "principal engineer", "director", "senior director", "manager", "vice president", "president"])
       - column_name: salary
-        data: None
+        data: None #NULL
       - column_name: height
-        data: "\"170 cm\""
+        data: "\"170 cm\"" #string
       - column_name: weight
-        data: 150
+        data: 150 #number
+      - column_name: school
+        data: fake.school_name()
          
 
