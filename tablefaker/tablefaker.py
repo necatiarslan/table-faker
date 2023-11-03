@@ -78,21 +78,24 @@ def to_parquet(config_file_path, target_file_path=None, table_name=None) -> {} :
     return to_target("parquet", config_file_path, target_file_path, table_name)
 
 def to_pandas(config_file_path:str) -> pd.DataFrame:
-    parser = config.Config(config_file_path)
-    tables = parser.config["tables"]
+    configurator = config.Config(config_file_path)
+    tables = configurator.config["tables"]
     util.log(f"table count={len(tables)}")
 
     result = {}
     for table in tables:
-        df = generate_table(table)
+        df = generate_table(table, configurator)
         result[table['table_name']] = df
     
     util.log(f"{len(result)} pandas dataframe(s) created")
     return result
 
-def generate_table(table) -> pd.DataFrame:
-    # Initialize the Faker generator
-    faker = Faker()
+def generate_table(table, configurator) -> pd.DataFrame:
+    locale = None
+    if "config" in configurator.config and "locale" in configurator.config["config"]:
+        locale = configurator.config["config"]["locale"]
+
+    faker = Faker(locale)
 
     table_name = table['table_name']
     row_count = table['row_count']

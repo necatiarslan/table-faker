@@ -85,17 +85,19 @@ https://github.com/necatiarslan/table-faker/issues/new
 
 
 ### TODO
-- Logging
+- Custom fake data creation function
 - Exception Management
-- Config File Validation
 - Foreign key
 - Custom Faker Provider support
-- Export To PostgreSQL
 - Parquet Column Types
+
+
+### Nice To Have
+- Export To PostgreSQL
 - Inline schema definition
 - Json schema file
 - Pyarrow table
-- Custom fake data creation function
+- Use Logging package
 
 Follow me on linkedin to get latest news \
 https://www.linkedin.com/in/necati-arslan/
