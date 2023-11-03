@@ -129,5 +129,4 @@ dmypy.json
 .pyre/
 
 junit_xml_test_report.xml
-*.csv
-*.parquet
+/tests/exports

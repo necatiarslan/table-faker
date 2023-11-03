@@ -49,7 +49,7 @@ def call_export_function(data_frame: pd.DataFrame, file_type, target_file_path):
     if file_type == "csv":
         data_frame.to_csv(target_file_path, index=False)
     elif file_type == "json":
-        data_frame.to_json(target_file_path, index=False)
+        data_frame.to_json(target_file_path, index=False, indent=4, orient='records', date_format='iso')
     elif file_type == "excel":
         data_frame.to_excel(target_file_path, index=False)
     elif file_type == "parquet":
