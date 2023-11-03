@@ -83,10 +83,10 @@ flake8:
 	python -m flake8 tablefaker
 
 pip-install-tablefaker:
-    pip install /Users/necatiarslan/GitHub/table-faker/dist/tablefaker-1.0.0-py3-none-any.whl --force-reinstall
+    pip install /Users/necatiarslan/GitHub/table-faker/dist/tablefaker-1.0.1-py3-none-any.whl --force-reinstall
 
 clean-files:
     find tests/exports -type f -name "*.*" -exec rm {} \;
 
 test-cli:
-    tablefaker --config /Users/necatiarslan/GitHub/table-faker/tests/test_table.yaml
+    tablefaker --config /Users/necatiarslan/GitHub/table-faker/tests/test_table.yaml --target /Users/necatiarslan/GitHub/table-faker/tests/exports
