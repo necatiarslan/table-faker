@@ -85,6 +85,9 @@ https://github.com/necatiarslan/table-faker/issues/new
 
 
 ### TODO
+- Logging
+- Exception Management
+- Config File Validation
 - Foreign key
 - Custom Faker Provider support
 - Export To PostgreSQL

@@ -4,7 +4,9 @@ python_version = "3.12"
 [packages]
 faker = "*"
 pyyaml = "*"
-pandas = "*" 
+pandas = "*"
+openpyxl = "*"
+fastparquet = "*"
 
 
 [dev-packages]

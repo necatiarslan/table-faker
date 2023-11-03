@@ -18,7 +18,7 @@ def to_target(file_type, config_file_path, target_file_path, table_name=None) ->
                 continue #skip other tables
 
             df = df_dict[key_table_name]
-            temp_file_path = path.join(target_file_path, util.get_temp_filename(key_table_name)+".csv")
+            temp_file_path = path.join(target_file_path, util.get_temp_filename(key_table_name) + get_file_extension(file_type))
             call_export_function(df, file_type, temp_file_path)
             util.log(f"data is exported to {temp_file_path} as {file_type}")
             result[key_table_name] = temp_file_path 
@@ -32,6 +32,18 @@ def to_target(file_type, config_file_path, target_file_path, table_name=None) ->
         result[table_name] = target_file_path
     
     return result
+
+def get_file_extension(file_type):
+    if file_type == "csv":
+        return ".csv"
+    elif file_type == "json":
+        return ".json"
+    elif file_type == "parquet":
+        return ".parquet"
+    elif file_type == "excel":
+        return ".xlsx"
+    else:
+        return ".txt"
 
 def call_export_function(data_frame: pd.DataFrame, file_type, target_file_path):
     if file_type == "csv":

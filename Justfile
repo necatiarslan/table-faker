@@ -2,6 +2,12 @@
 #install brew
 #brew install pyenv
 #brew install pyenv-virtualenv
+set shell := ["zsh", "-cu"]
+set positional-arguments
+
+run:
+    pyenv activate table-faker
+    ~/.pyenv/versions/3.11.6/envs/table-faker/bin/python ~/GitHub/table-faker/tests/test_tablefaker.py
 
 pip-install:
     pipenv lock
@@ -69,9 +75,9 @@ test:
 
 publish:
 	python setup.py sdist bdist_wheel
-	twine upload dist/* 
-    #Set your username to __token__
-    #Set your password to the token value, including the pypi- prefix
+	twine upload dist/*
+# Set your username to __token__
+# Set your password to the token value, including the pypi- prefix
 
 flake8:
 	python -m flake8 tablefaker
@@ -80,7 +86,7 @@ pip-install-tablefaker:
     pip install /Users/necatiarslan/GitHub/table-faker/dist/tablefaker-1.0.0-py3-none-any.whl --force-reinstall
 
 clean-files:
-    find . -type f -name "*.csv" -exec rm {} \;
+    find tests/exports -type f -name "*.*" -exec rm {} \;
 
 test-cli:
     tablefaker --config /Users/necatiarslan/GitHub/table-faker/tests/test_table.yaml
