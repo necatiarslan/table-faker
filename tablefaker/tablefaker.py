@@ -113,7 +113,7 @@ def generate_table(table, configurator, **kwargs) -> pd.DataFrame:
     for column in columns:
         column_name = column['column_name']
         data_command = column['data']
-        fake_data = generate_fake_data(faker, data_command, row_count, column)
+        fake_data = generate_fake_data(faker, data_command, row_count, column, **kwargs)
         table_data[column_name] = fake_data
         #print(f"fake_data={fake_data}")
 
@@ -162,6 +162,14 @@ def generate_fake_data(fake: Faker, command, row_count, column_config, **kwargs)
             "row_id": row_id
             }
         
+        if "custom_function" in kwargs:
+            if isinstance(kwargs["custom_function"], list):
+                for func in kwargs["custom_function"]:
+                    variables[func.__name__] = func
+            else:
+                func = kwargs["custom_function"]
+                variables[func.__name__] = func
+
         exec(f"result = {command}", variables)
         result = variables["result"]
         fake_data.append(result)

@@ -3,9 +3,9 @@ from . import tablefaker
 
 def main():
     parser = argparse.ArgumentParser(description=get_description())
-    parser.add_argument('--config', required=True, help='Path to the configuration file')
-    parser.add_argument('--file_type', required=False, help='Type of file to generate (csv,json,parquet,excel)')
-    parser.add_argument('--target', required=False, help='Path to the target directory/file')
+    parser.add_argument('--config', required=True, help='Config yaml file path')
+    parser.add_argument('--file_type', required=False, help='Target file type (csv,json,parquet,excel)')
+    parser.add_argument('--target', required=False, help='Target folder/file')
 
     args = parser.parse_args()
 

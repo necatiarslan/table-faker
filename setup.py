@@ -5,8 +5,8 @@ with open("README.md") as file:
 
 setup(
     name='tablefaker',
-    version='1.0.1',
-    description='A Python package for generating fake table data. Get data in pandas dataframe & pyarrow table or export to Csv, Json, Excel or Parquet',
+    version='1.0.2',
+    description='A Python package for generating fake table data. Get data in pandas dataframe or export to Csv, Json, Excel or Parquet',
     long_description = description,
     long_description_content_type = "text/markdown",
     author='Necati Arslan',
@@ -34,7 +34,7 @@ setup(
         'Topic :: Software Development :: Libraries',
     ],
     project_urls={
-        "Documentation": "https://github.com/necatiarslan/table-faker/README.md",
+        "Documentation": "https://github.com/necatiarslan/table-faker/blob/main/README.md",
         "Source": "https://github.com/necatiarslan/table-faker",
     },
     entry_points={
