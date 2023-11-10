@@ -18,7 +18,7 @@ def to_target(file_type, config_file_path, target_file_path, table_name=None, **
                 continue #skip other tables
 
             df = df_dict[key_table_name]
-            temp_file_path = path.join(target_file_path, util.get_temp_filename(key_table_name) + get_file_extension(file_type))
+            temp_file_path = path.join(target_file_path, util.get_temp_filename(key_table_name) + util.get_file_extension(file_type))
             call_export_function(df, file_type, temp_file_path)
             util.log(f"data is exported to {temp_file_path} as {file_type}")
             result[key_table_name] = temp_file_path 
@@ -32,18 +32,6 @@ def to_target(file_type, config_file_path, target_file_path, table_name=None, **
         result[table_name] = target_file_path
     
     return result
-
-def get_file_extension(file_type):
-    if file_type == "csv":
-        return ".csv"
-    elif file_type == "json":
-        return ".json"
-    elif file_type == "parquet":
-        return ".parquet"
-    elif file_type == "excel":
-        return ".xlsx"
-    else:
-        return ".txt"
 
 def call_export_function(data_frame: pd.DataFrame, file_type, target_file_path):
     if file_type == "csv":
@@ -109,32 +97,18 @@ def generate_table(table, configurator, **kwargs) -> pd.DataFrame:
     columns = table['columns']
 
     table_data = {}
-
+    iteration = 1
     for column in columns:
         column_name = column['column_name']
         data_command = column['data']
+        util.progress_bar(iteration, len(columns), f"Generating {table_name}/{column_name}")
         fake_data = generate_fake_data(faker, data_command, row_count, column, **kwargs)
         table_data[column_name] = fake_data
-        #print(f"fake_data={fake_data}")
+        iteration += 1
 
     df = pd.DataFrame(table_data)
     util.log(f"{table_name} pandas dataframe created")
     return df
-
-def parse_null_percentge(null_percentage):
-    if isinstance(null_percentage, str) and null_percentage[-1] == "%":
-        null_percentage = float(null_percentage[0:-1])
-    
-    if isinstance(null_percentage, str) and null_percentage[0] == "%":
-        null_percentage = float(null_percentage[1:])
-
-    if isinstance(null_percentage, int) or isinstance(null_percentage, float):
-        if null_percentage >= 0 and null_percentage <= 1:
-            return float(null_percentage)
-        elif null_percentage >= 0 and null_percentage<= 100:
-            return float(null_percentage / 100)
-
-    return float(0)
 
 def generate_fake_data(fake: Faker, command, row_count, column_config, **kwargs) -> []:
     result = None
@@ -142,7 +116,7 @@ def generate_fake_data(fake: Faker, command, row_count, column_config, **kwargs)
     null_percentge = 0
     null_indexies = []
     if "null_percentage" in column_config:
-        null_percentge = parse_null_percentge(column_config["null_percentage"])
+        null_percentge = util.parse_null_percentge(column_config["null_percentage"])
         for _ in range(1, int(row_count * null_percentge)+1):
             random_num = random.randint(1, row_count)
             null_indexies.append(random_num)
