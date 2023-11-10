@@ -1,6 +1,7 @@
 import inspect
 import datetime
 import sys
+import shutil
 
 def log(message):
     caller_function = ""
@@ -55,7 +56,15 @@ def progress_bar(iteration=1, lenght=1, suffix = "Complete"):
     percent = ("{0:.1f}").format(100 * (iteration / float(lenght)))
     filled_length = int(length * iteration // lenght)
     bar = fill * filled_length + '-' * (length - filled_length)
-    sys.stdout.write(f'\r{prefix} |{bar}| {iteration}/{lenght} | {percent}% {suffix}                    ')
+    line_lenght = shutil.get_terminal_size((80, 20)).columns
+    
+    progress_bar_text = f"\r{prefix} |{bar}| {iteration}/{lenght} | {percent}% {suffix}"
+    if len(progress_bar_text) > line_lenght:
+        progress_bar_text = progress_bar_text[:line_lenght]
+    else:
+        progress_bar_text += " " * (line_lenght - len(progress_bar_text))
+
+    sys.stdout.write(progress_bar_text)
     sys.stdout.flush()
 
     if iteration >= lenght:

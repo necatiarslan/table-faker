@@ -83,7 +83,7 @@ flake8:
 	python -m flake8 tablefaker
 
 pip-install-tablefaker:
-    pip install ~/GitHub/table-faker/dist/tablefaker-1.0.2-py3-none-any.whl --force-reinstall
+    pip install ~/GitHub/table-faker/dist/tablefaker-1.0.3-py3-none-any.whl --force-reinstall
 
 clean-files:
     find tests/exports -type f -name "*.*" -exec rm {} \;
