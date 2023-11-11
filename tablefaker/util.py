@@ -44,6 +44,8 @@ def get_file_extension(file_type):
         return ".parquet"
     elif file_type == "excel":
         return ".xlsx"
+    elif file_type == "sql":
+        return ".sql"
     else:
         return ".txt"
 

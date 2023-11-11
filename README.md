@@ -9,6 +9,7 @@ tablefaker is a versatile Python package that empowers you to effortlessly creat
 **Multiple Output Formats:** Generate fake data in various formats to suit your needs
 
 - Pandas Dataframe
+- Sql insert script
 - CSV File
 - Parquet File
 - JSON File
@@ -66,6 +67,9 @@ import tablefaker
 # exports to current folder in csv format
 tablefaker.to_csv("test_table.yaml")
 
+# exports to sql insert into scripts to insert to your database
+tablefaker.to_sql("test_table.yaml")
+
 # exports all tables in json format
 tablefaker.to_json("test_table.yaml", "./target_folder")
 
@@ -89,6 +93,9 @@ Faker custom providers and custom functions are not supported in CLI.
 # exports to current folder in csv format
 tablefaker --config test_table.yaml
 
+# exports as sql insert into script files
+tablefaker --config test_table.yaml --file_type sql
+
 # exports to current folder in excel format
 tablefaker --config test_table.yaml --file_type excel
 
@@ -107,6 +114,16 @@ id,first_name,last_name,age,dob,salary,height,weight
 3,Troy,Johnson,42,,170 cm,150
 4,Joshua,Hill,86,1985-07-11,,170 cm,150
 5,Matthew,Johnson,31,1940-03-31,,170 cm,150
+```
+
+### Sample Sql Output
+```sql
+INSERT INTO employee
+(id,person_id,hire_date,title,salary,height,weight,school,level)
+VALUES
+(1, 4, '2020-10-09', 'principal engineer', NULL, '170 cm', 150, 'ISLIP HIGH SCHOOL', 'level 2'),
+(2, 9, '2002-12-20', 'principal engineer', NULL, '170 cm', 150, 'GUY-PERKINS HIGH SCHOOL', 'level 1'),
+(3, 2, '1996-01-06', 'principal engineer', NULL, '170 cm', 150, 'SPRINGLAKE-EARTH ELEM/MIDDLE SCHOOL', 'level 3');
 ```
 
 ### Custom Functions
@@ -155,7 +172,6 @@ https://github.com/necatiarslan/table-faker/issues/new
 
 
 ### Nice To Have
-- Export To PostgreSQL
 - Inline schema definition
 - Json schema file
 - Pyarrow table

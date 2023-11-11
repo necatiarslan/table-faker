@@ -4,9 +4,10 @@ import pandas as pd
 from faker import Faker
 import random
 from os import path
+from datetime import date, datetime
 
 def to_target(file_type, config_file_path, target_file_path, table_name=None, **kwargs) -> {} :
-    if file_type not in ["csv", "json", "excel", "parquet"]:
+    if file_type not in ["csv", "json", "excel", "parquet", "sql"]:
         raise Exception(f"Wrong file_type = {file_type}")
     
     result = {}
@@ -42,6 +43,8 @@ def call_export_function(data_frame: pd.DataFrame, file_type, target_file_path):
         data_frame.to_excel(target_file_path, index=False)
     elif file_type == "parquet":
         data_frame.to_parquet(target_file_path, index=False)
+    elif file_type == "sql":
+        to_sql_internal(data_frame, target_file_path)
     else:
         raise Exception(f"Wrong file_type = {file_type}")
 
@@ -65,6 +68,39 @@ def to_parquet(config_file_path, target_file_path=None, table_name=None, **kwarg
         target_file_path = "."
     return to_target("parquet", config_file_path, target_file_path, table_name, **kwargs)
 
+def to_sql(config_file_path, target_file_path=None, table_name=None, **kwargs) -> {} :
+    if target_file_path is None:
+        target_file_path = "."
+    return to_target("sql", config_file_path, target_file_path, table_name, **kwargs)
+
+def to_sql_internal(data_frame: pd.DataFrame, target_file_path):
+
+    table_name = data_frame.Name
+    # Generate insert script file
+    column_names = ','.join(data_frame.columns)
+    insert_script = f"INSERT INTO {table_name}\n({column_names})\nVALUES\n"
+
+    # Iterate over DataFrame rows and create insert statements
+    for _, row in data_frame.iterrows():
+        value_list = []
+        for value in row:
+            if isinstance(value, (str, date, datetime)):
+                value_list.append(f"'{value}'")
+            elif value == None:
+                value_list.append("NULL")
+            else:
+                value_list.append(str(value))
+
+        values = ', '.join(value_list)
+        insert_script += f"({values}),\n"
+
+    # Remove the trailing comma and newline
+    insert_script = insert_script.rstrip(',\n')
+
+    # Write the insert script to the target file
+    with open(target_file_path, 'w') as file:
+        file.write(insert_script + ';')
+
 def to_pandas(config_file_path:str, **kwargs) -> pd.DataFrame:
     configurator = config.Config(config_file_path)
     tables = configurator.config["tables"]
@@ -73,6 +109,7 @@ def to_pandas(config_file_path:str, **kwargs) -> pd.DataFrame:
     result = {}
     for table in tables:
         df = generate_table(table, configurator, **kwargs)
+        df.Name = table['table_name']
         result[table['table_name']] = df
     
     util.log(f"{len(result)} pandas dataframe(s) created")

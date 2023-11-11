@@ -3,7 +3,7 @@ config:
   locale: en_US
 tables:
   - table_name: person
-    row_count: 10000
+    row_count: 10
     columns:
       - column_name: id
         data: row_id
@@ -29,7 +29,7 @@ tables:
       - column_name: left_handed
         data: fake.pybool()
   - table_name: employee
-    row_count: 10000
+    row_count: 10
     columns:
       - column_name: id
         data: row_id
