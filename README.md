@@ -172,6 +172,7 @@ https://github.com/necatiarslan/table-faker/issues/new
 
 
 ### Nice To Have
+- AI
 - Inline schema definition
 - Json schema file
 - Pyarrow table
