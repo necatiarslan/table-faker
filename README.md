@@ -86,6 +86,11 @@ from faker_education import SchoolProvider
 
 tablefaker.to_csv("test_table.yaml", "./target_folder", fake_provider=SchoolProvider)
 # multiple custom provider in list also works
+
+# get as pandas dataframes
+df_dict = tablefaker.to_pandas("test_table.yaml")
+person_df = df_dict["person"]
+print(person_df.head(5))
 ```
 
 ### Sample CLI Command
