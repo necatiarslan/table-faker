@@ -46,8 +46,8 @@ tables:
       - column_name: weight
         data: 150 #number
       - column_name: school
-        data: fake.school_name()
+        data: fake.school_name() # custom provider
       - column_name: level
-        data: get_level()
+        data: get_level() # custom function
          
 

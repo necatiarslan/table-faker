@@ -177,7 +177,6 @@ https://github.com/necatiarslan/table-faker/issues/new
 - Foreign key
 - Parquet Column Types
 
-
 ### Nice To Have
 - AI
 - Inline schema definition

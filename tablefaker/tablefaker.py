@@ -181,7 +181,15 @@ def generate_fake_data(fake: Faker, command, row_count, column_config, **kwargs)
                 func = kwargs["custom_function"]
                 variables[func.__name__] = func
 
-        exec(f"result = {command}", variables)
+        try:
+            exec(f"result = {command}", variables)
+        except AttributeError as error:
+            raise RuntimeError(f"Custom Faker Provider can not be found. {command} \n {error}")
+        except NameError as error:
+            raise RuntimeError(f"Custom function can not be found. {command} \n {error}")
+        except Exception as error:
+            raise error
+        
         result = variables["result"]
         fake_data.append(result)
 
