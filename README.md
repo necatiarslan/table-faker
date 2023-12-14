@@ -57,8 +57,6 @@ tables:
         data: fake.random_int(1, 10)
       - column_name: hire_date
         data: fake.date_between()
-      - column_name: school
-        data: fake.school_name()  # custom provider
 ```
 [full yml example](tests/test_table.yaml)
 
@@ -80,12 +78,6 @@ tablefaker.to_parquet("test_table.yaml", "./target_folder")
 
 # exports only the first table in excel format
 tablefaker.to_excel("test_table.yaml", "./target_folder/target_file.xlsx")
-
-# you can use customer faker provider
-from faker_education import SchoolProvider
-
-tablefaker.to_csv("test_table.yaml", "./target_folder", fake_provider=SchoolProvider)
-# multiple custom provider in list also works
 
 # get as pandas dataframes
 df_dict = tablefaker.to_pandas("test_table.yaml")
@@ -132,9 +124,45 @@ VALUES
 (2, 9, '2002-12-20', 'principal engineer', NULL, '170 cm', 150, 'GUY-PERKINS HIGH SCHOOL', 'level 1'),
 (3, 2, '1996-01-06', 'principal engineer', NULL, '170 cm', 150, 'SPRINGLAKE-EARTH ELEM/MIDDLE SCHOOL', 'level 3');
 ```
+### Custom Faker Providers
+You can add and use custom / community faker providers with table faker.\
+Here is a list of these community providers.\
+https://faker.readthedocs.io/en/master/communityproviders.html#
+
+```
+version: 1
+config:
+  locale: en_US
+tables:
+  - table_name: employee
+    row_count: 5
+    columns:
+      - column_name: id
+        data: row_id
+      - column_name: person_id
+        data: fake.random_int(1, 10)
+      - column_name: hire_date
+        data: fake.date_between()
+      - column_name: school
+        data: fake.school_name()  # custom provider
+```
+
+```python
+import tablefaker
+
+# import the custom faker provider
+from faker_education import SchoolProvider
+
+# provide the faker provider class to the tablefaker using fake_provider
+# you can add a single provider or a list of providers
+tablefaker.to_csv("test_table.yaml", "./target_folder", fake_provider=SchoolProvider)
+# this works with all other to_ methods as well.
+```
 
 ### Custom Functions
-With Table Faker, you have the flexibility to provide your own custom functions to generate column data. This advanced feature empowers developers to create custom fake data generation logic that can pull data from a database, API, file, or any other source as needed. You can also supply multiple functions in a list, allowing for even more versatility. The custom function you provide should return a single value, giving you full control over your synthetic data generation.
+With Table Faker, you have the flexibility to provide your own custom functions to generate column data. This advanced feature empowers developers to create custom fake data generation logic that can pull data from a database, API, file, or any other source as needed.\
+You can also supply multiple functions in a list, allowing for even more versatility. \
+The custom function you provide should return a single value, giving you full control over your synthetic data generation.
 
 ```python
 from tablefaker import tablefaker
