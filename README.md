@@ -204,6 +204,11 @@ https://github.com/necatiarslan/table-faker/issues/new
 ### TODO
 - Foreign key
 - Parquet Column Types
+- Modern File Formats
+  - Delta Lake
+  - Apache Avro
+  - Apache Orc
+  - Apache Arrow
 
 ### Nice To Have
 - AI
