@@ -27,7 +27,6 @@ def to_target(file_type, config_file_path, target_file_path, table_name=None, **
         if table_name is None:
             table_name = list(df_dict.keys())[0]
         df = df_dict[table_name]
-        df.to_csv(target_file_path)
         call_export_function(df, file_type, target_file_path)
         util.log(f"data is exported to {target_file_path} as {file_type}")
         result[table_name] = target_file_path
