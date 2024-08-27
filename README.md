@@ -204,6 +204,7 @@ https://github.com/necatiarslan/table-faker/issues/new
 
 
 ### TODO
+- Variables
 - Foreign key
 - Parquet Column Types
 - Modern File Formats
