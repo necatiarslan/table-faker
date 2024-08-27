@@ -6,7 +6,7 @@ import random
 from os import path
 from datetime import date, datetime
 
-def to_target(file_type, config_file_path, target_file_path, table_name=None, **kwargs) -> {} :
+def to_target(file_type, config_file_path, target_file_path, table_name=None, **kwargs) :
     if file_type not in ["csv", "json", "excel", "parquet", "sql"]:
         raise Exception(f"Wrong file_type = {file_type}")
     
@@ -48,27 +48,27 @@ def call_export_function(data_frame: pd.DataFrame, file_type, target_file_path):
     else:
         raise Exception(f"Wrong file_type = {file_type}")
 
-def to_csv(config_file_path, target_file_path=None, table_name=None, **kwargs) -> {} :
+def to_csv(config_file_path, target_file_path=None, table_name=None, **kwargs) :
     if target_file_path is None:
         target_file_path = "."
     return to_target("csv", config_file_path, target_file_path, table_name, **kwargs)
 
-def to_json(config_file_path, target_file_path=None, table_name=None, **kwargs) -> {} :
+def to_json(config_file_path, target_file_path=None, table_name=None, **kwargs) :
     if target_file_path is None:
         target_file_path = "."
     return to_target("json", config_file_path, target_file_path, table_name, **kwargs)
 
-def to_excel(config_file_path, target_file_path=None, table_name=None, **kwargs) -> {} :
+def to_excel(config_file_path, target_file_path=None, table_name=None, **kwargs) :
     if target_file_path is None:
         target_file_path = "."
     return to_target("excel", config_file_path, target_file_path, table_name, **kwargs)
 
-def to_parquet(config_file_path, target_file_path=None, table_name=None, **kwargs) -> {} :
+def to_parquet(config_file_path, target_file_path=None, table_name=None, **kwargs) :
     if target_file_path is None:
         target_file_path = "."
     return to_target("parquet", config_file_path, target_file_path, table_name, **kwargs)
 
-def to_sql(config_file_path, target_file_path=None, table_name=None, **kwargs) -> {} :
+def to_sql(config_file_path, target_file_path=None, table_name=None, **kwargs) :
     if target_file_path is None:
         target_file_path = "."
     return to_target("sql", config_file_path, target_file_path, table_name, **kwargs)
@@ -147,7 +147,7 @@ def generate_table(table, configurator, **kwargs) -> pd.DataFrame:
     util.log(f"{table_name} pandas dataframe created")
     return df
 
-def generate_fake_data(configurator, fake: Faker, command, row_count, column_config, **kwargs) -> []:
+def generate_fake_data(configurator, fake: Faker, command, row_count, column_config, **kwargs) :
     result = None
     
     python_import = configurator.get_python_import()
