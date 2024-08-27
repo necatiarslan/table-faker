@@ -51,3 +51,9 @@ class Config:
                     raise Exception(f"{table_name} table {column_name} column do not have a data attribute")
         
         util.log(f"config file is validated")
+
+    def get_python_import(self):
+        if "config" in self.config and "python_import" in self.config["config"]:
+            return self.config["config"]["python_import"]
+
+        return []

@@ -27,6 +27,8 @@ pip install tablefaker
 version: 1
 config:
   locale: en_US
+  python_import:
+    - datetime
 tables:
   - table_name: person
     row_count: 10
@@ -45,9 +47,11 @@ tables:
       - column_name: salary
         data: None                # NULL
       - column_name: height
-        data: "\"170 cm\""        # string
+        data: r"170 cm"        # string
       - column_name: weight
         data: 150                 # number
+      - column_name: today
+        data: datetime.datetime.today().strftime('%Y-%m-%d')  # python package
   - table_name: employee
     row_count: 5
     columns:

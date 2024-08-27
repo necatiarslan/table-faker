@@ -139,7 +139,7 @@ def generate_table(table, configurator, **kwargs) -> pd.DataFrame:
         column_name = column['column_name']
         data_command = column['data']
         util.progress_bar(iteration, len(columns), f"Generating {table_name}/{column_name}")
-        fake_data = generate_fake_data(faker, data_command, row_count, column, **kwargs)
+        fake_data = generate_fake_data(configurator, faker, data_command, row_count, column, **kwargs)
         table_data[column_name] = fake_data
         iteration += 1
 
@@ -147,9 +147,11 @@ def generate_table(table, configurator, **kwargs) -> pd.DataFrame:
     util.log(f"{table_name} pandas dataframe created")
     return df
 
-def generate_fake_data(fake: Faker, command, row_count, column_config, **kwargs) -> []:
+def generate_fake_data(configurator, fake: Faker, command, row_count, column_config, **kwargs) -> []:
     result = None
     
+    python_import = configurator.get_python_import()
+
     null_percentge = 0
     null_indexies = []
     if "null_percentage" in column_config:
@@ -180,6 +182,10 @@ def generate_fake_data(fake: Faker, command, row_count, column_config, **kwargs)
             else:
                 func = kwargs["custom_function"]
                 variables[func.__name__] = func
+
+        if python_import and isinstance(python_import, list):
+            for library_name in python_import:
+                variables[library_name] = __import__(library_name)
 
         try:
             exec(f"result = {command}", variables)
