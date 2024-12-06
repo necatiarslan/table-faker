@@ -143,6 +143,12 @@ def generate_table(table, configurator, **kwargs) -> pd.DataFrame:
         iteration += 1
 
     df = pd.DataFrame(table_data)
+    df.convert_dtypes() # auto set best fitting type
+    for column in columns:
+        column_name = column['column_name']
+        if "type" in column:
+            df[column_name] = df[column_name].astype(column['type'])
+
     util.log(f"{table_name} pandas dataframe created")
     return df
 
