@@ -206,6 +206,8 @@ https://github.com/necatiarslan/table-faker/issues/new
 ### TODO
 - Add Target File name to the yaml file
 - Specify Generated Data Type in yaml
+  - df[column] = df[column].astype("string")
+- write error messages with red color
 - Variables
 - Foreign key
 - Parquet Column Types
