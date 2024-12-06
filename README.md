@@ -205,6 +205,7 @@ https://github.com/necatiarslan/table-faker/issues/new
 
 ### TODO
 - Add Target File name to the yaml file
+- Specify Generated Data Type in yaml
 - Variables
 - Foreign key
 - Parquet Column Types
