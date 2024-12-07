@@ -10,7 +10,7 @@ run:
     ~/.pyenv/versions/3.11.6/envs/table-faker/bin/python ~/GitHub/table-faker/tests/test_tablefaker.py
 
 pip-install:
-    pipenv lock
+    pipenv lock --dev
     pipenv sync
     pipenv requirements > requirements.txt
     pipenv clean
@@ -47,7 +47,7 @@ pyenv-uninstall *args='':
 
 #provide python version
 pyenv-virtualenv-create *args='':
-    pyenv virtualenv $@ $(basename $(pwd))
+    pyenv virtualenv 3.13.0 $(basename $(pwd))
 
 pyenv-virtualenv-list:
     pyenv virtualenvs
@@ -73,9 +73,11 @@ test:
     pipenv run pytest --junit-xml=junit_xml_test_report.xml --cov-branch --cov=tablefaker tests
     pipenv run coverage xml -i
 
+build:
+    python setup.py sdist bdist_wheel
+    
 publish:
-	python setup.py sdist bdist_wheel
-	twine upload dist/*
+	twine upload dist/tablefaker-1.1.0*
 
 # After you run the command, it will ask username and password
 # Set your username to __token__

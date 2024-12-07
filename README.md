@@ -35,10 +35,13 @@ tables:
         data: row_id
       - column_name: first_name
         data: fake.first_name()
+        type: string
       - column_name: last_name
         data: fake.last_name()
+        type: string
       - column_name: age
         data: fake.random_int(18, 90)
+        type: int32
       - column_name: dob
         data: fake.date_of_birth()
         null_percentage: 0.20
@@ -62,6 +65,25 @@ tables:
 ```
 [full yml example](tests/test_table.yaml)
 
+### Data Generation
+You can define your dummy data generation logic in a Python function. The Faker and random packages are pre-imported and ready to use.
+
+- Use the Faker package for realistic data, e.g., `fake.first_name()` or `fake.random_int(1, 10)`.
+- Use the random package for basic randomness, e.g., `random.choice(["male", "female"])`.
+
+You can write your logic in a single line or multiple lines, depending on your preference. A built-in function, row_id, provides a unique integer for each row.
+
+Columns will automatically have the best-fitting data type. However, if you'd like to specify a data type, use the `type` keyword. You can assign data types using NumPy dtypes, Pandas ExtensionDtypes, or Python native types.
+
+Here are some examples:
+```
+fake.first_name()
+fake.random_int(1, 10)
+random.choice(["male", "female"])
+911 # number
+r"170 cm" # string
+
+```
 ### Sample Code
 ```python
 import tablefaker
@@ -205,25 +227,12 @@ https://github.com/necatiarslan/table-faker/issues/new
 
 ### TODO
 - Add Target File name to the yaml file
-- Specify Generated Data Type in yaml
-  - df[column] = df[column].astype("string")
-- write error messages with red color
 - Variables
 - Foreign key
-- Parquet Column Types
-- Modern File Formats
-  - Delta Lake
-  - Apache Avro
-  - Apache Orc
-  - Apache Arrow
 
 ### Nice To Have
-- AI
-- Inline schema definition
-- Json schema file
 - Pyarrow table
 - Use Logging package
-- Exception Management
 
 Follow me on linkedin to get latest news \
 https://www.linkedin.com/in/necati-arslan/

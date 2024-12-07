@@ -21,8 +21,8 @@ directory_path = 'tests/exports'
 df_dict = tablefaker.to_pandas("tests/test_table.yaml", fake_provider=SchoolProvider, custom_function=get_level)
 
 person_df = df_dict["person"]
-print(person_df.dtypes)
-#print(person_df.head(5))
+#print(person_df.dtypes)
+print(person_df.head(5))
 
 # employee_df = df_dict["employee"]
 # print(employee_df.head(5))
