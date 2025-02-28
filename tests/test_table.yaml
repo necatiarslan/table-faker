@@ -2,20 +2,22 @@ version: 1
 config:
   locale: en_US
   python_import:
-    - datetime
+    - dateutil
 tables:
   - table_name: person
     row_count: 10
-    start_row_id: 101
+    start_row_id: 101                               # you can set row_id starting point
     columns:
       - column_name: id
-        data: row_id
+        data: row_id                                # row_id is a built-in function
       - column_name: first_name
-        data: fake.first_name()
+        data: fake.first_name()                     # faker function
         type: string
       - column_name: last_name
         data: fake.last_name()
         type: string
+      - column_name: full_name
+        data: first_name + " " + last_name           # use a column to generate a new column
       - column_name: age
         data: fake.random_int(18, 90)
         type: int32
@@ -28,12 +30,14 @@ tables:
       - column_name: postcode
         data: fake.postcode()
       - column_name: gender
-        data: random.choice(["male", "female"])
-        null_percentage: 0.5
+        data: random.choice(["male", "female"])     # random.choice is a built-in function
+        null_percentage: 0.5                        # null_percentage is a built-in function
       - column_name: left_handed
         data: fake.pybool()
       - column_name: today
-        data: datetime.datetime.today().strftime('%Y-%m-%d')
+        data: datetime.today().strftime('%Y-%m-%d') # datetime package is available by default
+      - column_name: easter_date
+        data: dateutil.easter.easter(2025).strftime('%Y-%m-%d') # python package you need to import in python_import
   - table_name: employee
     row_count: 10
     columns:

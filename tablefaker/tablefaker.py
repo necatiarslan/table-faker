@@ -130,7 +130,7 @@ def generate_table_by_row(table, configurator, **kwargs) -> pd.DataFrame:
 
     variables = {
         "random": random,
-        "datetieme": datetime,
+        "datetime": datetime,
         "fake": fake,
         "result": [],
         }
@@ -145,7 +145,8 @@ def generate_table_by_row(table, configurator, **kwargs) -> pd.DataFrame:
 
     if python_import and isinstance(python_import, list):
         for library_name in python_import:
-            variables[library_name] = __import__(library_name)
+            if library_name not in variables:
+                variables[library_name] = __import__(library_name)
 
     table_name = table['table_name']
     row_count = table['row_count'] if "row_count" in table else 10
@@ -182,6 +183,7 @@ def generate_fake_row(columns:dict, variables:dict) :
         command = column["data"]
         column_name = column["column_name"]
         variables["command"] = command
+        
         try:
             exec(f"result = {command}", variables)
         except AttributeError as error:
@@ -191,6 +193,7 @@ def generate_fake_row(columns:dict, variables:dict) :
         except Exception as error:
             raise error
         
+        variables[column_name] = variables["result"]
         result[column_name] = variables["result"]
 
     return result
