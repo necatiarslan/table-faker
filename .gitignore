@@ -131,3 +131,6 @@ dmypy.json
 junit_xml_test_report.xml
 /tests/exports
 .idea
+
+.DS_Store
+tests/.DS_Store

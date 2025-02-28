@@ -18,8 +18,6 @@ tables:
       - column_name: age
         data: fake.random_int(18, 90)
         type: int32
-      - column_name: dob
-        data: fake.date_of_birth()
       - column_name: street_address
         data: fake.street_address()
       - column_name: city
@@ -44,6 +42,7 @@ tables:
         data: fake.random_int(1, 10)
       - column_name: hire_date
         data: fake.date_between()
+        type: string
       - column_name: title
         data: random.choice(["engineer", "senior engineer", "principal engineer", "director", "senior director", "manager", "vice president", "president"])
       - column_name: salary
