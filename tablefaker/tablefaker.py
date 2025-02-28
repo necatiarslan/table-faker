@@ -107,42 +107,60 @@ def to_pandas(config_file_path:str, **kwargs) -> pd.DataFrame:
 
     result = {}
     for table in tables:
-        df = generate_table(table, configurator, **kwargs)
+        df = generate_table_by_row(table, configurator, **kwargs)
         df.Name = table['table_name']
         result[table['table_name']] = df
     
     util.log(f"{len(result)} pandas dataframe(s) created")
     return result
 
-def generate_table(table, configurator, **kwargs) -> pd.DataFrame:
+def generate_table_by_row(table, configurator, **kwargs) -> pd.DataFrame:
     locale = None
     if "config" in configurator.config and "locale" in configurator.config["config"]:
         locale = configurator.config["config"]["locale"]
 
-    faker = Faker(locale)
-
+    fake = Faker(locale)
+    python_import = configurator.get_python_import()
     if "fake_provider" in kwargs:
         if not isinstance(kwargs["fake_provider"], list):
-            faker.add_provider(kwargs["fake_provider"])
+            fake.add_provider(kwargs["fake_provider"])
         else:
             for provider in kwargs["fake_provider"]:
-                faker.add_provider(provider)
+                fake.add_provider(provider)
+
+    variables = {
+        "random": random,
+        "datetieme": datetime,
+        "fake": fake,
+        "result": [],
+        }
+
+    if "custom_function" in kwargs:
+        if isinstance(kwargs["custom_function"], list):
+            for func in kwargs["custom_function"]:
+                variables[func.__name__] = func
+        else:
+            func = kwargs["custom_function"]
+            variables[func.__name__] = func
+
+    if python_import and isinstance(python_import, list):
+        for library_name in python_import:
+            variables[library_name] = __import__(library_name)
 
     table_name = table['table_name']
-    row_count = table['row_count']
+    row_count = table['row_count'] if "row_count" in table else 10
+    start_row_id = table['start_row_id'] if "start_row_id" in table else 1
     columns = table['columns']
 
-    table_data = {}
-    iteration = 1
-    for column in columns:
-        column_name = column['column_name']
-        data_command = column['data']
-        util.progress_bar(iteration, len(columns), f"Generating {table_name}/{column_name}")
-        fake_data = generate_fake_data(configurator, faker, data_command, row_count, column, **kwargs)
-        table_data[column_name] = fake_data
-        iteration += 1
+    rows = []
+    for row_id in range(start_row_id, start_row_id+row_count):
+        util.progress_bar(row_id-start_row_id+1, row_count, f"Table:{table_name}")
+        variables["row_id"] = row_id
+        new_row = generate_fake_row(columns, variables)
+        rows.append(new_row)
+        row_id += 1
 
-    df = pd.DataFrame(table_data)
+    df = pd.DataFrame(rows)
     df.convert_dtypes() # auto set best fitting type
     for column in columns:
         column_name = column['column_name']
@@ -152,46 +170,12 @@ def generate_table(table, configurator, **kwargs) -> pd.DataFrame:
     util.log(f"{table_name} pandas dataframe created")
     return df
 
-def generate_fake_data(configurator, fake: Faker, command, row_count, column_config, **kwargs) :
-    result = None
-    
-    python_import = configurator.get_python_import()
-
-    null_percentge = 0
-    null_indexies = []
-    if "null_percentage" in column_config:
-        null_percentge = util.parse_null_percentge(column_config["null_percentage"])
-        for _ in range(1, int(row_count * null_percentge)+1):
-            random_num = random.randint(1, row_count)
-            null_indexies.append(random_num)
-
-
-    fake_data = []
-    for row_id in range(1, row_count+1):
-        if row_id in null_indexies:
-            fake_data.append(None) #add null data
-            continue
-
-        variables = {
-            "random": random,
-            "fake": fake,
-            "result": result,
-            "command": command,
-            "row_id": row_id
-            }
-        
-        if "custom_function" in kwargs:
-            if isinstance(kwargs["custom_function"], list):
-                for func in kwargs["custom_function"]:
-                    variables[func.__name__] = func
-            else:
-                func = kwargs["custom_function"]
-                variables[func.__name__] = func
-
-        if python_import and isinstance(python_import, list):
-            for library_name in python_import:
-                variables[library_name] = __import__(library_name)
-
+def generate_fake_row(columns:dict, variables:dict) :
+    result = {}
+    for column in columns:
+        command = column["data"]
+        column_name = column["column_name"]
+        variables["command"] = command
         try:
             exec(f"result = {command}", variables)
         except AttributeError as error:
@@ -201,7 +185,7 @@ def generate_fake_data(configurator, fake: Faker, command, row_count, column_con
         except Exception as error:
             raise error
         
-        result = variables["result"]
-        fake_data.append(result)
+        result[column_name] = variables["result"]
 
-    return fake_data
+    return result
+

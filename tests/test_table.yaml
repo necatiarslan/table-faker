@@ -6,6 +6,7 @@ config:
 tables:
   - table_name: person
     row_count: 10
+    start_row_id: 101
     columns:
       - column_name: id
         data: row_id
