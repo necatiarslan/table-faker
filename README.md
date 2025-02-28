@@ -252,6 +252,7 @@ If you find Table Faker useful and would like to support its development, consid
 - Add target file name to YAML
 - Variables
 - Primary Key / Foreign Key Support
+- Export to multiple files
 
 ### Future Enhancements
 - PyArrow table support
