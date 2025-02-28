@@ -165,7 +165,13 @@ def generate_table_by_row(table, configurator, **kwargs) -> pd.DataFrame:
     for column in columns:
         column_name = column['column_name']
         if "type" in column:
+            print(f"Converting Column {column_name} to {column['type']}")
             df[column_name] = df[column_name].astype(column['type'])
+        if "null_percentage" in column:
+            null_percentge = util.parse_null_percentge(column["null_percentage"])
+            for _ in range(1, int(row_count * null_percentge)+1):
+                random_num = random.randint(1, row_count)
+                df.at[random_num-1, column_name] = None
 
     util.log(f"{table_name} pandas dataframe created")
     return df

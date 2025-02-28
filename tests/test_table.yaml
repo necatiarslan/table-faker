@@ -29,7 +29,7 @@ tables:
         data: fake.postcode()
       - column_name: gender
         data: random.choice(["male", "female"])
-        null_percentage: 0.3
+        null_percentage: 0.5
       - column_name: left_handed
         data: fake.pybool()
       - column_name: today
