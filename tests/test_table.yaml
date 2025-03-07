@@ -5,7 +5,7 @@ config:
     - dateutil
 tables:
   - table_name: person
-    row_count: 10000
+    row_count: 100000
     start_row_id: 101                               # you can set row_id starting point
     columns:
       - column_name: id

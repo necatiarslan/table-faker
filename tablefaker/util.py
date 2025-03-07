@@ -103,20 +103,21 @@ def get_file_extension(file_type):
 
 def progress_bar(iteration=1, lenght=1, suffix = "Complete", bar_color=FOREGROUND_COLOR.BRIGHT_GREEN, row_count_color=FOREGROUND_COLOR.BLUE, percent_color=FOREGROUND_COLOR.CYAN, suffix_color=FOREGROUND_COLOR.YELLOW):
     prefix = "Progress:"
-    length=50
-    fill="█"
+    fill_length=20
+    #fill="█"
+    fill="━━"
     print_end="\n"
 
     percent = ("{0:.1f}").format(100 * (iteration / float(lenght)))
     percent = percent_color + str(percent) + "%" + FOREGROUND_COLOR.RESET
 
-    filled_length = int(length * iteration // lenght)
-    bar = bar_color + fill * filled_length + '-' * (length - filled_length) + FOREGROUND_COLOR.RESET
+    filled_length = int(fill_length * iteration // lenght)
+    bar = bar_color + fill * filled_length + FOREGROUND_COLOR.MAGENTA + fill * (fill_length - filled_length) + FOREGROUND_COLOR.RESET
     
     row_count = row_count_color + f"{iteration}/{lenght}" + FOREGROUND_COLOR.RESET
     suffix = suffix_color + suffix + FOREGROUND_COLOR.RESET
 
-    progress_bar_text = f"\r{prefix} |{bar}| {row_count} | {percent} {suffix}"
+    progress_bar_text = f"\r{prefix} {bar} {row_count} • {percent} • {suffix}"
     line_lenght = shutil.get_terminal_size((80, 20)).columns
     if get_length_without_color_codes(progress_bar_text) > line_lenght:
         progress_bar_text = progress_bar_text[:line_lenght]

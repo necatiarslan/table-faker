@@ -76,8 +76,8 @@ test:
 build:
     python setup.py sdist bdist_wheel
     
-publish:
-	twine upload dist/tablefaker-1.3.0*
+publish version:
+	twine upload dist/tablefaker-{{version}}*
 
 # After you run the command, it will ask username and password
 # Set your username to __token__
