@@ -52,6 +52,7 @@ tables:
         data: random.choice(["engineer", "senior engineer", "principal engineer", "director", "senior director", "manager", "vice president", "president"])
       - column_name: salary
         data: None #NULL
+        type: float
       - column_name: height
         data: r"170 cm" #string
       - column_name: weight

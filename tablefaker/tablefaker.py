@@ -5,21 +5,29 @@ from faker import Faker
 import random
 from os import path
 from datetime import date, datetime
+import importlib.util
 
 def to_target(file_type, config_file_path, target_file_path, table_name=None, **kwargs) :
-    if file_type not in ["csv", "json", "excel", "parquet", "sql"]:
+    if file_type not in ["csv", "json", "excel", "parquet", "deltalake", "sql"]:
         raise Exception(f"Wrong file_type = {file_type}")
     
     result = {}
-    df_dict = to_pandas(config_file_path, **kwargs)
+    df_dict = to_pandas(config_file_path, table_name, **kwargs)
     
-    if path.isdir(target_file_path):
+    if path.isdir(target_file_path) or file_type == "deltalake":
         for key_table_name in df_dict.keys():
             if table_name != None and key_table_name != table_name:
                 continue #skip other tables
 
             df = df_dict[key_table_name]
-            temp_file_path = path.join(target_file_path, util.get_temp_filename(key_table_name) + util.get_file_extension(file_type))
+
+            if file_type == "deltalake" and key_table_name == table_name and not path.exists(target_file_path) and path.exists(path.dirname(path.normpath(target_file_path)) + "/"):
+                # in delta lake format, if the latest folder does not exists, assume it is requested delta lake folder
+                temp_file_path = target_file_path.rstrip('/')
+            else:
+                file_name = util.get_temp_filename(key_table_name) + util.get_file_extension(file_type)
+                temp_file_path = path.join(target_file_path, file_name)
+
             call_export_function(df, file_type, temp_file_path)
             util.log(f"data is exported to {temp_file_path} as {file_type}")
             result[key_table_name] = temp_file_path 
@@ -44,6 +52,8 @@ def call_export_function(data_frame: pd.DataFrame, file_type, target_file_path):
         data_frame.to_parquet(target_file_path, index=False)
     elif file_type == "sql":
         to_sql_internal(data_frame, target_file_path)
+    elif file_type == "deltalake":
+        to_deltalake_internal(data_frame, target_file_path)
     else:
         raise Exception(f"Wrong file_type = {file_type}")
 
@@ -67,11 +77,23 @@ def to_parquet(config_file_path, target_file_path=None, table_name=None, **kwarg
         target_file_path = "."
     return to_target("parquet", config_file_path, target_file_path, table_name, **kwargs)
 
+def to_deltalake(config_file_path, target_file_path=None, table_name=None, **kwargs) :
+    if target_file_path is None:
+        target_file_path = "."
+    return to_target("deltalake", config_file_path, target_file_path, table_name, **kwargs)
+
+
 def to_sql(config_file_path, target_file_path=None, table_name=None, **kwargs) :
     if target_file_path is None:
         target_file_path = "."
     return to_target("sql", config_file_path, target_file_path, table_name, **kwargs)
 
+def to_deltalake_internal(data_frame: pd.DataFrame, target_file_path):
+    if importlib.util.find_spec("deltalake"):
+        deltalake = __import__("deltalake")
+        deltalake.writer.write_deltalake(target_file_path, data_frame, mode="overwrite")
+    else:
+        raise Exception("deltalake package is not installed. install it with pip install deltalake")
 def to_sql_internal(data_frame: pd.DataFrame, target_file_path):
 
     table_name = data_frame.Name
@@ -100,13 +122,16 @@ def to_sql_internal(data_frame: pd.DataFrame, target_file_path):
     with open(target_file_path, 'w') as file:
         file.write(insert_script + ';')
 
-def to_pandas(config_file_path:str, **kwargs) -> pd.DataFrame:
+def to_pandas(config_file_path:str, table_name=None, **kwargs) -> pd.DataFrame:
     configurator = config.Config(config_file_path)
     tables = configurator.config["tables"]
     util.log(f"table count={len(tables)}")
 
     result = {}
     for table in tables:
+        if table_name != None and table['table_name'] != table_name:
+                continue #skip other tables
+        
         df = generate_table_by_row(table, configurator, **kwargs)
         df.Name = table['table_name']
         result[table['table_name']] = df

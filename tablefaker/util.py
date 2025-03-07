@@ -46,6 +46,8 @@ def get_file_extension(file_type):
         return ".xlsx"
     elif file_type == "sql":
         return ".sql"
+    elif file_type == "deltalake":
+        return ""
     else:
         return ".txt"
 

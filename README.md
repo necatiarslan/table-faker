@@ -11,6 +11,7 @@
   - Parquet
   - JSON
   - Excel
+  - Delta Lake
 
 ## Installation
 ```bash
@@ -251,11 +252,14 @@ If you find Table Faker useful and would like to support its development, consid
 ### TODO
 - Add target file name to YAML
 - Variables
-- Primary Key / Foreign Key Support
 - Export to multiple files
+- DeltaLake Format Support
+- Generate template yaml file from sample data
+- use an ai service to generate data generation logic
 
 ### Future Enhancements
 - PyArrow table support
+- Primary Key / Foreign Key Support
 
 ---
 **Follow for Updates**: [LinkedIn](https://www.linkedin.com/in/necati-arslan/)  
