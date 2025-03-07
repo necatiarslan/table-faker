@@ -29,14 +29,14 @@ def to_target(file_type, config_file_path, target_file_path, table_name=None, **
                 temp_file_path = path.join(target_file_path, file_name)
 
             call_export_function(df, file_type, temp_file_path)
-            util.log(f"data is exported to {temp_file_path} as {file_type}")
+            util.log(f"data is exported to {temp_file_path}", util.FOREGROUND_COLOR.GREEN)
             result[key_table_name] = temp_file_path 
     else:
         if table_name is None:
             table_name = list(df_dict.keys())[0]
         df = df_dict[table_name]
         call_export_function(df, file_type, target_file_path)
-        util.log(f"data is exported to {target_file_path} as {file_type}")
+        util.log(f"data is exported to {target_file_path}", util.FOREGROUND_COLOR.GREEN)
         result[table_name] = target_file_path
     
     return result
@@ -199,7 +199,7 @@ def generate_table_by_row(table, configurator, **kwargs) -> pd.DataFrame:
                 random_num = random.randint(1, row_count)
                 df.at[random_num-1, column_name] = None
 
-    util.log(f"{table_name} pandas dataframe created")
+    util.log(f"{table_name} pandas dataframe created", util.FOREGROUND_COLOR.GREEN)
     return df
 
 def generate_fake_row(columns:dict, variables:dict) :

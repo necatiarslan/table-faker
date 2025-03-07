@@ -7,7 +7,7 @@ class Config:
         if not path.isabs(file_path):
             file_path = path.abspath(file_path)
 
-        util.log(f"received config is {file_path}")
+        util.log(f"received config is {file_path}", util.FOREGROUND_COLOR.GREEN)
         self.file_path = file_path
         self.load_config_file()
         self.validate_config()

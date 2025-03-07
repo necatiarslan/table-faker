@@ -5,8 +5,8 @@ with open("README.md") as file:
 
 setup(
     name='tablefaker',
-    version='1.2.0',
-    description='A Python package for generating fake table data. Get data in pandas dataframe or export to Sql, Csv, Json, Excel or Parquet',
+    version='1.3.0',
+    description='A Python package to generate fake tabular data. Get data in pandas dataframe or export to Parquet, DeltaLake, Csv, Json, Excel or Sql',
     long_description = description,
     long_description_content_type = "text/markdown",
     author='Necati Arslan',
@@ -31,6 +31,7 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
         'Topic :: Software Development :: Libraries',
     ],
     project_urls={

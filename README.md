@@ -1,4 +1,5 @@
 # Table Faker
+![screenshoot](media/terminal.png)
 **tablefaker** is a versatile Python package that enables effortless generation of realistic yet synthetic table data for various applications. Whether you need test data for software development, this tool simplifies the process with an intuitive schema definition in YAML format.
 
 ## Key Features
@@ -19,7 +20,7 @@ pip install tablefaker
 ```
 
 ## Example Yaml File
-```
+```yaml
 version: 1
 config:
   locale: en_US
@@ -74,6 +75,7 @@ tables:
         data: random.choice(["engineer", "senior engineer", "principal engineer", "director", "senior director", "manager", "vice president", "president"])
       - column_name: salary
         data: None #NULL
+        type: float
       - column_name: height
         data: r"170 cm" #string
       - column_name: weight
@@ -123,6 +125,12 @@ tablefaker.to_json("test_table.yaml", "./target_folder")
 # exports all tables in parquet format
 tablefaker.to_parquet("test_table.yaml", "./target_folder")
 
+# exports all tables in deltalake format
+tablefaker.to_deltalake("test_table.yaml", "./target_folder")
+
+# export single table to the provided folder
+tablefaker.to_deltalake("test_table.yaml", "./target_folder/person/", table_name="person")
+
 # exports only the first table in excel format
 tablefaker.to_excel("test_table.yaml", "./target_folder/target_file.xlsx")
 
@@ -150,6 +158,9 @@ tablefaker --config test_table.yaml --file_type json --target ./target_folder
 
 # exports only the first table
 tablefaker --config test_table.yaml --file_type parquet --target ./target_folder/target_file.parquet
+
+# exports to current folder in deltalake format
+tablefaker --config test_table.yaml --file_type deltalake
 ```
 
 ## Sample CSV Output
@@ -176,7 +187,7 @@ You can add and use custom / community faker providers with table faker.\
 Here is a list of these community providers.\
 https://faker.readthedocs.io/en/master/communityproviders.html#
 
-```
+```yaml
 version: 1
 config:
   locale: en_US
@@ -222,7 +233,7 @@ def get_level():
 tablefaker.to_csv("test_table.yaml", "./target_folder", custom_function=get_level)
 ```
 Add get_level function to your yaml file
-```
+```yaml
 version: 1
 config:
   locale: en_US
@@ -253,7 +264,6 @@ If you find Table Faker useful and would like to support its development, consid
 - Add target file name to YAML
 - Variables
 - Export to multiple files
-- DeltaLake Format Support
 - Generate template yaml file from sample data
 - use an ai service to generate data generation logic
 
