@@ -7,7 +7,7 @@ class Config:
         if not path.isabs(file_path):
             file_path = path.abspath(file_path)
 
-        util.log(f"received config is {file_path}", util.FOREGROUND_COLOR.GREEN)
+        util.log(f"received config {file_path}", util.FOREGROUND_COLOR.GREEN)
         self.file_path = file_path
         self.load_config_file()
         self.validate_config()
@@ -50,7 +50,7 @@ class Config:
                 if "data" not in column:
                     raise Exception(f"{table_name} table {column_name} column do not have a data attribute")
         
-        util.log(f"config file is validated")
+        #util.log(f"config file is validated")
 
     def get_python_import(self):
         if "config" in self.config and "python_import" in self.config["config"]:

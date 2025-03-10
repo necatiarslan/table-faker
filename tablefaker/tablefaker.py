@@ -12,32 +12,30 @@ def to_target(file_type, config_file_path, target_file_path, table_name=None, **
         raise Exception(f"Wrong file_type = {file_type}")
     
     result = {}
-    df_dict = to_pandas(config_file_path, table_name, **kwargs)
+    configurator = config.Config(config_file_path)
+    tables = configurator.config["tables"]
+    for table in tables:
+        if table_name != None and table["table_name"] != table_name:
+            continue #skip other tables
+
+        df = generate_table(table, configurator, **kwargs)
     
-    if path.isdir(target_file_path) or file_type == "deltalake":
-        for key_table_name in df_dict.keys():
-            if table_name != None and key_table_name != table_name:
-                continue #skip other tables
-
-            df = df_dict[key_table_name]
-
-            if file_type == "deltalake" and key_table_name == table_name and not path.exists(target_file_path) and path.exists(path.dirname(path.normpath(target_file_path)) + "/"):
+        if path.isdir(target_file_path) or file_type == "deltalake":
+            if file_type == "deltalake" and table["table_name"] == table_name and not path.exists(target_file_path) and path.exists(path.dirname(path.normpath(target_file_path)) + "/"):
                 # in delta lake format, if the latest folder does not exists, assume it is requested delta lake folder
                 temp_file_path = target_file_path.rstrip('/')
             else:
-                file_name = util.get_temp_filename(key_table_name) + util.get_file_extension(file_type)
+                file_name = util.get_temp_filename(table["table_name"]) + util.get_file_extension(file_type)
                 temp_file_path = path.join(target_file_path, file_name)
 
             call_export_function(df, file_type, temp_file_path)
             util.log(f"data is exported to {temp_file_path}", util.FOREGROUND_COLOR.GREEN)
-            result[key_table_name] = temp_file_path 
-    else:
-        if table_name is None:
-            table_name = list(df_dict.keys())[0]
-        df = df_dict[table_name]
-        call_export_function(df, file_type, target_file_path)
-        util.log(f"data is exported to {target_file_path}", util.FOREGROUND_COLOR.GREEN)
-        result[table_name] = target_file_path
+            result[table["table_name"]] = temp_file_path 
+        else:
+            call_export_function(df, file_type, target_file_path)
+            util.log(f"data is exported to {target_file_path}", util.FOREGROUND_COLOR.GREEN)
+            result[table_name] = target_file_path
+            break # if single table is requested
     
     return result
 
@@ -56,6 +54,18 @@ def call_export_function(data_frame: pd.DataFrame, file_type, target_file_path):
         to_deltalake_internal(data_frame, target_file_path)
     else:
         raise Exception(f"Wrong file_type = {file_type}")
+
+def to_pandas(config_file_path:str, table_name=None, **kwargs):
+    result = {}
+    configurator = config.Config(config_file_path)
+    tables = configurator.config["tables"]
+    for table in tables:
+        if table_name != None and table["table_name"] != table_name:
+            continue #skip other tables
+
+        df = generate_table(table, configurator, **kwargs)
+        result[table["table_name"]] = df
+    return result
 
 def to_csv(config_file_path, target_file_path=None, table_name=None, **kwargs) :
     if target_file_path is None:
@@ -122,24 +132,7 @@ def to_sql_internal(data_frame: pd.DataFrame, target_file_path):
     with open(target_file_path, 'w') as file:
         file.write(insert_script + ';')
 
-def to_pandas(config_file_path:str, table_name=None, **kwargs) -> pd.DataFrame:
-    configurator = config.Config(config_file_path)
-    tables = configurator.config["tables"]
-    util.log(f"table count={len(tables)}")
-
-    result = {}
-    for table in tables:
-        if table_name != None and table['table_name'] != table_name:
-                continue #skip other tables
-        
-        df = generate_table_by_row(table, configurator, **kwargs)
-        df.Name = table['table_name']
-        result[table['table_name']] = df
-    
-    util.log(f"{len(result)} pandas dataframe(s) created")
-    return result
-
-def generate_table_by_row(table, configurator, **kwargs) -> pd.DataFrame:
+def generate_table(table, configurator, **kwargs) -> pd.DataFrame:
     locale = None
     if "config" in configurator.config and "locale" in configurator.config["config"]:
         locale = configurator.config["config"]["locale"]
@@ -187,11 +180,12 @@ def generate_table_by_row(table, configurator, **kwargs) -> pd.DataFrame:
         row_id += 1
 
     df = pd.DataFrame(rows)
+    df.Name = table['table_name']
     df.convert_dtypes() # auto set best fitting type
     for column in columns:
         column_name = column['column_name']
         if "type" in column:
-            print(f"Converting Column {column_name} to {column['type']}")
+            util.log(f"Converting Column {column_name} to {column['type']}", util.FOREGROUND_COLOR.MAGENTA)
             df[column_name] = df[column_name].astype(column['type'])
         if "null_percentage" in column:
             null_percentge = util.parse_null_percentge(column["null_percentage"])
