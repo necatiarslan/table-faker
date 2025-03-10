@@ -30,6 +30,7 @@ tables:
   - table_name: person
     row_count: 10
     start_row_id: 101                               # you can set row_id starting point
+    export_file_count: 3                           # you can set export file count (dominant to export_file_row_count)
     columns:
       - column_name: id
         data: row_id                                # row_id is a built-in function
@@ -63,6 +64,7 @@ tables:
         data: dateutil.easter.easter(2025).strftime('%Y-%m-%d') # python package you need to import in python_import
   - table_name: employee
     row_count: 10
+    export_file_row_count: 60                      # you can set export file row count
     columns:
       - column_name: id
         data: row_id
@@ -96,6 +98,12 @@ You can define your dummy data generation logic in a Python function. The Faker,
 - You can use a column to generate a new column, e.g., `first_name + " " + last_name`.
 
 You can write your logic in a single line or multiple lines, depending on your preference. A built-in function, `row_id`, provides a unique integer for each row. You can specify row_id starting point using the `start_row_id` keyword.
+
+In addition, you have control over how your data is exported:
+
+- **`export_file_count`**: This keyword lets you specify the total number of output files to generate. It's especially useful when you need to split a large dataset into multiple, more manageable files.
+- **`export_file_row_count`**: Use this keyword to set the maximum number of rows that each exported file should contain. This ensures that each file remains within a desired size limit and is easier to handle.
+
 
 Columns will automatically have the best-fitting data type. However, if you'd like to specify a data type, use the `type` keyword. You can assign data types using NumPy dtypes, Pandas Extension Dtypes, or Python native types.
 
@@ -263,7 +271,6 @@ If you find Table Faker useful and would like to support its development, consid
 ### TODO
 - Add target file name to YAML
 - Variables
-- Export to multiple files
 - Generate template yaml file from sample data
 - use an ai service to generate data generation logic
 
