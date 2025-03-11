@@ -5,7 +5,7 @@ with open("README.md") as file:
 
 setup(
     name='tablefaker',
-    version='1.4.0',
+    version='1.4.1',
     description='A Python package to generate fake tabular data. Get data in pandas dataframe or export to Parquet, DeltaLake, Csv, Json, Excel or Sql',
     long_description = description,
     long_description_content_type = "text/markdown",

@@ -47,7 +47,7 @@ def to_target(file_type, config_file_path, target_file_path, table_name=None, **
 def to_target_file(file_type, target_file_path, table_name, kwargs, result, configurator, table, export_file_row_count, row_count):
     internal_row_id = 0
     internal_row_count = min(export_file_row_count, sys.maxsize)
-    file_count = round(row_count / export_file_row_count)
+    file_count = math.ceil(row_count / export_file_row_count)
     total_exported_row_count = 0
     for i in range(file_count):
                 #internal_row_count = export_file_row_count
