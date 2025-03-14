@@ -1,13 +1,34 @@
 from . import config
 from . import util
 import pandas as pd
+import numpy as np
 from faker import Faker
 import random
 from os import path
 from datetime import date, datetime
 import importlib.util
-import sys, math, gc
+import sys, math, gc, psutil
 
+start_time = datetime.now()
+
+def reset_start_time():
+    global start_time
+    start_time = datetime.now()
+
+def print_sys_stats():
+    end_time = datetime.now()
+    elapsed_time = end_time - start_time
+    minutes, seconds = divmod(elapsed_time.seconds, 60)
+    seconds = f"{seconds:02}"
+    milliseconds = f"{elapsed_time.microseconds // 1000:03}"
+
+    memory_usage = psutil.Process().memory_info().rss / (1024 * 1024)
+    memory_usage = f"{memory_usage:.2f} MB"
+
+    cpu_usage = psutil.cpu_percent(interval=1)  # Measure over 1 second
+    cpu_usage = f"{cpu_usage:.2f}%"
+
+    util.log(f"Elapsed:{minutes}:{seconds}:{milliseconds}, Memory:{memory_usage}, CPU:{cpu_usage}", util.FOREGROUND_COLOR.GREEN)
 def to_target(file_type, config_file_path, target_file_path, table_name=None, **kwargs) :
     if file_type not in ["csv", "json", "excel", "parquet", "deltalake", "sql"]:
         raise Exception(f"Wrong file_type = {file_type}")
@@ -52,6 +73,7 @@ def to_target_file(file_type, target_file_path, table_name, kwargs, result, conf
     for i in range(file_count):
                 #internal_row_count = export_file_row_count
         internal_row_count = min(export_file_row_count, row_count - total_exported_row_count)
+        reset_start_time()
         df = generate_table(table, configurator, internal_row_id, internal_row_count, **kwargs)
         if file_count > 1:
             file_name, file_extension = path.splitext(target_file_path)
@@ -62,6 +84,7 @@ def to_target_file(file_type, target_file_path, table_name, kwargs, result, conf
         del df
         gc.collect()
         util.log(f"data is exported to {temp_file_path}", util.FOREGROUND_COLOR.GREEN)
+        print_sys_stats()
         result[table_name] = temp_file_path
         internal_row_id = internal_row_id + internal_row_count
         total_exported_row_count = total_exported_row_count + internal_row_count
@@ -89,8 +112,9 @@ def to_pandas(config_file_path:str, table_name=None, **kwargs):
     for table in tables:
         if table_name != None and table["table_name"] != table_name:
             continue #skip other tables
-
+        reset_start_time()
         df = generate_table(table, configurator, **kwargs)
+        print_sys_stats()
         result[table["table_name"]] = df
     return result
 
@@ -200,13 +224,18 @@ def generate_table(table, configurator, internal_start_row_id=0, internal_row_co
     start_row_id = start_row_id + internal_start_row_id
     columns = table['columns']
 
+    compiled_commands = {}
+    for column in columns:
+        command = column["data"]
+        compiled_commands[column["column_name"]] = compile(f"result = {command}", "<string>", "exec")
+
+
     rows = []
     for row_id in range(start_row_id, start_row_id+row_count):
         util.progress_bar(row_id-start_row_id+1, row_count, f"Table:{table_name}")
         variables["row_id"] = row_id
-        new_row = generate_fake_row(columns, variables)
+        new_row = generate_fake_row(columns, variables, compiled_commands)
         rows.append(new_row)
-        row_id += 1
 
     df = pd.DataFrame(rows)
     df.Name = table['table_name']
@@ -217,23 +246,24 @@ def generate_table(table, configurator, internal_start_row_id=0, internal_row_co
             util.log(f"Converting Column {column_name} to {column['type']}", util.FOREGROUND_COLOR.MAGENTA)
             df[column_name] = df[column_name].astype(column['type'])
         if "null_percentage" in column:
-            null_percentge = util.parse_null_percentge(column["null_percentage"])
-            for _ in range(1, int(row_count * null_percentge)+1):
-                random_num = random.randint(1, row_count)
-                df.at[random_num-1, column_name] = None
+            null_percentage = util.parse_null_percentge(column["null_percentage"])
+            num_nulls = int(row_count * null_percentage)
+            null_indices = np.random.choice(df.index, size=num_nulls, replace=False)
+            df.loc[null_indices, column_name] = None
 
     util.log(f"{table_name} pandas dataframe created", util.FOREGROUND_COLOR.GREEN)
     return df
 
-def generate_fake_row(columns:dict, variables:dict) :
+def generate_fake_row(columns:dict, variables:dict, compiled_commands:dict=None):
     result = {}
     for column in columns:
         command = column["data"]
         column_name = column["column_name"]
         variables["command"] = command
-        
+        code = compiled_commands[column_name]
         try:
-            exec(f"result = {command}", variables)
+            #exec(f"result = {command}", variables)
+            exec(code, variables)
         except AttributeError as error:
             raise RuntimeError(f"Custom Faker Provider can not be found. {command} \n {error}")
         except NameError as error:

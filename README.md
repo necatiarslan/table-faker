@@ -273,6 +273,7 @@ If you find Table Faker useful and would like to support its development, consid
 - Variables
 - Generate template yaml file from sample data
 - use an ai service to generate data generation logic
+- Avro file support
 
 ### Future Enhancements
 - PyArrow table support

@@ -5,7 +5,7 @@ with open("README.md") as file:
 
 setup(
     name='tablefaker',
-    version='1.4.2',
+    version='1.4.4',
     description='A Python package to generate fake tabular data. Get data in pandas dataframe or export to Parquet, DeltaLake, Csv, Json, Excel or Sql',
     long_description = description,
     long_description_content_type = "text/markdown",
@@ -17,7 +17,8 @@ setup(
         'pyyaml',
         'pandas',
         'openpyxl',
-        'fastparquet'
+        'fastparquet',
+        'psutil'
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
