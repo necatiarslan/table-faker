@@ -10,11 +10,11 @@ def main():
     args = parser.parse_args()
 
     file_type = None
-    config_file_path = None
+    config_source = None
     target_file_path = None
 
     if args.config is not None:
-        config_file_path = args.config
+        config_source = args.config
     else:
         print("Missing --config parameter. Use --help for more detail.")
         return
@@ -30,8 +30,8 @@ def main():
         target_file_path = "."  
 
 
-    if isinstance(config_file_path, str):
-        tablefaker.to_target(file_type, config_file_path, target_file_path)
+    if isinstance(config_source, str):
+        tablefaker.to_target(file_type, config_source, target_file_path)
     else:
         print("Wrong paramater(s)")
         print(get_description())

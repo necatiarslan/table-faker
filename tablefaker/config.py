@@ -1,21 +1,29 @@
-import yaml
+import yaml, json
 from os import path
 from . import util
 
 class Config:
-    def __init__(self, file_path):
-        if not path.isabs(file_path):
-            file_path = path.abspath(file_path)
+    def __init__(self, source):
+        if isinstance(source, str):
+            if not path.isabs(source):
+                source = path.abspath(source)
+            util.log(f"received config {source}", util.FOREGROUND_COLOR.GREEN)
+            self.file_path = source
+            self.load_config_file()
+        elif isinstance(source, dict):
+            self.config = source
 
-        util.log(f"received config {file_path}", util.FOREGROUND_COLOR.GREEN)
-        self.file_path = file_path
-        self.load_config_file()
         self.validate_config()
-    
+
     def load_config_file(self):
-        if path.isfile(self.file_path):
+        if isinstance(self.file_path, str) and path.isfile(self.file_path):
             with open(self.file_path, "r") as file:
-                self.config = yaml.safe_load(file)
+                if self.file_path.endswith(".yaml"):
+                    self.config = yaml.safe_load(file)
+                elif self.file_path.endswith(".json"):
+                    self.config = json.load(file)
+                else:
+                    raise Exception(f"Unsupported config file type {self.file_path}")
         else:
             raise Exception(f"{self.file_path} file not found")
     

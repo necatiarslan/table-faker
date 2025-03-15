@@ -29,12 +29,12 @@ def print_sys_stats():
     cpu_usage = f"{cpu_usage:.2f}%"
 
     util.log(f"Elapsed:{minutes}:{seconds}:{milliseconds}, Memory:{memory_usage}, CPU:{cpu_usage}", util.FOREGROUND_COLOR.GREEN)
-def to_target(file_type, config_file_path, target_file_path, table_name=None, **kwargs) :
+def to_target(file_type, config_source, target_file_path, table_name=None, **kwargs) :
     if file_type not in ["csv", "json", "excel", "parquet", "deltalake", "sql"]:
         raise Exception(f"Wrong file_type = {file_type}")
     
     result = {}
-    configurator = config.Config(config_file_path)
+    configurator = config.Config(config_source)
     tables = configurator.config["tables"]
     
     for table in tables:
@@ -105,9 +105,9 @@ def call_export_function(data_frame: pd.DataFrame, file_type, target_file_path):
     else:
         raise Exception(f"Wrong file_type = {file_type}")
 
-def to_pandas(config_file_path:str, table_name=None, **kwargs):
+def to_pandas(config_source:str, table_name=None, **kwargs):
     result = {}
-    configurator = config.Config(config_file_path)
+    configurator = config.Config(config_source)
     tables = configurator.config["tables"]
     for table in tables:
         if table_name != None and table["table_name"] != table_name:
@@ -118,36 +118,36 @@ def to_pandas(config_file_path:str, table_name=None, **kwargs):
         result[table["table_name"]] = df
     return result
 
-def to_csv(config_file_path, target_file_path=None, table_name=None, **kwargs) :
+def to_csv(config_source, target_file_path=None, table_name=None, **kwargs) :
     if target_file_path is None:
         target_file_path = "."
-    return to_target("csv", config_file_path, target_file_path, table_name, **kwargs)
+    return to_target("csv", config_source, target_file_path, table_name, **kwargs)
 
-def to_json(config_file_path, target_file_path=None, table_name=None, **kwargs) :
+def to_json(config_source, target_file_path=None, table_name=None, **kwargs) :
     if target_file_path is None:
         target_file_path = "."
-    return to_target("json", config_file_path, target_file_path, table_name, **kwargs)
+    return to_target("json", config_source, target_file_path, table_name, **kwargs)
 
-def to_excel(config_file_path, target_file_path=None, table_name=None, **kwargs) :
+def to_excel(config_source, target_file_path=None, table_name=None, **kwargs) :
     if target_file_path is None:
         target_file_path = "."
-    return to_target("excel", config_file_path, target_file_path, table_name, **kwargs)
+    return to_target("excel", config_source, target_file_path, table_name, **kwargs)
 
-def to_parquet(config_file_path, target_file_path=None, table_name=None, **kwargs) :
+def to_parquet(config_source, target_file_path=None, table_name=None, **kwargs) :
     if target_file_path is None:
         target_file_path = "."
-    return to_target("parquet", config_file_path, target_file_path, table_name, **kwargs)
+    return to_target("parquet", config_source, target_file_path, table_name, **kwargs)
 
-def to_deltalake(config_file_path, target_file_path=None, table_name=None, **kwargs) :
+def to_deltalake(config_source, target_file_path=None, table_name=None, **kwargs) :
     if target_file_path is None:
         target_file_path = "."
-    return to_target("deltalake", config_file_path, target_file_path, table_name, **kwargs)
+    return to_target("deltalake", config_source, target_file_path, table_name, **kwargs)
 
 
-def to_sql(config_file_path, target_file_path=None, table_name=None, **kwargs) :
+def to_sql(config_source, target_file_path=None, table_name=None, **kwargs) :
     if target_file_path is None:
         target_file_path = "."
-    return to_target("sql", config_file_path, target_file_path, table_name, **kwargs)
+    return to_target("sql", config_source, target_file_path, table_name, **kwargs)
 
 def to_deltalake_internal(data_frame: pd.DataFrame, target_file_path):
     if importlib.util.find_spec("deltalake"):
