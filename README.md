@@ -269,15 +269,15 @@ If you find Table Faker useful and would like to support its development, consid
 
 ## Roadmap
 ### TODO
-- Add target file name to YAML
 - Variables
 - Generate template yaml file from sample data
 - use an ai service to generate data generation logic
-- Avro file support
 
 ### Future Enhancements
 - PyArrow table support
 - Primary Key / Foreign Key Support
+- Avro file support
+- Add target file name to YAML
 
 ---
 **Follow for Updates**: [LinkedIn](https://www.linkedin.com/in/necati-arslan/)  
