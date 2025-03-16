@@ -282,3 +282,7 @@ def to_sql(config_source, target_file_path=None, table_name=None, **kwargs) :
 def to_target(file_type, config_source, target_file_path, table_name=None, **kwargs) :
     table_faker = TableFaker()
     return table_faker.to_target(file_type, config_source, target_file_path, table_name, **kwargs)
+
+def yaml_to_json(config_source, target_file_path=None):
+    conf = config.Config(config_source)
+    conf.to_json(target_file_path)

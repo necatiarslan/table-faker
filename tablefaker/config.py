@@ -15,6 +15,17 @@ class Config:
 
         self.validate_config()
 
+    def to_json(self, target_file_path=None):
+        if target_file_path is None:
+            target_file_path = "."
+
+        if path.isdir(target_file_path):
+            file_name = util.get_temp_filename("config") + ".json"
+            target_file_path = path.join(target_file_path, file_name)
+
+        with open(target_file_path, "w") as file:
+            json.dump(self.config, file, indent=4)
+
     def load_config_file(self):
         if isinstance(self.file_path, str) and path.isfile(self.file_path):
             with open(self.file_path, "r") as file:
@@ -40,8 +51,8 @@ class Config:
             
             table_name = table["table_name"]
 
-            if "row_count" not in table:
-                raise Exception(f"{table_name} table should have a row_count attribute")
+            # if "row_count" not in table:
+            #     raise Exception(f"{table_name} table should have a row_count attribute")
 
             if "columns" not in table:
                 raise Exception(f"{table_name} table should have a columns attribute")

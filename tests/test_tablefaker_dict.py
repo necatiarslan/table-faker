@@ -36,3 +36,4 @@ config = {
 
 tablefaker.to_csv(config, "./tests/exports", fake_provider=[SchoolProvider], custom_function=get_level)
 
+tablefaker.yaml_to_json("tests/test_table.yaml", "./tests/exports")
