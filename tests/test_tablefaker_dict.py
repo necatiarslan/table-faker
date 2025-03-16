@@ -27,7 +27,7 @@ config = {
         { "column_name": "id", "data": "row_id" },
         { "column_name": "first_name", "data": "fake.first_name()", "type": "string"},
         { "column_name": "last_name", "data": "fake.last_name()", "type": "string" },
-        { "column_name": "full_name", "data": "first_name + \" \" + last_name" },
+        { "column_name": "full_name", "data": "first_name + last_name" },
         { "column_name": "age", "data": "fake.random_int(18, 90)", "type": "int32" }
       ]
     }
