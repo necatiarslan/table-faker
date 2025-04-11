@@ -5,6 +5,7 @@
 ## Key Features
 - **Schema Definition**: Define your table schema using a simple YAML file, specifying column names, data types, fake data generation logic, and relationships.
 - **Faker & Randomization**: Utilize the **Faker** library and random data generation to create authentic-looking synthetic data.
+- **Multiple Table Support**: Create multiple tables with different schemas and data generation logic in a single YAML file. Define relationships between tables for foreign keys and primary keys.
 - **Multiple Output Formats**:
   - Pandas DataFrame
   - SQL insert script
@@ -34,6 +35,7 @@ tables:
     columns:
       - column_name: id
         data: row_id                                # row_id is a built-in function
+        is_primary_key: true                        # define primary key to use as a foreign key
       - column_name: first_name
         data: fake.first_name()                     # faker function
         type: string
@@ -69,7 +71,7 @@ tables:
       - column_name: id
         data: row_id
       - column_name: person_id
-        data: fake.random_int(1, 10)
+        data: foreign_key("person", "id")          # get primary key from another table
       - column_name: hire_date
         data: fake.date_between()
         type: string
@@ -96,6 +98,8 @@ You can define your dummy data generation logic in a Python function. The Faker,
 - Use the random package for basic randomness, e.g., `random.choice(["male", "female"])`.
 - Use the datetime package for current date and time, e.g., `datetime.today().strftime('%Y-%m-%d')`.
 - You can use a column to generate a new column, e.g., `first_name + " " + last_name`.
+- Use is_primary_key to define a primary key, e.g., `is_primary_key: true`.
+- Use foreign_key to get a primary key from another table, e.g., `foreign_key("person", "id")`.
 
 You can write your logic in a single line or multiple lines, depending on your preference. A built-in function, `row_id`, provides a unique integer for each row. You can specify row_id starting point using the `start_row_id` keyword.
 
@@ -275,7 +279,6 @@ If you find Table Faker useful and would like to support its development, consid
 
 ### Future Enhancements
 - PyArrow table support
-- Primary Key / Foreign Key Support
 - Avro file support
 - Add target file name to YAML
 

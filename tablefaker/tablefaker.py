@@ -13,6 +13,7 @@ import sys, math, gc, psutil
 class TableFaker:
     def __init__(self):
         self.reset_start_time()
+        self.primary_key_cache = {}
     def reset_start_time(self):
         self.start_time = datetime.now()
 
@@ -177,6 +178,7 @@ class TableFaker:
             "datetime": datetime,
             "fake": fake,
             "result": [],
+            "foreign_key": self.foreign_key
             }
 
         if "custom_function" in kwargs:
@@ -209,7 +211,7 @@ class TableFaker:
         for row_id in range(start_row_id, start_row_id+row_count):
             util.progress_bar(row_id-start_row_id+1, row_count, f"Table:{table_name}")
             variables["row_id"] = row_id
-            new_row = self.generate_fake_row(columns, variables, compiled_commands)
+            new_row = self.generate_fake_row(table_name, columns, variables, compiled_commands)
             rows.append(new_row)
 
         df = pd.DataFrame(rows)
@@ -229,15 +231,24 @@ class TableFaker:
         util.log(f"{table_name} pandas dataframe created", util.FOREGROUND_COLOR.GREEN)
         return df
 
-    def generate_fake_row(self, columns:dict, variables:dict, compiled_commands:dict=None):
+    def foreign_key(self, table_name, column_name):
+        if table_name not in self.primary_key_cache:
+            raise Exception(f"Table {table_name} not found while looking for primary key")
+        if column_name not in self.primary_key_cache[table_name]:
+            raise Exception(f"Column {column_name} not found in table {table_name} while looking for primary key")
+        
+        return random.choice(self.primary_key_cache[table_name][column_name])
+
+    def generate_fake_row(self, table_name:str, columns:dict, variables:dict, compiled_commands:dict=None):
         result = {}
         for column in columns:
             command = column["data"]
             column_name = column["column_name"]
             variables["command"] = command
+            is_primary_key = column["is_primary_key"]  if "is_primary_key" in column else False
+
             code = compiled_commands[column_name]
             try:
-                #exec(f"result = {command}", variables)
                 exec(code, variables)
             except AttributeError as error:
                 raise RuntimeError(f"Custom Faker Provider can not be found. {command} \n {error}")
@@ -245,10 +256,16 @@ class TableFaker:
                 raise RuntimeError(f"Custom function can not be found. {command} \n {error}")
             except Exception as error:
                 raise error
-            
-            variables[column_name] = variables["result"]
-            result[column_name] = variables["result"]
+            generated_value = variables["result"]
+            variables[column_name] = generated_value
+            result[column_name] = generated_value
 
+            if is_primary_key:
+                if table_name not in self.primary_key_cache:
+                    self.primary_key_cache[table_name] = {}
+                if column_name not in self.primary_key_cache[table_name]:
+                    self.primary_key_cache[table_name][column_name] = []
+                self.primary_key_cache[table_name][column_name].append(generated_value)
         return result
 
 def to_pandas(config_source:str, table_name=None, **kwargs):

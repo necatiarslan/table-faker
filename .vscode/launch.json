@@ -4,14 +4,20 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
-
         {
             "name": "Run: Test",
             "type": "debugpy",
             "request": "launch",
             "program": "/Users/necatiarslan/github/table-faker/tests/test_tablefaker.py",
             "console": "integratedTerminal"
-        }
+        },
+        {
+            "name": "Run: Test PK",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/Users/necatiarslan/github/table-faker/tests/test_tablefaker_pk.py",
+            "console": "integratedTerminal"
+        },
+
     ]
 }

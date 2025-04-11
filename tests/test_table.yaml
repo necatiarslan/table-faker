@@ -11,6 +11,7 @@ tables:
     columns:
       - column_name: id
         data: row_id                                # row_id is a built-in function
+        is_primary_key: true                        # define primary key to use as a foreign key
       - column_name: first_name
         data: fake.first_name()                     # faker function
         type: string
@@ -46,7 +47,7 @@ tables:
       - column_name: id
         data: row_id
       - column_name: person_id
-        data: fake.random_int(1, 10)
+        data: foreign_key("person", "id")          # get primary key from another table
       - column_name: hire_date
         data: fake.date_between()
         type: string

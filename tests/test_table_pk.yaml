@@ -1,0 +1,36 @@
+version: 1
+config:
+  locale: en_US
+  python_import:
+    - dateutil
+tables:
+  - table_name: person
+    row_count: 5
+    columns:
+      - column_name: id
+        data: row_id                                # row_id is a built-in function
+        is_primary_key: true
+      - column_name: first_name
+        data: fake.first_name()                     # faker function
+        type: string
+      - column_name: last_name
+        data: fake.last_name()
+        type: string
+      - column_name: full_name
+        data: first_name + " " + last_name           # use a column to generate a new column
+      - column_name: age
+        data: fake.random_int(20, 65)
+        type: int32
+  - table_name: employee
+    row_count: 10
+    columns:
+      - column_name: id
+        data: row_id
+      - column_name: person_id
+        data: foreign_key("person", "id")
+      - column_name: hire_date
+        data: fake.date_between()
+        type: string
+      - column_name: title
+        data: random.choice(["engineer", "senior engineer", "principal engineer", "director", "senior director", "manager", "vice president", "president"])    
+
