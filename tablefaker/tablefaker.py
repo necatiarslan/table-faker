@@ -14,6 +14,7 @@ class TableFaker:
     def __init__(self):
         self.reset_start_time()
         self.primary_key_cache = {}
+        self.primary_key_seed = None
     def reset_start_time(self):
         self.start_time = datetime.now()
 
@@ -211,6 +212,7 @@ class TableFaker:
         for row_id in range(start_row_id, start_row_id+row_count):
             util.progress_bar(row_id-start_row_id+1, row_count, f"Table:{table_name}")
             variables["row_id"] = row_id
+            self.primary_key_seed = row_id
             new_row = self.generate_fake_row(table_name, columns, variables, compiled_commands)
             rows.append(new_row)
 
@@ -237,7 +239,10 @@ class TableFaker:
         if column_name not in self.primary_key_cache[table_name]:
             raise Exception(f"Column {column_name} not found in table {table_name} while looking for primary key")
         
-        return random.choice(self.primary_key_cache[table_name][column_name])
+        rnd = random.Random()
+        rnd.seed(self.primary_key_seed) # to get the same primary table row for all foreign keys
+        result = rnd.choice(self.primary_key_cache[table_name][column_name])
+        return result
 
     def generate_fake_row(self, table_name:str, columns:dict, variables:dict, compiled_commands:dict=None):
         result = {}

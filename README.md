@@ -72,6 +72,8 @@ tables:
         data: row_id
       - column_name: person_id
         data: foreign_key("person", "id")          # get primary key from another table
+      - column_name: full_name
+        data: foreign_key("person", "full_name")
       - column_name: hire_date
         data: fake.date_between()
         type: string
@@ -99,7 +101,7 @@ You can define your dummy data generation logic in a Python function. The Faker,
 - Use the datetime package for current date and time, e.g., `datetime.today().strftime('%Y-%m-%d')`.
 - You can use a column to generate a new column, e.g., `first_name + " " + last_name`.
 - Use is_primary_key to define a primary key, e.g., `is_primary_key: true`.
-- Use foreign_key to get a primary key from another table, e.g., `foreign_key("person", "id")`.
+- Use foreign_key to get a primary key from another table, e.g., `foreign_key("person", "id")`. If you use multiple foreign key functions, you will get the primary key values from the same row.
 
 You can write your logic in a single line or multiple lines, depending on your preference. A built-in function, `row_id`, provides a unique integer for each row. You can specify row_id starting point using the `start_row_id` keyword.
 
