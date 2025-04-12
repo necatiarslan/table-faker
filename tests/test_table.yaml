@@ -5,7 +5,7 @@ config:
     - dateutil
 tables:
   - table_name: person
-    row_count: 100
+    row_count: 10
     start_row_id: 10                               # you can set row_id starting point
     export_file_count: 3                           # you can set export file count (dominant to export_file_row_count)
     columns:
@@ -24,6 +24,8 @@ tables:
       - column_name: age
         data: fake.random_int(18, 90)
         type: int32
+      - column_name: retired
+        data: True if age > 65 else False
       - column_name: street_address
         data: fake.street_address()
       - column_name: city
@@ -42,8 +44,8 @@ tables:
       - column_name: easter_date
         data: dateutil.easter.easter(2025).strftime('%Y-%m-%d') # python package you need to import in python_import
   - table_name: employee
-    row_count: 100
-    export_file_row_count: 60                      # you can set export file row count
+    row_count: 10
+    export_file_row_count: 5                      # you can set export file row count
     columns:
       - column_name: id
         data: row_id
