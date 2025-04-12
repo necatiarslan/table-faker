@@ -44,6 +44,7 @@ tables:
         type: string
       - column_name: full_name
         data: first_name + " " + last_name           # use a column to generate a new column
+        is_primary_key: true
       - column_name: age
         data: fake.random_int(18, 90)
         type: int32
