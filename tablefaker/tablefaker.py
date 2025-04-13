@@ -7,7 +7,7 @@ import random
 from os import path
 from datetime import date, datetime
 import importlib.util
-import sys, math, gc, psutil
+import sys, math, gc, psutil, string
 
 
 class TableFaker:
@@ -177,6 +177,7 @@ class TableFaker:
         variables = {
             "random": random,
             "datetime": datetime,
+            "string": string,
             "fake": fake,
             "result": [],
             "foreign_key": self.foreign_key
@@ -205,7 +206,18 @@ class TableFaker:
         compiled_commands = {}
         for column in columns:
             command = column["data"]
-            compiled_commands[column["column_name"]] = compile(f"result = {command}", "<string>", "exec")
+            column_name = column["column_name"]
+            if command and isinstance(command, str) and "return " in command:
+                func_inner_code = "\n".join(["    " + line for line in command.split("\n")])
+                func_name = f"func_" + ''.join(random.choices(string.ascii_lowercase, k=5))
+                func_code = f"def {func_name}():\n{func_inner_code}"
+                namespace = {}
+                exec(func_code, variables, namespace)
+                func = namespace[func_name]
+                variables[func_name] = func
+                command = f"{func_name}()"
+            
+            compiled_commands[column_name] = compile(f"result = {command}", "<string>", "exec")
 
 
         rows = []

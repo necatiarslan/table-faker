@@ -65,6 +65,12 @@ tables:
         data: datetime.today().strftime('%Y-%m-%d') # datetime package is available by default
       - column_name: easter_date
         data: dateutil.easter.easter(2025).strftime('%Y-%m-%d') # python package you need to import in python_import
+      - column_name: discount_eligibility           # custom python function
+        data: |
+          if age < 25 or age > 60:
+            return True
+          else:
+            return False
   - table_name: employee
     row_count: 10
     export_file_row_count: 60                      # you can set export file row count
