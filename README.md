@@ -19,8 +19,19 @@
 ```bash
 pip install tablefaker
 ```
-
-## Example Yaml File
+## Sample Yaml File Minimal
+```yaml
+tables:
+  - table_name: person
+    columns:
+      - column_name: id
+        data: row_id
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+```
+## Sample Yaml File Advanced
 ```yaml
 version: 1
 config:
