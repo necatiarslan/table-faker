@@ -158,8 +158,6 @@ class Config:
             name = field.get("name")
             ftype = field.get("type")
             col = {"column_name": name}
-            if "doc" in field:
-                col["description"] = field["doc"]
 
             # map types
             mapped = Config.avro_type_to_tablefaker_type(ftype)
@@ -185,6 +183,12 @@ class Config:
                 # fallback
                 col.setdefault("data", "None")
 
+            if isinstance(ftype, list) and "null" in ftype:
+                col["null_percentage"] = 0.1  # default 10% nulls for nullable fields
+
+            if "doc" in field:
+                col["description"] = field["doc"].replace('\n', ' ')
+
             yaml_struct["tables"][0]["columns"].append(col)
 
         yaml_text = yaml.safe_dump(yaml_struct, sort_keys=False)
@@ -193,5 +197,7 @@ class Config:
             with open(target_file_path, "w", encoding="utf-8") as out_f:
                 out_f.write(yaml_text)
             return target_file_path
+
+        util.log(f"yaml is generated at {target_file_path}", util.FOREGROUND_COLOR.GREEN)
 
         return target_file_path
