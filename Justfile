@@ -24,6 +24,7 @@ pip-clean:
 
 pip-graph:
     pipenv graph
+    pipenv graph --reverse
 
 
 #show active version

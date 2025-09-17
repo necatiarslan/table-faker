@@ -16,7 +16,7 @@ if os.path.isdir(directory_path):
 
 os.system('clear')
 
-tablefaker.to_csv("tests/test_basic_table.yaml", "./tests/exports", fake_provider=[SchoolProvider], custom_function=get_level)
+# tablefaker.to_csv("tests/test_basic_table.yaml", "./tests/exports", fake_provider=[SchoolProvider], custom_function=get_level)
 # tablefaker.to_csv("tests/test_table.json", "./tests/exports", fake_provider=[SchoolProvider], custom_function=get_level)
 # tablefaker.to_csv("tests/test_table.yaml", "./tests/exports", fake_provider=[SchoolProvider], custom_function=get_level)
 # tablefaker.to_csv("tests/test_table.yaml", "./tests/exports", table_name="person", fake_provider=[SchoolProvider], custom_function=get_level)
@@ -34,3 +34,6 @@ tablefaker.to_csv("tests/test_basic_table.yaml", "./tests/exports", fake_provide
 
 # employee_df = df_dict["employee"]
 # print(employee_df.head(5))
+
+tablefaker.avro_to_yaml("tests/test_person.avsc", "tests/exports/person.yaml")
+tablefaker.to_csv("tests/exports/person.yaml", "./tests/exports/")

@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "person",
+  "namespace": "tablefaker.tests",
+  "doc": "Auto-generated Avro schema for person test data used by tablefaker",
+  "fields": [
+    { "name": "id", "type": "long", "doc": "row id (primary key)" },
+    { "name": "first_name", "type": ["null", "string"], "default": null },
+    { "name": "last_name", "type": ["null", "string"], "default": null },
+    { "name": "full_name", "type": ["null", "string"], "default": null, "doc": "first_name + ' ' + last_name (primary key)" },
+    { "name": "age", "type": ["null", "int"], "default": null },
+    { "name": "retired", "type": ["null", "boolean"], "default": null },
+    { "name": "street_address", "type": ["null", "string"], "default": null },
+    { "name": "city", "type": ["null", "string"], "default": null },
+    { "name": "state_abbr", "type": ["null", "string"], "default": null },
+    { "name": "postcode", "type": ["null", "string"], "default": null },
+    { "name": "gender", "type": ["null", "string"], "default": null, "doc": "random.choice(['male','female']) with nulls allowed" },
+    { "name": "left_handed", "type": ["null", "boolean"], "default": null },
+    { "name": "today", "type": ["null", "string"], "default": null, "doc": "ISO date string YYYY-MM-DD" },
+    { "name": "easter_date", "type": ["null", "string"], "default": null, "doc": "easter date (YYYY-MM-DD) - requires python import of dateutil.easter" },
+    { "name": "discount_eligibility", "type": ["null", "boolean"], "default": null, "doc": "True if age < 25 or age > 60" }
+  ]
+}

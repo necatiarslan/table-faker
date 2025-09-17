@@ -293,9 +293,13 @@ If you find Table Faker useful and would like to support its development, consid
 
 ## Roadmap
 ### TODO
+- Provide foreign keys (dictionary, array etc) as an external source
 - Variables
 - Generate template yaml file from sample data
 - use an ai service to generate data generation logic
+- make openpyxl package optional to export to excel
+- look for need of psutils package
+- Generate yaml from avro schema
 
 ### Future Enhancements
 - PyArrow table support

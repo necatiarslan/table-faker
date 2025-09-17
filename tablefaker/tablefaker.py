@@ -320,3 +320,6 @@ def to_target(file_type, config_source, target_file_path, table_name=None, **kwa
 def yaml_to_json(config_source, target_file_path=None):
     conf = config.Config(config_source)
     conf.to_json(target_file_path)
+
+def avro_to_yaml(avro_file_path, target_file_path=None):
+    config.Config.avro_to_yaml(avro_file_path, target_file_path)
