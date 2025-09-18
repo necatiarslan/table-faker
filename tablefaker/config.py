@@ -201,3 +201,84 @@ class Config:
         util.log(f"yaml is generated at {target_file_path}", util.FOREGROUND_COLOR.GREEN)
 
         return target_file_path
+    
+    def csv_to_yaml(csv_file_path, target_file_path=None):
+        """Read a CSV file and produce a tablefaker YAML config.
+
+        csv_file_path: path to .csv file
+        target_file_path: optional path to write YAML (if None, returns YAML string)
+        returns: YAML string when target_file_path is None, else returns target_file_path
+        """
+        if not path.isfile(csv_file_path):
+            raise Exception(f"{csv_file_path} file not found")
+
+        if target_file_path is None:
+            target_file_path = "."
+
+        if path.isdir(target_file_path):
+            file_name = util.get_temp_filename("config") + ".yaml"
+            target_file_path = path.join(target_file_path, file_name)
+
+        table_name = path.splitext(path.basename(csv_file_path))[0]
+
+        yaml_struct = {
+            "version": 1,
+            "config": {
+                "locale": "en_US"
+            },
+            "tables": [
+                {
+                    "table_name": table_name.lower(),
+                    "row_count": 10,
+                    "columns": []
+                }
+            ]
+        }
+
+        import pandas as pd
+        df = pd.read_csv(csv_file_path)
+        util.log("csv columns:" + ", ".join(df.columns), util.FOREGROUND_COLOR.GREEN)
+
+        if "column_name" not in df.columns:
+            raise Exception(f"'column_name' is not a column in the csv file")
+
+        columns_allowed = ["column_name", "type", "data", "null_percentage", "description"]
+        present_columns = [col for col in df.columns if col in columns_allowed]
+        util.log("columns will be used in csv: " + ", ".join(present_columns), util.FOREGROUND_COLOR.GREEN)
+
+        unused_columns = [col for col in df.columns if col not in columns_allowed]
+        if unused_columns:
+            util.log("columns will NOT be used in csv: " + ", ".join(unused_columns), util.FOREGROUND_COLOR.YELLOW)
+
+        for row in df.itertuples(index=False):
+            col_struct = {
+                "column_name": getattr(row, "column_name")
+            }
+            if "type" in df.columns and isinstance(getattr(row, "type"), str):
+                col_struct["type"] = getattr(row, "type")
+            if "data" in df.columns and isinstance(getattr(row, "data"), str):
+                col_struct["data"] = getattr(row, "data")
+            if "null_percentage" in df.columns and isinstance(getattr(row, "null_percentage"), (float, int)):
+                null_perc = getattr(row, "null_percentage")
+                try:
+                    null_perc = float(null_perc)
+                    if 0.0 <= null_perc <= 1.0:
+                        col_struct["null_percentage"] = null_perc
+                except:
+                    util.log(f"invalid null_percentage value {null_perc} for column {col_struct['column_name']}. 0.0 <= null_percentage <= 1.0", util.FOREGROUND_COLOR.YELLOW)
+            if "description" in df.columns and isinstance(getattr(row, "description"), str):
+                desc = getattr(row, "description")
+                if isinstance(desc, str) and desc.strip():
+                    col_struct["description"] = desc.strip()
+            yaml_struct["tables"][0]["columns"].append(col_struct)
+
+        yaml_text = yaml.safe_dump(yaml_struct, sort_keys=False)
+
+        if target_file_path:
+            with open(target_file_path, "w", encoding="utf-8") as out_f:
+                out_f.write(yaml_text)
+            return target_file_path
+
+        util.log(f"yaml is generated at {target_file_path}", util.FOREGROUND_COLOR.GREEN)
+
+        return target_file_path

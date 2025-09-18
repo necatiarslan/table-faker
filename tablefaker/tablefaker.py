@@ -323,3 +323,6 @@ def yaml_to_json(config_source, target_file_path=None):
 
 def avro_to_yaml(avro_file_path, target_file_path=None):
     config.Config.avro_to_yaml(avro_file_path, target_file_path)
+
+def csv_to_yaml(csv_file_path, target_file_path=None):
+    config.Config.csv_to_yaml(csv_file_path, target_file_path)

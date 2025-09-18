@@ -35,5 +35,8 @@ os.system('clear')
 # employee_df = df_dict["employee"]
 # print(employee_df.head(5))
 
-tablefaker.avro_to_yaml("tests/test_person.avsc", "tests/exports/person.yaml")
-tablefaker.to_csv("tests/exports/person.yaml", "./tests/exports/")
+# tablefaker.avro_to_yaml("tests/test_person.avsc", "tests/exports/person.yaml")
+# tablefaker.to_csv("tests/exports/person.yaml", "./tests/exports/")
+
+# tablefaker.csv_to_yaml("tests/test_person.csv", "tests/exports/person.yaml")
+# tablefaker.to_csv("tests/exports/person.yaml", "./tests/exports/")
