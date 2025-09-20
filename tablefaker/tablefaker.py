@@ -5,7 +5,7 @@ import numpy as np
 from faker import Faker
 import random
 from os import path
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, time, timezone, tzinfo, UTC, MINYEAR, MAXYEAR
 import importlib.util
 import sys, math, gc, psutil, string
 
@@ -177,6 +177,15 @@ class TableFaker:
         variables = {
             "random": random,
             "datetime": datetime,
+            "date": date,
+            "timedelta": timedelta,
+            "time": time,
+            "timezone": timezone,
+            "tzinfo": tzinfo,
+            "UTC": UTC,
+            "MINYEAR": MINYEAR,
+            "MAXYEAR": MAXYEAR,
+            "math": math,
             "string": string,
             "fake": fake,
             "result": [],
@@ -268,9 +277,9 @@ class TableFaker:
             try:
                 exec(code, variables)
             except AttributeError as error:
-                raise RuntimeError(f"Custom Faker Provider can not be found. {command} \n {error}")
+                raise RuntimeError(f"Attribute can not be found. {command} \n {error}")
             except NameError as error:
-                raise RuntimeError(f"Custom function can not be found. {command} \n {error}")
+                raise RuntimeError(f"Function can not be found. {command} \n {error}")
             except Exception as error:
                 raise error
             generated_value = variables["result"]
