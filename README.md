@@ -111,6 +111,166 @@ tables:
 ```
 [full yml example](tests/test_table.yaml)
 
+## Configuration: Determinism & Attribute Inference
+
+### Seed (deterministic)
+[`yaml.declaration()`](table-faker/README.md:114)
+```yaml
+config:
+  locale: en_US
+  seed: 42  # Optional: for reproducible datasets
+```
+- Setting `config.seed` makes runs deterministic: the same seed and same YAML produce identical outputs.
+- The seed is applied to Python's `random`, NumPy (when available), and the `Faker` instance used by tablefaker.
+- Use cases: repeatable tests, CI snapshots, and reproducible examples.
+
+### Attribute name inference
+[`yaml.declaration()`](table-faker/README.md:114)
+```yaml
+config:
+  infer_entity_attrs_by_name: true  # Optional: auto-infer FK attributes
+```
+- When enabled, columns named with the pattern `<fkprefix>_<attr>` will be automatically bound to the referenced parent row if a sibling `<fkprefix>_id` exists and is a foreign key.
+- Example: `customer_email` will be auto-resolved from the row referenced by `customer_id` (if `customer_id` is a FK to `customers.customer_id`).
+
+## Cross-Table Relationships
+
+### Using copy_from_fk()
+[`yaml.declaration()`](table-faker/README.md:114)
+```yaml
+- column_name: customer_email
+  data: copy_from_fk("customer_id", "customers", "email")
+```
+- `copy_from_fk(fk_column, parent_table, parent_attr)` copies an attribute from the parent row referenced by the foreign key.
+- Useful when you need to duplicate a value from the parent instead of generating it again.
+- Parent tables must be defined before child tables in the YAML (no automatic backfilling).
+
+Full parent/child example:
+[`yaml.declaration()`](table-faker/README.md:114)
+```yaml
+tables:
+  - table_name: customers
+    row_count: 10
+    columns:
+      - column_name: customer_id
+        is_primary_key: true
+        data: row_id
+      - column_name: email
+        data: fake.email()
+
+  - table_name: orders
+    row_count: 50
+    columns:
+      - column_name: order_id
+        data: row_id
+        is_primary_key: true
+      - column_name: customer_id
+        data: foreign_key("customers", "customer_id")
+      - column_name: customer_email
+        data: copy_from_fk("customer_id", "customers", "email")
+```
+
+### Automatic attribute inference in action
+[`yaml.declaration()`](table-faker/README.md:114)
+```yaml
+config:
+  infer_entity_attrs_by_name: true
+tables:
+  - table_name: customers
+    columns:
+      - column_name: customer_id
+        is_primary_key: true
+        data: row_id
+      - column_name: email
+        data: fake.email()
+  - table_name: orders
+    columns:
+      - column_name: customer_id
+        data: foreign_key("customers", "customer_id")
+      - column_name: customer_email
+        data: auto  # Automatically resolved from the customer_id FK
+```
+- `data: auto` indicates that the value will be inferred by name from the referenced parent row when `infer_entity_attrs_by_name` is true.
+
+## Foreign Key Distributions
+Foreign keys support different sampling distributions to model realistic parent usage patterns.
+
+### Uniform distribution (default)
+[`yaml.declaration()`](table-faker/README.md:114)
+```yaml
+data: foreign_key("customers", "customer_id")
+```
+- Backward compatible: selects parent keys uniformly at random.
+
+### Zipf (power-law) distribution
+[`yaml.declaration()`](table-faker/README.md:114)
+```yaml
+data: foreign_key("customers", "customer_id", distribution="zipf", param=1.2)
+```
+- Produces head-heavy (long-tail) distributions where a few parents appear much more frequently.
+- `param` controls concentration: higher values concentrate more on top-ranked parents.
+- Useful for modeling popular customers, trending products, or social-systems with power-law behavior.
+
+### Weighted parent distribution (attribute-based)
+[`yaml.declaration()`](table-faker/README.md:114)
+```yaml
+data: foreign_key(
+  "customers",
+  "customer_id",
+  distribution="weighted_parent",
+  parent_attr="rating",
+  weights={"5": 3, "4": 2, "3": 1}
+)
+```
+- Weights are applied based on a parent attribute (here `rating`) so parents with certain attribute values are preferred.
+- Any parent attribute value not listed in `weights` defaults to weight `1.0`.
+- Useful to prefer high-rated customers, VIP tiers, or any attribute-driven bias.
+
+## Complete example (seed, inference, weighted FK)
+[`yaml.declaration()`](table-faker/README.md:114)
+```yaml
+version: 1
+config:
+  locale: en_US
+  seed: 4242
+  infer_entity_attrs_by_name: true
+
+tables:
+  - table_name: customers
+    row_count: 100
+    columns:
+      - column_name: customer_id
+        data: row_id
+        is_primary_key: true
+      - column_name: email
+        data: fake.unique.email()
+      - column_name: rating
+        data: random.choice([3, 4, 5])
+
+  - table_name: orders
+    row_count: 500
+    columns:
+      - column_name: order_id
+        data: row_id
+        is_primary_key: true
+      - column_name: customer_id
+        data: foreign_key(
+          "customers",
+          "customer_id",
+          distribution="weighted_parent",
+          parent_attr="rating",
+          weights={"5": 3, "4": 2, "3": 1}
+        )
+      - column_name: customer_email
+        data: auto  # Inferred from customer_id FK
+```
+
+## Notes
+- Parent tables must be defined before child tables (no automatic backfilling/topological sort yet).
+- Two-phase row evaluation ensures column order within a table does not affect correctness (you can reference other columns freely).
+- `fake.unique` behavior is deterministic only when the same `Faker` instance is reused and `config.seed` is fixed.
+- All sampling distributions are deterministic given a fixed seed.
+ 
 ## Data Generation
 You can define your dummy data generation logic in a Python function. The Faker, random and datetime packages are pre-imported and ready to use.
 
@@ -173,26 +333,33 @@ print(person_df.head(5))
 ```
 
 ## Sample CLI Command
-You can use tablefaker in your terminal for adhoc needs or shell script to automate fake data generation. \
-Faker custom providers and custom functions are not supported in CLI.
-```bash
-# exports to current folder in csv format
-tablefaker --config test_table.yaml
+You can use tablefaker in your terminal for ad-hoc needs or in shell scripts to automate fake data generation. The CLI reads the YAML config and supports importing Python modules via `config.python_import` and adding Faker community providers declared under `config.community_providers` (see "Custom Faker Providers" below). Custom Python functions (passed via the `custom_function` parameter) are only supported when using the Python API programmatically.
 
-# exports as sql insert into script files
-tablefaker --config test_table.yaml --file_type sql
+Supported CLI flags:
+- --config : path to YAML or JSON config
+- --file_type : csv,json,parquet,excel,sql,deltalake (default: csv)
+- --target : target folder or file path
+- --seed : integer seed to make generation deterministic
+- --infer-attrs : "true" or "false" to override infer_entity_attrs_by_name
+
+```bash
+# exports to current folder in csv format (reads community_providers from config)
+tablefaker --config tests/test_table.yaml
+
+# exports as sql insert script files
+tablefaker --config tests/test_table.yaml --file_type sql --target ./out
 
 # exports to current folder in excel format
-tablefaker --config test_table.yaml --file_type excel
+tablefaker --config tests/test_table.yaml --file_type excel
 
-# exports all tables in json format
-tablefaker --config test_table.yaml --file_type json --target ./target_folder 
+# exports all tables in json format to a folder
+tablefaker --config tests/test_table.yaml --file_type json --target ./target_folder
 
-# exports only the first table
-tablefaker --config test_table.yaml --file_type parquet --target ./target_folder/target_file.parquet
+# exports a single table to a parquet file
+tablefaker --config tests/test_table.yaml --file_type parquet --target ./target_folder/target_file.parquet
 
-# exports to current folder in deltalake format
-tablefaker --config test_table.yaml --file_type deltalake
+# pass an explicit seed and enable attribute inference
+tablefaker --config tests/test_table.yaml --seed 42 --infer-attrs true
 ```
 
 ## Sample CSV Output

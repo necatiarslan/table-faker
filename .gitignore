@@ -135,3 +135,6 @@ junit_xml_test_report.xml
 
 .DS_Store
 tests/.DS_Store
+
+.dev/
+dev/

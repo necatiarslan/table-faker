@@ -1,0 +1,37 @@
+version: 1
+config:
+  locale: en_US
+  seed: 123
+tables:
+  - table_name: customers
+    row_count: 50
+    columns:
+      - column_name: customer_id
+        data: row_id
+        is_primary_key: true
+      - column_name: rating
+        data: random.choice([5,4,3])
+  - table_name: orders_uniform
+    row_count: 1000
+    columns:
+      - column_name: order_id
+        data: row_id
+        is_primary_key: true
+      - column_name: customer_id
+        data: foreign_key("customers","customer_id")
+  - table_name: orders_zipf
+    row_count: 1000
+    columns:
+      - column_name: order_id
+        data: row_id
+        is_primary_key: true
+      - column_name: customer_id
+        data: foreign_key("customers","customer_id", distribution="zipf", param=1.1)
+  - table_name: orders_weighted
+    row_count: 3000
+    columns:
+      - column_name: order_id
+        data: row_id
+        is_primary_key: true
+      - column_name: customer_id
+        data: foreign_key("customers","customer_id", distribution="weighted_parent", parent_attr="rating", weights={"5":3,"4":2,"3":1})

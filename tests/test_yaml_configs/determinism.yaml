@@ -1,0 +1,13 @@
+version: 1
+config:
+  locale: en_US
+  seed: 42
+tables:
+  - table_name: users
+    row_count: 20
+    columns:
+      - column_name: user_id
+        data: row_id
+        is_primary_key: true
+      - column_name: email
+        data: fake.unique.email()

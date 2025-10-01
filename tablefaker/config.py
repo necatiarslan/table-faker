@@ -77,6 +77,24 @@ class Config:
 
         return []
     
+    def get_community_providers(self):
+        """
+        Get community providers from config.
+        Format: ['faker_education(SchoolProvider)', 'another_module(SomeProvider)']
+        Returns: list of tuples [(module_name, provider_class_name), ...]
+        """
+        if "config" in self.config and "community_providers" in self.config["config"]:
+            providers = self.config["config"]["community_providers"]
+            parsed = []
+            for provider_str in providers:
+                # Parse format: module_name(ClassName)
+                if '(' in provider_str and ')' in provider_str:
+                    module_name = provider_str[:provider_str.index('(')].strip()
+                    class_name = provider_str[provider_str.index('(')+1:provider_str.index(')')].strip()
+                    parsed.append((module_name, class_name))
+            return parsed
+        return []
+    
 
     def avro_type_to_tablefaker_type(avro_type):
         """Map Avro field type to a tablefaker column type hint."""
