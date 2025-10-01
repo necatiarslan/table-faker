@@ -9,6 +9,7 @@ from datetime import date, datetime, timedelta, time, timezone, tzinfo, UTC, MIN
 import importlib.util
 import sys, math, gc, psutil, string
 import hashlib
+import yaml
 
 
 class TableFaker:
@@ -517,6 +518,7 @@ class TableFaker:
             self._current_row = None
         
         return result
+
 
 def to_pandas(config_source:str, table_name=None, **kwargs):
     table_faker = TableFaker()

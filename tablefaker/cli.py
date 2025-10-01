@@ -1,5 +1,6 @@
 import argparse
 from . import tablefaker
+from . import relationships
 
 def main():
     parser = argparse.ArgumentParser(description=get_description())
@@ -8,6 +9,7 @@ def main():
     parser.add_argument('--target', required=False, help='Target folder/file')
     parser.add_argument('--seed', type=int, required=False, help='Override seed value for deterministic output')
     parser.add_argument('--infer-attrs', type=str, required=False, choices=['true', 'false'], help='Override infer_entity_attrs_by_name (true/false)')
+    parser.add_argument('--relationships', action='store_true', required=False, help='Generate relationships YAML file')
 
     args = parser.parse_args()
 
@@ -40,7 +42,11 @@ def main():
         kwargs['infer_attrs'] = args.infer_attrs
 
     if isinstance(config_source, str):
-        tablefaker.to_target(file_type, config_source, target_file_path, **kwargs)
+        if args.relationships:
+            out = relationships.generate_relationships(config_source, target_file_path)
+            print(f"Relationships written to {out}")
+        else:
+            tablefaker.to_target(file_type, config_source, target_file_path, **kwargs)
     else:
         print("Wrong paramater(s)")
         print(get_description())

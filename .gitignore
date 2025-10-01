@@ -138,3 +138,5 @@ tests/.DS_Store
 
 .dev/
 dev/
+
+domains/*/output
