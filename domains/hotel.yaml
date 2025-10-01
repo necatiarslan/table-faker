@@ -1,0 +1,240 @@
+version: 1
+config:
+  locale: en_US
+  version: 1
+  config:
+    locale: en_US
+    # Helpful third-party imports available to column python expressions
+    python_import:
+      - dateutil
+tables:
+    - table_name: hotel
+      row_count: 5
+      start_row_id: 100
+      columns:
+        - column_name: id
+          data: row_id
+          is_primary_key: true
+        - column_name: name
+          data: fake.company() + " Hotel"
+        - column_name: street_address
+          data: fake.street_address()
+        - column_name: city
+          data: fake.city()
+        - column_name: state_abbr
+          data: fake.state_abbr()
+        - column_name: postcode
+          data: fake.postcode()
+        - column_name: phone
+          data: fake.phone_number()
+        - column_name: rating
+          data: round(random.uniform(2.5, 5.0), 1)
+          type: float
+        - column_name: opened_date
+          data: fake.date_between(start_date='-20y', end_date='-1y')
+
+    - table_name: room
+      row_count: 200
+      start_row_id: 1000
+      columns:
+        - column_name: id
+          data: row_id
+          is_primary_key: true
+        - column_name: hotel_id
+          data: foreign_key("hotel", "id")
+        - column_name: room_number
+          data: fake.random_int(100, 999)
+        - column_name: floor
+          data: int(room_number / 100)
+        - column_name: room_type
+          data: random.choice(["standard", "deluxe", "suite", "family", "accessible"])
+        - column_name: capacity
+          data: |
+            if room_type == 'suite':
+              return 4
+            if room_type == 'family':
+              return 5
+            if room_type == 'accessible':
+              return 2
+            return 2
+          type: int32
+        - column_name: base_rate
+          data: |
+            # base rate determined by room type and hotel rating (higher rated hotels charge more)
+            base = {'standard': 80, 'deluxe': 140, 'suite': 300, 'family': 200, 'accessible': 100}[room_type]
+            # Use hotel's rating to nudge price up to 30%
+            hotel_rating = copy_from_fk("hotel_id", "hotel", "rating")
+            multiplier = 1 + ((hotel_rating - 3.0) / 10.0)
+            return round(base * multiplier + random.uniform(-10, 25), 2)
+          type: float
+        - column_name: is_smoking
+          data: False if room_type == 'suite' else fake.pybool()
+
+    - table_name: amenity
+      row_count: 12
+      columns:
+        - column_name: id
+          data: row_id
+          is_primary_key: true
+        - column_name: name
+          data: random.choice(["breakfast", "parking", "wifi_premium", "spa_access", "airport_shuttle", "extra_bed", "late_checkout", "gym_access", "pet_fee", "minibar", "laundry", "room_service"])
+        - column_name: price_per_night
+          data: round(random.uniform(0, 60), 2)
+          type: float
+        - column_name: included
+          data: True if name in ["wifi_premium","gym_access"] else False
+
+    - table_name: guest
+      row_count: 500
+      start_row_id: 5000
+      columns:
+        - column_name: id
+          data: row_id
+          is_primary_key: true
+        - column_name: first_name
+          data: fake.first_name()
+        - column_name: last_name
+          data: fake.last_name()
+        - column_name: full_name
+          data: first_name + " " + last_name
+        - column_name: email
+          data: fake.email()
+        - column_name: phone
+          data: fake.phone_number()
+        - column_name: loyalty_member
+          data: random.choice([True, False, False])
+        - column_name: loyalty_points
+          data: |
+            if loyalty_member:
+              return fake.random_int(0, 20000)
+            return 0
+          type: int32
+
+    - table_name: staff
+      row_count: 50
+      start_row_id: 8000
+      columns:
+        - column_name: id
+          data: row_id
+          is_primary_key: true
+        - column_name: hotel_id
+          data: foreign_key("hotel", "id")
+        - column_name: full_name
+          data: fake.name()
+        - column_name: role
+          data: random.choice(["front_desk", "housekeeping", "manager", "concierge", "maintenance", "chef"])
+        - column_name: hire_date
+          data: fake.date_between(start_date='-10y', end_date='today')
+        - column_name: salary
+          data: |
+            base = {'front_desk':35000,'housekeeping':28000,'manager':90000,'concierge':42000,'maintenance':38000,'chef':50000}[role]
+            return float(base + random.randint(-5000, 15000))
+          type: float
+
+    - table_name: reservation
+      row_count: 700
+      start_row_id: 20000
+      columns:
+        - column_name: id
+          data: row_id
+          is_primary_key: true
+        - column_name: guest_id
+          data: foreign_key("guest", "id")
+        - column_name: hotel_id
+          data: foreign_key("hotel", "id")
+        - column_name: room_id
+          data: foreign_key("room", "id")
+        - column_name: check_in
+          data: fake.date_between(start_date='-90d', end_date='today')
+        - column_name: stay_length
+          data: fake.random_int(1, 14)
+          type: int32
+        - column_name: check_out
+          data: |
+            # check_in is a date object; add days
+            return (check_in + timedelta(days=stay_length)).strftime('%Y-%m-%d')
+        - column_name: adults
+          data: fake.random_int(1, 2)
+        - column_name: children
+          data: fake.random_int(0, 3)
+        - column_name: room_rate
+          data: copy_from_fk("room_id", "room", "base_rate")
+          type: float
+        - column_name: estimated_amenities_total
+          data: round(random.uniform(0, 100), 2)
+          type: float
+        - column_name: subtotal
+          data: |
+            # compute room charges + estimated amenities
+            return round(room_rate * stay_length + estimated_amenities_total, 2)
+          type: float
+        - column_name: tax_rate
+          data: 0.12
+          type: float
+        - column_name: tax_amount
+          data: round(subtotal * tax_rate, 2)
+          type: float
+        - column_name: total_amount
+          data: round(subtotal + tax_amount, 2)
+          type: float
+        - column_name: booking_channel
+          data: random.choice(["direct", "OTA", "corporate", "phone"])
+        - column_name: payment_status
+          data: random.choice(["paid", "unpaid", "pending"])
+
+    - table_name: reservation_amenity
+      row_count: 900
+      columns:
+        - column_name: id
+          data: row_id
+          is_primary_key: true
+        - column_name: reservation_id
+          data: foreign_key("reservation", "id")
+        - column_name: amenity_id
+          data: foreign_key("amenity", "id")
+        - column_name: nights
+          data: copy_from_fk("reservation_id", "reservation", "stay_length")
+          type: int32
+        - column_name: amount
+          data: round(copy_from_fk("amenity_id", "amenity", "price_per_night") * nights, 2)
+          type: float
+
+    - table_name: invoice
+      row_count: 700
+      columns:
+        - column_name: id
+          data: row_id
+          is_primary_key: true
+        - column_name: reservation_id
+          data: foreign_key("reservation", "id")
+        - column_name: issue_date
+          data: datetime.today().strftime('%Y-%m-%d')
+        - column_name: subtotal
+          data: copy_from_fk("reservation_id", "reservation", "subtotal")
+          type: float
+        - column_name: tax_amount
+          data: copy_from_fk("reservation_id", "reservation", "tax_amount")
+          type: float
+        - column_name: total
+          data: copy_from_fk("reservation_id", "reservation", "total_amount")
+          type: float
+        - column_name: paid
+          data: True if copy_from_fk("reservation_id", "reservation", "payment_status") == 'paid' else False
+
+    - table_name: payment
+      row_count: 700
+      columns:
+        - column_name: id
+          data: row_id
+          is_primary_key: true
+        - column_name: invoice_id
+          data: foreign_key("invoice", "id")
+        - column_name: reservation_id
+          data: copy_from_fk("invoice_id", "invoice", "reservation_id")
+        - column_name: paid_amount
+          data: copy_from_fk("invoice_id", "invoice", "total")
+          type: float
+        - column_name: paid_date
+          data: datetime.today().strftime('%Y-%m-%d')
+        - column_name: method
+          data: random.choice(["credit_card", "cash", "bank_transfer", "mobile_pay"])

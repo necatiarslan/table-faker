@@ -500,7 +500,7 @@ class TableFaker:
             
             # Phase A: independent PKs, foreign keys, and expressions with no column dependencies
             # Phase B: expressions that reference other columns
-            if (is_pk or has_fk) and not has_dependencies:
+            if (is_pk or has_fk or not has_dependencies):
                 phase_a.append(col)
             else:
                 phase_b.append(col)

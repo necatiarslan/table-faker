@@ -8,7 +8,7 @@ config:
     - faker_education(SchoolProvider)
 tables:
   - table_name: person
-    row_count: 10
+    row_count: 100
     start_row_id: 10                               # you can set row_id starting point
     export_file_count: 1                           # you can set export file count (dominant to export_file_row_count)
     columns:
@@ -53,7 +53,7 @@ tables:
           else:
             return False
   - table_name: employee
-    row_count: 10
+    row_count: 1
     export_file_row_count: 1                      # you can set export file row count
     columns:
       - column_name: id
