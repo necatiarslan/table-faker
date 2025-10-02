@@ -1,6 +1,7 @@
 import yaml, json
 from os import path
 from . import util
+import sys  # NEW
 
 class Config:
     def __init__(self, source):
@@ -9,6 +10,14 @@ class Config:
                 source = path.abspath(source)
             util.log(f"received config {source}", util.FOREGROUND_COLOR.GREEN)
             self.file_path = source
+
+            # modules in the same folder as the YAML importable
+            cfg_dir = path.dirname(self.file_path) or "."
+            abs_cfg_dir = path.abspath(cfg_dir)
+            # avoid duplicates comparing absolute paths
+            if abs_cfg_dir not in [path.abspath(p) for p in sys.path if isinstance(p, str)]:
+                sys.path.insert(0, abs_cfg_dir)
+
             self.load_config_file()
         elif isinstance(source, dict):
             self.config = source

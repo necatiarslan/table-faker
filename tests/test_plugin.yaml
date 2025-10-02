@@ -1,0 +1,28 @@
+version: 1
+config:
+  locale: en_US
+  python_import:
+    - test_plugin_utils
+
+tables:
+  - table_name: parent
+    row_count: 10
+    columns:
+      - column_name: id
+        data: row_id
+        is_primary_key: true
+      - column_name: value
+        data: fake.random_int(1, 100)
+        type: int32
+
+  - table_name: child
+    row_count: 5
+    columns:
+      - column_name: id
+        data: row_id
+        is_primary_key: true
+      - column_name: parent_count
+        data: test_plugin_utils.get_parent_count(get_table)
+        type: int32
+      - column_name: summary
+        data: test_plugin_utils.summarize(get_table)

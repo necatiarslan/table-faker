@@ -1,5 +1,6 @@
 from . import config
 from . import util
+from .plugin_loader import PluginManager
 import pandas as pd
 import numpy as np
 from faker import Faker
@@ -20,6 +21,7 @@ class TableFaker:
         self.parent_rows = {}          # table -> {pk_value: full_row_dict}
         self.fake_by_locale = {}       # locale -> Faker
         self._current_row = None       # for copy_from_fk access during phase B
+        self.generated_rows = {}       # table_name -> list of row dicts (for get_table)
     
     def reset_start_time(self):
         self.start_time = datetime.now()
@@ -217,6 +219,12 @@ class TableFaker:
         fake = self._get_fake(locale)
         python_import = configurator.get_python_import()
         
+        # Load plugins from python_import configuration
+        plugins = PluginManager(
+            python_import,
+            extra_paths=[path.dirname(configurator.file_path)] if configurator.file_path else []
+        )
+        
         # Add community providers from config
         community_providers = configurator.get_community_providers()
         for module_name, class_name in community_providers:
@@ -236,7 +244,8 @@ class TableFaker:
                 for provider in kwargs["fake_provider"]:
                     fake.add_provider(provider)
 
-        variables = {
+        # Base evaluation environment
+        base_locals = {
             "random": random,
             "datetime": datetime,
             "date": date,
@@ -253,8 +262,17 @@ class TableFaker:
             "result": [],
             "foreign_key": self.foreign_key,
             "copy_from_fk": self._copy_from_fk
-            }
+        }
+        
+        # Helper function for plugins to access generated table data
+        def get_table(name: str):
+            """Get list of generated rows for a table."""
+            return self.generated_rows.get(name, [])
+        
+        # Inject plugins into evaluation environment
+        variables = plugins.make_eval_locals(base_locals, get_table)
 
+        # Support for programmatically added custom functions (via kwargs)
         if "custom_function" in kwargs:
             if isinstance(kwargs["custom_function"], list):
                 for func in kwargs["custom_function"]:
@@ -262,25 +280,6 @@ class TableFaker:
             else:
                 func = kwargs["custom_function"]
                 variables[func.__name__] = func
-
-        if python_import and isinstance(python_import, list):
-            import importlib
-            for library_name in python_import:
-                if library_name not in variables:
-                    # Use importlib to properly handle modules and submodules
-                    try:
-                        module = importlib.import_module(library_name)
-                        variables[library_name] = module
-                        # For packages like 'dateutil', also import commonly used submodules
-                        if library_name == 'dateutil':
-                            # Import submodules to make dateutil.easter accessible
-                            try:
-                                importlib.import_module('dateutil.easter')
-                            except ImportError:
-                                pass
-                    except ImportError:
-                        # Fallback to __import__ for backward compatibility
-                        variables[library_name] = __import__(library_name)
 
         table_name = table['table_name']
         row_count = table['row_count'] if "row_count" in table else 10
@@ -349,6 +348,10 @@ class TableFaker:
 
         rows = []
         pk_cols = [c["column_name"] for c in columns if c.get("is_primary_key")]
+        
+        # Initialize generated_rows for this table
+        self.generated_rows[table_name] = rows
+        
         for row_id in range(start_row_id, start_row_id+row_count):
             util.progress_bar(row_id-start_row_id+1, row_count, f"Table:{table_name}")
             variables["row_id"] = row_id
