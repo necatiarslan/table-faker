@@ -1,0 +1,26 @@
+# LLM Configuration for Semantic View Generation
+# Copy this file to llm.config and configure with your API credentials
+
+# Set to true to enable LLM-powered description generation
+enabled: false
+
+# Your OpenAI API key or compatible API key
+api_key: your-api-key-here
+
+# API endpoint (default: OpenAI, can be changed for compatible APIs like Anthropic, local LLMs, etc.)
+base_url: https://api.openai.com/v1
+
+# Model name to use
+# Examples: gpt-4, gpt-3.5-turbo, claude-3-sonnet-20240229
+model: gpt-4
+
+# Temperature controls randomness (0.0 = deterministic, 1.0 = creative)
+temperature: 0.7
+
+# Maximum tokens in response
+max_tokens: 500
+
+# Additional notes:
+# - For Anthropic Claude: set base_url to https://api.anthropic.com/v1
+# - For local LLMs (e.g., Ollama): set base_url to http://localhost:11434/v1
+# - Make sure to install the openai package: pip install openai

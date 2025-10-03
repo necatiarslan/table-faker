@@ -1,0 +1,26 @@
+version: 1
+config:
+  locale: en_US
+tables:
+  - table_name: customers
+    row_count: 3
+    columns:
+      - column_name: customer_id
+        data: row_id
+        is_primary_key: true
+      - column_name: email
+        data: fake.email()
+      - column_name: rating
+        data: random.choice([5,4,3])
+  - table_name: orders
+    row_count: 5
+    columns:
+      - column_name: order_id
+        data: row_id
+        is_primary_key: true
+      - column_name: customer_id
+        data: foreign_key("customers","customer_id")
+      - column_name: customer_email
+        data: copy_from_fk("customer_id","customers","email")
+      - column_name: customer_rating
+        data: copy_from_fk("customer_id","customers","rating")

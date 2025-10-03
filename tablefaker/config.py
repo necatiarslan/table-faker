@@ -1,6 +1,7 @@
 import yaml, json
 from os import path
 from . import util
+import sys  # NEW
 
 class Config:
     def __init__(self, source):
@@ -9,6 +10,14 @@ class Config:
                 source = path.abspath(source)
             util.log(f"received config {source}", util.FOREGROUND_COLOR.GREEN)
             self.file_path = source
+
+            # modules in the same folder as the YAML importable
+            cfg_dir = path.dirname(self.file_path) or "."
+            abs_cfg_dir = path.abspath(cfg_dir)
+            # avoid duplicates comparing absolute paths
+            if abs_cfg_dir not in [path.abspath(p) for p in sys.path if isinstance(p, str)]:
+                sys.path.insert(0, abs_cfg_dir)
+
             self.load_config_file()
         elif isinstance(source, dict):
             self.config = source
@@ -75,6 +84,24 @@ class Config:
         if "config" in self.config and "python_import" in self.config["config"]:
             return self.config["config"]["python_import"]
 
+        return []
+    
+    def get_community_providers(self):
+        """
+        Get community providers from config.
+        Format: ['faker_education(SchoolProvider)', 'another_module(SomeProvider)']
+        Returns: list of tuples [(module_name, provider_class_name), ...]
+        """
+        if "config" in self.config and "community_providers" in self.config["config"]:
+            providers = self.config["config"]["community_providers"]
+            parsed = []
+            for provider_str in providers:
+                # Parse format: module_name(ClassName)
+                if '(' in provider_str and ')' in provider_str:
+                    module_name = provider_str[:provider_str.index('(')].strip()
+                    class_name = provider_str[provider_str.index('(')+1:provider_str.index(')')].strip()
+                    parsed.append((module_name, class_name))
+            return parsed
         return []
     
 

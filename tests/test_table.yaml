@@ -3,11 +3,14 @@ config:
   locale: en_US
   python_import:
     - dateutil
+    - faker_education
+  community_providers:
+    - faker_education(SchoolProvider)
 tables:
   - table_name: person
-    row_count: 10
+    row_count: 100
     start_row_id: 10                               # you can set row_id starting point
-    export_file_count: 3                           # you can set export file count (dominant to export_file_row_count)
+    export_file_count: 1                           # you can set export file count (dominant to export_file_row_count)
     columns:
       - column_name: id
         data: row_id                                # row_id is a built-in function
@@ -50,8 +53,8 @@ tables:
           else:
             return False
   - table_name: employee
-    row_count: 10
-    export_file_row_count: 5                      # you can set export file row count
+    row_count: 1
+    export_file_row_count: 1                      # you can set export file row count
     columns:
       - column_name: id
         data: row_id
@@ -72,8 +75,6 @@ tables:
       - column_name: weight
         data: 150 #number
       - column_name: school
-        data: fake.school_name() # custom provider
-      - column_name: level
-        data: get_level() # custom function
+        data: fake.school_district() # custom provider
+ 
          
-

@@ -1,0 +1,23 @@
+version: 1
+config:
+  locale: en_US
+tables:
+  - table_name: customers
+    row_count: 3
+    columns:
+      - column_name: customer_id
+        data: row_id
+        is_primary_key: true
+      - column_name: email
+        data: fake.email()
+  - table_name: orders
+    row_count: 6
+    columns:
+      - column_name: order_id
+        data: row_id
+        is_primary_key: true
+      # Derived column appears before foreign_key in YAML but should still work due to two-phase
+      - column_name: customer_email
+        data: copy_from_fk("customer_id","customers","email")
+      - column_name: customer_id
+        data: foreign_key("customers","customer_id")
