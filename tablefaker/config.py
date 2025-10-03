@@ -21,6 +21,7 @@ class Config:
             self.load_config_file()
         elif isinstance(source, dict):
             self.config = source
+            self.file_path = None
 
         self.validate_config()
 
