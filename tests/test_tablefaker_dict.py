@@ -1,3 +1,5 @@
+import sys, os, shutil
+sys.path.append(os.path.abspath("."))
 import pytest
 from tablefaker import tablefaker
 from faker_education import SchoolProvider

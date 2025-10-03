@@ -1,4 +1,5 @@
-# test_plugin_utils.py
+import sys, os, shutil
+sys.path.append(os.path.abspath("."))
 from tablefaker.plugin_loader import tf_expose
 
 @tf_expose()

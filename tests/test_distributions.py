@@ -1,3 +1,5 @@
+import sys, os, shutil
+sys.path.append(os.path.abspath("."))
 import pandas as pd
 import pytest
 from tablefaker.tablefaker import TableFaker

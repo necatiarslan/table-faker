@@ -1,4 +1,5 @@
-import os
+import sys, os, shutil
+sys.path.append(os.path.abspath("."))
 import tempfile
 import shutil
 import pandas as pd
