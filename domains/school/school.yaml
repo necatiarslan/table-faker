@@ -1,0 +1,287 @@
+version: 1
+config:
+  locale: en_US
+  python_import:
+    - dateutil
+    - datetime
+
+# Sample school management system domain
+# Tables included: student, guardian, teacher, subject, classroom,
+#                 section, enrollment, assignment, grade, attendance,
+#                 fee, payment
+
+tables:
+  # Table: guardian — PK: guardian_id. Stores contact info for student guardians.
+  - table_name: guardian
+    row_count: 400
+    start_row_id: 5000
+    columns:
+      - column_name: guardian_id
+        data: row_id
+        is_primary_key: true
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: full_name
+        data: first_name + " " + last_name
+      - column_name: relationship
+        data: random.choice(["mother", "father", "other", "guardian"])
+      - column_name: phone
+        data: fake.phone_number()
+      - column_name: email
+        data: fake.email()
+      - column_name: address
+        data: fake.address()
+
+  # Table: student — PK: student_id. FK: primary_guardian_id -> guardian(guardian_id).
+  - table_name: student
+    row_count: 1200
+    start_row_id: 1000
+    columns:
+      - column_name: student_id
+        data: row_id
+        is_primary_key: true
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: full_name
+        data: first_name + " " + last_name
+      - column_name: dob
+        data: fake.date_of_birth(minimum_age=5, maximum_age=22)
+      - column_name: grade_level
+        data: random.choice(list(range(1, 13)))
+        type: int32
+      - column_name: enrollment_date
+        data: fake.date_between(start_date='-6y', end_date='today')
+      - column_name: primary_guardian_id
+        data: foreign_key("guardian", "guardian_id")
+      - column_name: email
+        data: fake.email()
+      - column_name: phone
+        data: fake.phone_number()
+      - column_name: address
+        data: fake.street_address()
+
+  # Table: teacher — PK: teacher_id. Teacher directory and employment info.
+  - table_name: teacher
+    row_count: 120
+    start_row_id: 2000
+    columns:
+      - column_name: teacher_id
+        data: row_id
+        is_primary_key: true
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: full_name
+        data: first_name + " " + last_name
+      - column_name: hire_date
+        data: fake.date_between(start_date='-20y', end_date='-1y')
+      - column_name: email
+        data: fake.email()
+      - column_name: phone
+        data: fake.phone_number()
+      - column_name: salary
+        data: round(random.uniform(35000, 95000), 2)
+        type: float
+
+  # Table: subject — PK: subject_id. Canonical list of subjects/courses.
+  - table_name: subject
+    row_count: 24
+    columns:
+      - column_name: subject_id
+        data: row_id
+        is_primary_key: true
+      - column_name: code
+        data: random.choice(["MATH", "ENG", "SCI", "HIST", "PE", "ART", "MUSIC", "COMP"])+str(fake.random_int(100,499))
+      - column_name: name
+        data: random.choice(["Mathematics", "English", "Biology", "History", "Physical Education", "Art", "Music", "Computer Science"])
+      - column_name: credits
+        data: random.choice([1,2,3])
+        type: int32
+
+  # Table: classroom — PK: classroom_id. Physical rooms with capacities.
+  - table_name: classroom
+    row_count: 40
+    start_row_id: 3000
+    columns:
+      - column_name: classroom_id
+        data: row_id
+        is_primary_key: true
+      - column_name: building
+        data: random.choice(["A", "B", "C", "D", "E"])
+      - column_name: room_number
+        data: fake.random_int(100, 499)
+      - column_name: capacity
+        data: random.choice([20, 24, 28, 30, 35])
+        type: int32
+
+  # Table: section — PK: section_id. Instance of a subject taught by a teacher in a classroom.
+  - table_name: section
+    # course sections (instances of a subject taught by a teacher in a classroom)
+    row_count: 200
+    start_row_id: 4000
+    columns:
+      - column_name: section_id
+        data: row_id
+        is_primary_key: true
+      - column_name: subject_id
+        data: foreign_key("subject", "subject_id")
+      - column_name: teacher_id
+        data: foreign_key("teacher", "teacher_id")
+      - column_name: classroom_id
+        data: foreign_key("classroom", "classroom_id")
+      - column_name: period
+        data: random.choice([1,2,3,4,5,6,7,8])
+        type: int32
+      - column_name: days
+        data: random.choice(["Mon/Wed/Fri", "Tue/Thu", "Mon/Tue/Wed/Thu", "Mon-Fri"])
+      - column_name: max_capacity
+        data: copy_from_fk("classroom_id", "classroom", "capacity")
+        type: int32
+      - column_name: enrolled_count
+        data: random.randint(int(max_capacity*0.4), max_capacity)
+        type: int32
+      - column_name: start_date
+        data: fake.date_between(start_date='-1y', end_date='today')
+      - column_name: end_date
+        data: fake.date_between(start_date='today', end_date='+180d')
+
+  # Table: enrollment — PK: enrollment_id. Links students to sections (FKs: student_id, section_id).
+  - table_name: enrollment
+    row_count: 2200
+    start_row_id: 6000
+    columns:
+      - column_name: enrollment_id
+        data: row_id
+        is_primary_key: true
+      - column_name: student_id
+        data: foreign_key("student", "student_id")
+      - column_name: section_id
+        data: foreign_key("section", "section_id")
+      - column_name: enrollment_date
+        data: fake.date_between(start_date='-2y', end_date='today')
+      - column_name: status
+        data: random.choice(["active", "withdrawn", "completed"])
+      - column_name: final_score
+        data: |
+          # final score simulates aggregated assignment scores (0-100)
+          base = random.uniform(50, 95)
+          # small noise
+          return round(min(100, base + random.uniform(-8, 8)), 2)
+        type: float
+      - column_name: final_grade
+        data: |
+          s = final_score
+          if s >= 90:
+            return 'A'
+          if s >= 80:
+            return 'B'
+          if s >= 70:
+            return 'C'
+          if s >= 60:
+            return 'D'
+          return 'F'
+
+  # Table: assignment — PK: assignment_id. Assignments issued per section.
+  - table_name: assignment
+    row_count: 1200
+    start_row_id: 10000
+    columns:
+      - column_name: assignment_id
+        data: row_id
+        is_primary_key: true
+      - column_name: section_id
+        data: foreign_key("section", "section_id")
+      - column_name: title
+        data: random.choice(["Homework", "Quiz", "Midterm", "Project", "Final"]) + "#" + str(fake.random_int(1,10))
+      - column_name: due_date
+        data: fake.date_between(start_date='-90d', end_date='+90d')
+      - column_name: max_score
+        data: random.choice([10, 20, 50, 100])
+        type: int32
+
+  # Table: grade — PK: grade_id. Stores student scores for assignments (FKs: assignment_id, student_id).
+  - table_name: grade
+    row_count: 6000
+    start_row_id: 13000
+    columns:
+      - column_name: grade_id
+        data: row_id
+        is_primary_key: true
+      - column_name: assignment_id
+        data: foreign_key("assignment", "assignment_id")
+      - column_name: student_id
+        data: foreign_key("student", "student_id")
+      - column_name: score
+        data: |
+          # score as a fraction of max_score with some randomness
+          m = copy_from_fk("assignment_id", "assignment", "max_score")
+          return round(max(0, min(m, int(random.gauss(m * 0.8, m * 0.12)))), 0)
+        type: int32
+      - column_name: percent
+        data: |
+          m = copy_from_fk("assignment_id", "assignment", "max_score")
+          return round((score / float(m)) * 100, 2) if m and m > 0 else 0.0
+        type: float
+
+  # Table: attendance — PK: attendance_id. Daily attendance records per student per section.
+  - table_name: attendance
+    row_count: 15000
+    start_row_id: 19000
+    columns:
+      - column_name: attendance_id
+        data: row_id
+        is_primary_key: true
+      - column_name: student_id
+        data: foreign_key("student", "student_id")
+      - column_name: section_id
+        data: foreign_key("section", "section_id")
+      - column_name: date
+        data: fake.date_between(start_date='-120d', end_date='today')
+      - column_name: status
+        data: random.choices(["present", "absent", "tardy"], weights=[85,10,5])[0]
+
+  # Table: fee — PK: fee_id. Billing items charged to students.
+  - table_name: fee
+    row_count: 400
+    start_row_id: 22000
+    columns:
+      - column_name: fee_id
+        data: row_id
+        is_primary_key: true
+      - column_name: student_id
+        data: foreign_key("student", "student_id")
+      - column_name: fee_type
+        data: random.choice(["tuition", "activity", "lab", "library"])
+      - column_name: amount
+        data: round(random.uniform(25, 5000), 2)
+        type: float
+      - column_name: due_date
+        data: fake.date_between(start_date='-60d', end_date='+60d')
+      - column_name: paid
+        data: random.choice([True, False, False])
+
+  # Table: payment — PK: payment_id. Payments applied to fees (FK: fee_id).
+  - table_name: payment
+    row_count: 350
+    start_row_id: 22600
+    columns:
+      - column_name: payment_id
+        data: row_id
+        is_primary_key: true
+      - column_name: fee_id
+        data: foreign_key("fee", "fee_id")
+      - column_name: student_id
+        data: copy_from_fk("fee_id", "fee", "student_id")
+      - column_name: amount
+        data: copy_from_fk("fee_id", "fee", "amount")
+        type: float
+      - column_name: paid_date
+        data: fake.date_between(start_date='-60d', end_date='today')
+      - column_name: method
+        data: random.choice(["credit_card", "cash", "bank_transfer", "check"])
+
