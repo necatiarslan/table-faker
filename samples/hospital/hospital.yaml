@@ -1,0 +1,298 @@
+version: 1
+config:
+  locale: en_US
+  python_import:
+    - datetime
+    - dateutil
+
+# Simplified Hospital Management System sample dataset
+tables:
+  - table_name: department
+    row_count: 12
+    start_row_id: 2000
+    columns:
+      - column_name: department_id
+        data: row_id
+        is_primary_key: true
+      - column_name: name
+        data: random.choice(["Cardiology","Emergency","Pediatrics","Oncology","Neurology","Orthopedics","Radiology","Surgery","Maternity","Urology","Dermatology","Psychiatry"])
+      - column_name: floor
+        data: random.randint(1,10)
+        type: int32
+      - column_name: phone
+        data: fake.phone_number()
+
+  - table_name: patient
+    row_count: 2000
+    start_row_id: 1000
+    columns:
+      - column_name: patient_id
+        data: row_id
+        is_primary_key: true
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: full_name
+        data: first_name + " " + last_name
+      - column_name: dob
+        data: fake.date_of_birth(minimum_age=0, maximum_age=100)
+      - column_name: gender
+        data: random.choice(["Male","Female","Other"])
+      - column_name: phone
+        data: fake.phone_number()
+      - column_name: email
+        data: fake.email()
+      - column_name: address
+        data: fake.street_address()
+      - column_name: emergency_contact_name
+        data: fake.name()
+      - column_name: emergency_contact_phone
+        data: fake.phone_number()
+
+  - table_name: doctor
+    row_count: 150
+    start_row_id: 3000
+    columns:
+      - column_name: doctor_id
+        data: row_id
+        is_primary_key: true
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: full_name
+        data: first_name + " " + last_name
+      - column_name: specialty
+        data: random.choice(["Cardiology","Emergency","Pediatrics","Oncology","Neurology","Orthopedics","Radiology","Surgery","Maternity"])
+      - column_name: department_id
+        data: foreign_key("department", "department_id")
+      - column_name: hire_date
+        data: fake.date_between(start_date='-25y', end_date='-1y')
+      - column_name: phone
+        data: fake.phone_number()
+      - column_name: email
+        data: fake.email()
+
+  - table_name: nurse
+    row_count: 300
+    start_row_id: 4000
+    columns:
+      - column_name: nurse_id
+        data: row_id
+        is_primary_key: true
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: full_name
+        data: first_name + " " + last_name
+      - column_name: department_id
+        data: foreign_key("department", "department_id")
+      - column_name: phone
+        data: fake.phone_number()
+
+  - table_name: room
+    row_count: 200
+    start_row_id: 5000
+    columns:
+      - column_name: room_id
+        data: row_id
+        is_primary_key: true
+      - column_name: room_number
+        data: fake.random_int(100, 599)
+      - column_name: room_type
+        data: random.choice(["ICU","General","Private","Surgery","Maternity"])
+      - column_name: capacity
+        data: random.choice([1,2,4,6])
+        type: int32
+      - column_name: occupied
+        data: random.choice([True, False, False])
+
+  - table_name: admission
+    row_count: 600
+    start_row_id: 6000
+    columns:
+      - column_name: admission_id
+        data: row_id
+        is_primary_key: true
+      - column_name: patient_id
+        data: foreign_key("patient", "patient_id")
+      - column_name: room_id
+        data: foreign_key("room", "room_id")
+      - column_name: admitted_date
+        data: fake.date_between(start_date='-1y', end_date='today')
+      - column_name: discharged_date
+        data: random.choice([fake.date_between(start_date='today', end_date='+30d'), None, None])
+      - column_name: admitting_doctor_id
+        data: foreign_key("doctor", "doctor_id")
+      - column_name: status
+        data: random.choice(["admitted","discharged","transferred"])
+
+  - table_name: appointment
+    row_count: 3000
+    start_row_id: 7000
+    columns:
+      - column_name: appointment_id
+        data: row_id
+        is_primary_key: true
+      - column_name: patient_id
+        data: foreign_key("patient", "patient_id")
+      - column_name: doctor_id
+        data: foreign_key("doctor", "doctor_id")
+      - column_name: nurse_id
+        data: random.choice([None, foreign_key("nurse", "nurse_id")])
+      - column_name: appointment_date
+        data: fake.date_between(start_date='-1y', end_date='+90d')
+      - column_name: reason
+        data: fake.sentence(nb_words=6)
+      - column_name: status
+        data: random.choice(["scheduled","completed","cancelled"])
+
+  - table_name: diagnosis
+    row_count: 1200
+    start_row_id: 10000
+    columns:
+      - column_name: diagnosis_id
+        data: row_id
+        is_primary_key: true
+      - column_name: admission_id
+        data: foreign_key("admission", "admission_id")
+      - column_name: code
+        data: random.choice(["I10","E11.9","J45","K21.9","M54.5","N39.0","R10.9"])
+      - column_name: description
+        data: fake.sentence(nb_words=8)
+      - column_name: diagnosed_on
+        data: fake.date_between(start_date='-1y', end_date='today')
+
+  - table_name: medication
+    row_count: 800
+    start_row_id: 12000
+    columns:
+      - column_name: medication_id
+        data: row_id
+        is_primary_key: true
+      - column_name: name
+        data: fake.word().capitalize() + " " + random.choice(["Tab","Cap","Syrup","Injection"])
+      - column_name: manufacturer
+        data: fake.company()
+      - column_name: unit_price
+        data: round(random.uniform(0.5, 200.0), 2)
+        type: float
+      - column_name: unit
+        data: random.choice(["mg","ml","tablet","capsule","unit"])
+
+  - table_name: prescription
+    row_count: 1500
+    start_row_id: 11000
+    columns:
+      - column_name: prescription_id
+        data: row_id
+        is_primary_key: true
+      - column_name: patient_id
+        data: foreign_key("patient", "patient_id")
+      - column_name: doctor_id
+        data: foreign_key("doctor", "doctor_id")
+      - column_name: date
+        data: fake.date_between(start_date='-1y', end_date='today')
+      - column_name: notes
+        data: fake.sentence(nb_words=6)
+
+  - table_name: prescription_item
+    row_count: 2500
+    start_row_id: 13000
+    columns:
+      - column_name: item_id
+        data: row_id
+        is_primary_key: true
+      - column_name: prescription_id
+        data: foreign_key("prescription", "prescription_id")
+      - column_name: medication_id
+        data: foreign_key("medication", "medication_id")
+      - column_name: dose
+        data: random.choice(["5mg","10mg","250mg","500mg","1g"])
+      - column_name: frequency
+        data: random.choice(["once a day","twice a day","three times a day","as needed"])
+      - column_name: quantity
+        data: random.randint(1,60)
+        type: int32
+      - column_name: unit_price
+        data: copy_from_fk("medication_id", "medication", "unit_price")
+        type: float
+      - column_name: line_total
+        data: |
+          # line_total = unit_price * quantity
+          return round(unit_price * quantity, 2)
+        type: float
+
+  - table_name: lab_test
+    row_count: 400
+    start_row_id: 14000
+    columns:
+      - column_name: lab_test_id
+        data: row_id
+        is_primary_key: true
+      - column_name: name
+        data: random.choice(["CBC","BMP","Lipid Panel","Liver Panel","Urinalysis","COVID-19 PCR","Blood Culture"])
+      - column_name: normal_range
+        data: random.choice(["4.0-10.0 x10^3/uL","70-110 mg/dL","<200 mg/dL","7-56 U/L","Negative","Negative"])
+
+  - table_name: lab_result
+    row_count: 1800
+    start_row_id: 15000
+    columns:
+      - column_name: lab_result_id
+        data: row_id
+        is_primary_key: true
+      - column_name: lab_test_id
+        data: foreign_key("lab_test", "lab_test_id")
+      - column_name: patient_id
+        data: foreign_key("patient", "patient_id")
+      - column_name: result_value
+        data: |
+          # produce a plausible numeric or textual result depending on test
+          if "CBC" in copy_from_fk("lab_test_id","lab_test","name"):
+            return round(random.uniform(4.0, 10.0), 2)
+          if "Lipid" in copy_from_fk("lab_test_id","lab_test","name"):
+            return round(random.uniform(100, 300), 2)
+          return random.choice(["Negative","Positive", str(round(random.uniform(0.1, 150.0), 2))])
+      - column_name: result_date
+        data: fake.date_between(start_date='-1y', end_date='today')
+
+  - table_name: billing
+    row_count: 1000
+    start_row_id: 16000
+    columns:
+      - column_name: billing_id
+        data: row_id
+        is_primary_key: true
+      - column_name: patient_id
+        data: foreign_key("patient", "patient_id")
+      - column_name: admission_id
+        data: random.choice([None, foreign_key("admission", "admission_id")])
+      - column_name: amount
+        data: round(random.uniform(50.0, 15000.0), 2)
+        type: float
+      - column_name: issued_date
+        data: fake.date_between(start_date='-1y', end_date='today')
+      - column_name: due_date
+        data: fake.date_between(start_date='today', end_date='+90d')
+      - column_name: paid
+        data: random.choice([True, False, False])
+
+  - table_name: payment
+    row_count: 800
+    start_row_id: 17000
+    columns:
+      - column_name: payment_id
+        data: row_id
+        is_primary_key: true
+      - column_name: billing_id
+        data: foreign_key("billing", "billing_id")
+      - column_name: amount
+        data: copy_from_fk("billing_id", "billing", "amount")
+        type: float
+      - column_name: paid_date
+        data: fake.date_between(start_date='-90d', end_date='today')
+      - column_name: method
+        data: random.choice(["cash","credit_card","insurance","bank_transfer"])

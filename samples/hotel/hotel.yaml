@@ -212,7 +212,6 @@ tables:
         - column_name: payment_status
           data: random.choice(["paid", "unpaid", "pending"])
 
-
     - table_name: reservation_amenity
       row_count: 800
       columns:

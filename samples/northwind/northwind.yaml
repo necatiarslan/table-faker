@@ -1,0 +1,198 @@
+version: 1
+config:
+  locale: en_US
+
+# Microsoft Northwind sample dataset (simplified)
+tables:
+  - table_name: customer
+    row_count: 90
+    start_row_id: 1000
+    columns:
+      - column_name: customer_id
+        data: row_id
+        is_primary_key: true
+      - column_name: company_name
+        data: fake.company()
+      - column_name: contact_name
+        data: fake.name()
+      - column_name: contact_title
+        data: random.choice(["Owner","Purchasing Manager","Sales Representative","Administrator"])
+      - column_name: address
+        data: fake.street_address()
+      - column_name: city
+        data: fake.city()
+      - column_name: region
+        data: fake.state()
+      - column_name: postal_code
+        data: fake.postcode()
+      - column_name: country
+        data: fake.country()
+      - column_name: phone
+        data: fake.phone_number()
+      - column_name: fax
+        data: fake.phone_number()
+
+  - table_name: supplier
+    row_count: 30
+    start_row_id: 2000
+    columns:
+      - column_name: supplier_id
+        data: row_id
+        is_primary_key: true
+      - column_name: company_name
+        data: fake.company()
+      - column_name: contact_name
+        data: fake.name()
+      - column_name: contact_title
+        data: random.choice(["Sales Manager","Owner","Purchasing Agent"])
+      - column_name: address
+        data: fake.street_address()
+      - column_name: city
+        data: fake.city()
+      - column_name: country
+        data: fake.country()
+      - column_name: phone
+        data: fake.phone_number()
+      - column_name: fax
+        data: fake.phone_number()
+      - column_name: homepage
+        data: fake.domain_name()
+
+  - table_name: category
+    row_count: 10
+    start_row_id: 3000
+    columns:
+      - column_name: category_id
+        data: row_id
+        is_primary_key: true
+      - column_name: category_name
+        data: random.choice(["Beverages","Condiments","Confections","Dairy","Grains/Cereals","Meat/Poultry","Produce","Seafood","Snacks","Bakery"])
+      - column_name: description
+        data: fake.sentence(nb_words=8)
+
+  - table_name: product
+    row_count: 250
+    start_row_id: 4000
+    columns:
+      - column_name: product_id
+        data: row_id
+        is_primary_key: true
+      - column_name: product_name
+        data: fake.word().capitalize() + " " + random.choice(["Mix","Sauce","Slices","Nuggets","Blend","Bottle"])
+      - column_name: supplier_id
+        data: foreign_key("supplier", "supplier_id")
+      - column_name: category_id
+        data: foreign_key("category", "category_id")
+      - column_name: quantity_per_unit
+        data: random.choice(["10 boxes", "24 - 12 oz bottles", "12 - 1 lb pkgs", "1 kg box"])
+      - column_name: unit_price
+        data: round(random.uniform(2.5, 120.0), 2)
+        type: float
+      - column_name: units_in_stock
+        data: random.randint(0, 120)
+        type: int32
+      - column_name: units_on_order
+        data: random.randint(0, 40)
+        type: int32
+      - column_name: reorder_level
+        data: random.randint(0, 20)
+        type: int32
+      - column_name: discontinued
+        data: random.choice([False, False, False, True])
+
+  - table_name: employee
+    row_count: 12
+    start_row_id: 5000
+    columns:
+      - column_name: employee_id
+        data: row_id
+        is_primary_key: true
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: title
+        data: random.choice(["Sales Representative","Inside Sales Coordinator","Accountant","Vice President, Sales"])
+      - column_name: birth_date
+        data: fake.date_of_birth(minimum_age=30, maximum_age=70)
+      - column_name: hire_date
+        data: fake.date_between(start_date='-20y', end_date='-1y')
+      - column_name: address
+        data: fake.street_address()
+      - column_name: city
+        data: fake.city()
+      - column_name: country
+        data: fake.country()
+      - column_name: phone
+        data: fake.phone_number()
+      - column_name: extension
+        data: str(fake.random_int(100,999))
+
+  - table_name: shipper
+    row_count: 6
+    start_row_id: 6000
+    columns:
+      - column_name: shipper_id
+        data: row_id
+        is_primary_key: true
+      - column_name: company_name
+        data: fake.company()
+      - column_name: phone
+        data: fake.phone_number()
+
+  - table_name: order
+    row_count: 1000
+    start_row_id: 7000
+    columns:
+      - column_name: order_id
+        data: row_id
+        is_primary_key: true
+      - column_name: customer_id
+        data: foreign_key("customer", "customer_id")
+      - column_name: employee_id
+        data: foreign_key("employee", "employee_id")
+      - column_name: order_date
+        data: fake.date_between(start_date='-5y', end_date='today')
+      - column_name: required_date
+        data: fake.date_between(start_date='today', end_date='+60d')
+      - column_name: shipped_date
+        data: random.choice([fake.date_between(start_date='today', end_date='+30d'), None, None])
+      - column_name: ship_via
+        data: foreign_key("shipper", "shipper_id")
+      - column_name: freight
+        data: round(random.uniform(0, 200), 2)
+        type: float
+      - column_name: ship_name
+        data: copy_from_fk("customer_id", "customer", "company_name")
+      - column_name: ship_address
+        data: copy_from_fk("customer_id", "customer", "address")
+      - column_name: ship_city
+        data: copy_from_fk("customer_id", "customer", "city")
+      - column_name: ship_country
+        data: copy_from_fk("customer_id", "customer", "country")
+
+  - table_name: order_detail
+    row_count: 2500
+    start_row_id: 8000
+    columns:
+      - column_name: order_detail_id
+        data: row_id
+        is_primary_key: true
+      - column_name: order_id
+        data: foreign_key("order", "order_id")
+      - column_name: product_id
+        data: foreign_key("product", "product_id")
+      - column_name: unit_price
+        data: copy_from_fk("product_id", "product", "unit_price")
+        type: float
+      - column_name: quantity
+        data: random.randint(1, 20)
+        type: int32
+      - column_name: discount
+        data: round(random.choice([0.0, 0.05, 0.1, 0.15]), 2)
+        type: float
+      - column_name: line_total
+        data: |
+          # calculate (unit_price * quantity) * (1 - discount)
+          return round(unit_price * quantity * (1 - discount), 2)
+        type: float

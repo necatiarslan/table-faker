@@ -1,9 +1,6 @@
 version: 1
 config:
   locale: en_US
-  python_import:
-    - dateutil
-    - datetime
 
 # Sample school management system domain
 # Tables included: student, guardian, teacher, subject, classroom,

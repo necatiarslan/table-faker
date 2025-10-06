@@ -52,7 +52,7 @@ tables:
               #   None                        -> explicit NULL
               #   multi-line Python block using | (must return a value)
         is_primary_key: <true|false>
-        type: string | int32 | int64 | float | boolean
+        type: string | int32 | int64 | float | boolean # a NumPy dtype object, a pandas ExtensionDtype, or a Python type
         null_percentage: <float between 0.0 and 1.0>
         description: <string>
 
@@ -72,7 +72,7 @@ tables:
 Notes:
 - Parent tables must be defined before child tables.
 - Two-phase evaluation resolves columns that reference other columns correctly.
-- For a full example, see [`tests/test_table.yaml`](tests/test_table.yaml:1).
+- For a full example, see [`tests/test_table.yaml`](tests/test_table.yaml).
 
 ## Sample Yaml File Minimal
 ```yaml
@@ -172,7 +172,6 @@ tables:
 ## Configuration: Determinism & Attribute Inference
 
 ### Seed (deterministic)
-[`yaml.declaration()`](table-faker/README.md:114)
 ```yaml
 config:
   locale: en_US
@@ -183,7 +182,6 @@ config:
 - Use cases: repeatable tests, CI snapshots, and reproducible examples.
 
 ### Attribute name inference
-[`yaml.declaration()`](table-faker/README.md:114)
 ```yaml
 config:
   infer_entity_attrs_by_name: true  # Optional: auto-infer FK attributes
@@ -194,7 +192,6 @@ config:
 ## Cross-Table Relationships
 
 ### Using copy_from_fk()
-[`yaml.declaration()`](table-faker/README.md:114)
 ```yaml
 - column_name: customer_email
   data: copy_from_fk("customer_id", "customers", "email")
@@ -204,7 +201,6 @@ config:
 - Parent tables must be defined before child tables in the YAML (no automatic backfilling).
 
 Full parent/child example:
-[`yaml.declaration()`](table-faker/README.md:114)
 ```yaml
 tables:
   - table_name: customers
@@ -229,7 +225,6 @@ tables:
 ```
 
 ### Automatic attribute inference in action
-[`yaml.declaration()`](table-faker/README.md:114)
 ```yaml
 config:
   infer_entity_attrs_by_name: true
@@ -254,14 +249,12 @@ tables:
 Foreign keys support different sampling distributions to model realistic parent usage patterns.
 
 ### Uniform distribution (default)
-[`yaml.declaration()`](table-faker/README.md:114)
 ```yaml
 data: foreign_key("customers", "customer_id")
 ```
 - Backward compatible: selects parent keys uniformly at random.
 
 ### Zipf (power-law) distribution
-[`yaml.declaration()`](table-faker/README.md:114)
 ```yaml
 data: foreign_key("customers", "customer_id", distribution="zipf", param=1.2)
 ```
@@ -270,7 +263,6 @@ data: foreign_key("customers", "customer_id", distribution="zipf", param=1.2)
 - Useful for modeling popular customers, trending products, or social-systems with power-law behavior.
 
 ### Weighted parent distribution (attribute-based)
-[`yaml.declaration()`](table-faker/README.md:114)
 ```yaml
 data: foreign_key(
   "customers",
@@ -285,7 +277,6 @@ data: foreign_key(
 - Useful to prefer high-rated customers, VIP tiers, or any attribute-driven bias.
 
 ## Complete example (seed, inference, weighted FK)
-[`yaml.declaration()`](table-faker/README.md:114)
 ```yaml
 version: 1
 config:
@@ -549,7 +540,6 @@ If you find Table Faker useful and would like to support its development, consid
 - Generate template yaml file from sample data
 - use an ai service to generate data generation logic
 - make openpyxl package optional to export to excel
-- look for need of psutils package
 
 ### Future Enhancements
 - PyArrow table support

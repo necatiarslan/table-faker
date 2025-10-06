@@ -139,5 +139,5 @@ tests/.DS_Store
 .dev/
 dev/
 
-domains/*/output
-domains/*/exports
+samples/*/output
+samples/*/exports
