@@ -21,6 +21,6 @@ tables:
       - column_name: customer_id
         data: foreign_key("customers","customer_id")
       - column_name: customer_email
-        data: copy_from_fk("customer_id","customers","email")
+        data: copy_from_fk("customers","customer_id","email")
       - column_name: customer_rating
-        data: copy_from_fk("customer_id","customers","rating")
+        data: copy_from_fk("customers","customer_id","rating")

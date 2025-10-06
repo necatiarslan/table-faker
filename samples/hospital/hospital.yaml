@@ -1,9 +1,6 @@
 version: 1
 config:
   locale: en_US
-  python_import:
-    - datetime
-    - dateutil
 
 # Simplified Hospital Management System sample dataset
 tables:
@@ -217,7 +214,7 @@ tables:
         data: random.randint(1,60)
         type: int32
       - column_name: unit_price
-        data: copy_from_fk("medication_id", "medication", "unit_price")
+        data: copy_from_fk("medication", "medication_id", "unit_price")
         type: float
       - column_name: line_total
         data: |
@@ -251,9 +248,9 @@ tables:
       - column_name: result_value
         data: |
           # produce a plausible numeric or textual result depending on test
-          if "CBC" in copy_from_fk("lab_test_id","lab_test","name"):
+          if "CBC" in copy_from_fk("lab_test","lab_test_id","name"):
             return round(random.uniform(4.0, 10.0), 2)
-          if "Lipid" in copy_from_fk("lab_test_id","lab_test","name"):
+          if "Lipid" in copy_from_fk("lab_test","lab_test_id","name"):
             return round(random.uniform(100, 300), 2)
           return random.choice(["Negative","Positive", str(round(random.uniform(0.1, 150.0), 2))])
       - column_name: result_date
@@ -290,7 +287,7 @@ tables:
       - column_name: billing_id
         data: foreign_key("billing", "billing_id")
       - column_name: amount
-        data: copy_from_fk("billing_id", "billing", "amount")
+        data: copy_from_fk("billing", "billing_id", "amount")
         type: float
       - column_name: paid_date
         data: fake.date_between(start_date='-90d', end_date='today')

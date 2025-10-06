@@ -163,13 +163,13 @@ tables:
         data: round(random.uniform(0, 200), 2)
         type: float
       - column_name: ship_name
-        data: copy_from_fk("customer_id", "customer", "company_name")
+        data: copy_from_fk("customer", "customer_id", "company_name")
       - column_name: ship_address
-        data: copy_from_fk("customer_id", "customer", "address")
+        data: copy_from_fk("customer", "customer_id", "address")
       - column_name: ship_city
-        data: copy_from_fk("customer_id", "customer", "city")
+        data: copy_from_fk("customer", "customer_id", "city")
       - column_name: ship_country
-        data: copy_from_fk("customer_id", "customer", "country")
+        data: copy_from_fk("customer", "customer_id", "country")
 
   - table_name: order_detail
     row_count: 2500
@@ -183,7 +183,7 @@ tables:
       - column_name: product_id
         data: foreign_key("product", "product_id")
       - column_name: unit_price
-        data: copy_from_fk("product_id", "product", "unit_price")
+        data: copy_from_fk("product", "product_id", "unit_price")
         type: float
       - column_name: quantity
         data: random.randint(1, 20)

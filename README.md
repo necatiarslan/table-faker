@@ -62,7 +62,7 @@ tables:
 #
 # Special helper functions:
 #   foreign_key(parent_table, parent_column, distribution="uniform", param=None, parent_attr=None, weights=None)
-#   copy_from_fk(fk_column, parent_table, parent_attr)
+#   copy_from_fk(parent_table, fk_column, parent_attr)
 #
 # Multi-line Python block:
 # Use YAML block scalar `|` and include a final `return <value>` statement.
@@ -194,7 +194,7 @@ config:
 ### Using copy_from_fk()
 ```yaml
 - column_name: customer_email
-  data: copy_from_fk("customer_id", "customers", "email")
+  data: copy_from_fk("customers", "customer_id", "email")
 ```
 - `copy_from_fk(fk_column, parent_table, parent_attr)` copies an attribute from the parent row referenced by the foreign key.
 - Useful when you need to duplicate a value from the parent instead of generating it again.
@@ -221,7 +221,7 @@ tables:
       - column_name: customer_id
         data: foreign_key("customers", "customer_id")
       - column_name: customer_email
-        data: copy_from_fk("customer_id", "customers", "email")
+        data: copy_from_fk("customers", "customer_id", "email")
 ```
 
 ### Automatic attribute inference in action

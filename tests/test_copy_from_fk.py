@@ -34,7 +34,7 @@ tables:
       - column_name: customer_id
         data: foreign_key("customers","customer_id")
       - column_name: customer_email
-        data: copy_from_fk("customer_id","customers","email")
+        data: copy_from_fk("customers","customer_id","email")
 """
     cfg = tmp_path / "cfg.yaml"
     _write_yaml(cfg, yaml)
@@ -64,7 +64,7 @@ tables:
       - column_name: customer_id
         data: foreign_key("customers","customer_id")
       - column_name: customer_email
-        data: copy_from_fk("customer_id","customers","email")
+        data: copy_from_fk("customers","customer_id","email")
   - table_name: customers
     row_count: 2
     columns:
@@ -115,9 +115,9 @@ tables:
       - column_name: vendor_id
         data: foreign_key("vendors","vendor_id")
       - column_name: customer_email
-        data: copy_from_fk("customer_id","customers","email")
+        data: copy_from_fk("customers","customer_id","email")
       - column_name: vendor_name
-        data: copy_from_fk("vendor_id","vendors","vendor_name")
+        data: copy_from_fk("vendors","vendor_id","vendor_name")
 """
     cfg = tmp_path / "multi_parent.yaml"
     _write_yaml(cfg, yaml)

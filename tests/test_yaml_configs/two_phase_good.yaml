@@ -18,6 +18,6 @@ tables:
         is_primary_key: true
       # Derived column appears before foreign_key in YAML but should still work due to two-phase
       - column_name: customer_email
-        data: copy_from_fk("customer_id","customers","email")
+        data: copy_from_fk("customers","customer_id","email")
       - column_name: customer_id
         data: foreign_key("customers","customer_id")

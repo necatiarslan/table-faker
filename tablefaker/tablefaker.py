@@ -45,8 +45,11 @@ class TableFaker:
         key = "|".join(map(str, parts)).encode("utf-8")
         return int.from_bytes(hashlib.md5(key).digest()[:4], "little")
     
-    def _copy_from_fk(self, fk_col, parent_table, parent_attr):
-        """Copy attribute from parent row via foreign key."""
+    def _copy_from_fk(self, parent_table, fk_col, parent_attr):
+        """Copy attribute from parent row via foreign key.
+
+        New parameter order: (parent_table, fk_col, parent_attr)
+        """
         fk_val = self._current_row[fk_col]
         try:
             return self.parent_rows[parent_table][fk_val][parent_attr]
@@ -321,7 +324,8 @@ class TableFaker:
                         fk_col = f"{prefix}_id"
                         if fk_col in fk_sources:
                             parent_table, _ = fk_sources[fk_col]
-                            c["data"] = f'copy_from_fk("{fk_col}","{parent_table}","{attr}")'
+                            # New copy_from_fk signature: (parent_table, fk_col, parent_attr)
+                            c["data"] = f'copy_from_fk("{parent_table}","{fk_col}","{attr}")'
  
         compiled_commands = {}
         for column in columns:

@@ -137,7 +137,7 @@ tables:
       - column_name: days
         data: random.choice(["Mon/Wed/Fri", "Tue/Thu", "Mon/Tue/Wed/Thu", "Mon-Fri"])
       - column_name: max_capacity
-        data: copy_from_fk("classroom_id", "classroom", "capacity")
+        data: copy_from_fk("classroom", "classroom_id", "capacity")
         type: int32
       - column_name: enrolled_count
         data: random.randint(int(max_capacity*0.4), max_capacity)
@@ -216,12 +216,12 @@ tables:
       - column_name: score
         data: |
           # score as a fraction of max_score with some randomness
-          m = copy_from_fk("assignment_id", "assignment", "max_score")
+          m = copy_from_fk("assignment", "assignment_id", "max_score")
           return round(max(0, min(m, int(random.gauss(m * 0.8, m * 0.12)))), 0)
         type: int32
       - column_name: percent
         data: |
-          m = copy_from_fk("assignment_id", "assignment", "max_score")
+          m = copy_from_fk("assignment", "assignment_id", "max_score")
           return round((score / float(m)) * 100, 2) if m and m > 0 else 0.0
         type: float
 
@@ -273,9 +273,9 @@ tables:
       - column_name: fee_id
         data: foreign_key("fee", "fee_id")
       - column_name: student_id
-        data: copy_from_fk("fee_id", "fee", "student_id")
+        data: copy_from_fk("fee", "fee_id", "student_id")
       - column_name: amount
-        data: copy_from_fk("fee_id", "fee", "amount")
+        data: copy_from_fk("fee", "fee_id", "amount")
         type: float
       - column_name: paid_date
         data: fake.date_between(start_date='-60d', end_date='today')
