@@ -1,0 +1,142 @@
+version: 1
+config:
+  locale: en_US
+
+tables:
+  - table_name: lab
+    row_count: 3
+    start_row_id: 1
+    columns:
+      - column_name: lab_id
+        data: row_id
+        is_primary_key: true
+      - column_name: lab_name
+        data: fake.company() + " Lab"
+      - column_name: location
+        data: fake.city()
+      - column_name: established_year
+        data: random.randint(1980, 2023)
+        type: int16
+      - column_name: head_of_lab
+        data: fake.name()
+      - column_name: funding_amount
+        data: round(random.uniform(50000.00, 5000000.00), 2)
+        type: float32
+      - column_name: is_active
+        data: random.choice([True, False])
+  - table_name: experiment
+    row_count: 5
+    start_row_id: 1
+    columns:
+      - column_name: experiment_id
+        data: row_id
+        is_primary_key: true
+      - column_name: experiment_name
+        data: fake.word().capitalize() + " Experiment"
+      - column_name: date_conducted
+        data: fake.date_between(start_date='-1y', end_date='today')
+      - column_name: result
+        data: random.choice(["Success", "Failure", "Inconclusive"])
+      - column_name: lead_scientist
+        data: fake.name()
+      - column_name: budget
+        data: round(random.uniform(1000.00, 100000.00), 2)
+        type: float32
+      - column_name: is_approved
+        data: random.choice([True, False])
+  - table_name: scientist
+    row_count: 2
+    start_row_id: 1
+    columns:
+      - column_name: scientist_id
+        data: row_id
+        is_primary_key: true
+      - column_name: name
+        data: fake.name()
+      - column_name: field_of_study
+        data: random.choice(["Biology", "Chemistry", "Physics", "Mathematics", "Computer Science"])
+      - column_name: years_of_experience
+        data: random.randint(1, 40)
+        type: int8
+      - column_name: email
+        data: fake.email()
+      - column_name: phone_number
+        data: fake.phone_number()
+      - column_name: institution
+        data: fake.company()
+  - table_name: publication
+    row_count: 50
+    start_row_id: 1
+    columns:
+      - column_name: publication_id
+        data: row_id
+        is_primary_key: true
+      - column_name: scientist_id
+        data: foreign_key("scientist", "scientist_id")
+      - column_name: lab_id
+        data: foreign_key("lab", "lab_id")
+        null_percent: 0.2
+      - column_name: title
+        data: fake.sentence(nb_words=6).rstrip('.')
+      - column_name: journal
+        data: random.choice(["Nature", "Science", "Cell", "The Lancet", "PLOS ONE"])
+      - column_name: publication_date
+        data: fake.date_between(start_date='-5y', end_date='today')
+      - column_name: doi
+        data: fake.uuid4()
+      - column_name: lead_author
+        data: copy_from_fk("scientist", "scientist_id", "name")
+      - column_name: citations
+        data: random.randint(0, 500)
+        type: int16
+      - column_name: is_peer_reviewed
+        data: random.choice([True, False])
+  - table_name: equipment
+    row_count: 10
+    start_row_id: 1
+    columns:
+      - column_name: equipment_id
+        data: row_id
+        is_primary_key: true
+      - column_name: lab_id
+        data: foreign_key("lab", "lab_id")
+      - column_name: equipment_name
+        data: random.choice(["Microscope", "Centrifuge", "Spectrometer", "PCR Machine", "Incubator"])
+      - column_name: purchase_date
+        data: fake.date_between(start_date='-10y', end_date='today')
+      - column_name: cost
+        data: round(random.uniform(1000.00, 100000.00), 2)
+        type: float32
+      - column_name: is_functional
+        data: random.choice([True, False])
+      - column_name: last_maintenance_date
+        data: fake.date_between(start_date='-1y', end_date='today')
+      - column_name: warranty_years
+        data: random.randint(1, 5)
+        type: int8
+      - column_name: manufacturer
+        data: fake.company()
+      - column_name: serial_number
+        data: fake.bothify(text='??-########')
+  - table_name: test_result
+    row_count: 20
+    start_row_id: 1
+    columns:
+      - column_name: test_result_id
+        data: row_id
+        is_primary_key: true
+      - column_name: experiment_id
+        data: foreign_key("experiment", "experiment_id")
+      - column_name: parameter_name
+        data: random.choice(["pH Level", "Temperature", "Concentration", "Pressure", "Humidity"])
+      - column_name: value
+        data: round(random.uniform(0.0, 100.0), 2)
+        type: float32
+      - column_name: unit
+        data: random.choice(["units", "Celsius", "mg/L", "atm", "%"])
+      - column_name: measured_at
+        data: fake.date_time_between(start_date='-1y', end_date='now')
+      - column_name: is_within_expected_range
+        data: random.choice([True, False])
+      - column_name: notes
+        data: fake.sentence(nb_words=10)

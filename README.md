@@ -535,6 +535,11 @@ If you find Table Faker useful and would like to support its development, consid
 
 ## Roadmap
 ### TODO
+- Support composite primary key
+  - composite keys are not unique
+  - composite keys are not stored together
+  - copy_from_fk do not support composite primary key
+- is_unique support
 - Provide foreign keys (dictionary, array etc) as an external source
 - Variables
 - Generate template yaml file from sample data

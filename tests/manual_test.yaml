@@ -1,0 +1,80 @@
+version: 1
+config:
+  locale: en_US
+  python_import:
+    - dateutil
+    - faker_education
+  community_providers:
+    - faker_education(SchoolProvider)
+tables:
+  - table_name: person
+    row_count: 100
+    start_row_id: 10                               # you can set row_id starting point
+    export_file_count: 2                           # you can set export file count (dominant to export_file_row_count)
+    columns:
+      - column_name: id
+        data: row_id                                # row_id is a built-in function
+        is_primary_key: true                        # define primary key to use as a foreign key
+      - column_name: first_name
+        data: fake.first_name()                     # faker function
+        type: string
+      - column_name: last_name
+        data: fake.last_name()
+        type: string
+      - column_name: full_name
+        data: first_name + " " + last_name           # use a column to generate a new column
+        is_primary_key: true
+      - column_name: age
+        data: fake.random_int(18, 90)
+        type: int32
+      - column_name: retired
+        data: True if age > 65 else False
+      - column_name: street_address
+        data: fake.street_address()
+      - column_name: city
+        data: fake.city()
+      - column_name: state_abbr
+        data: fake.state_abbr()
+      - column_name: postcode
+        data: fake.postcode()
+      - column_name: gender
+        data: random.choice(["male", "female"])     # random.choice is a built-in function
+        null_percentage: 0.5                        # null_percentage is a built-in function
+      - column_name: left_handed
+        data: fake.pybool()
+      - column_name: today
+        data: datetime.today().strftime('%Y-%m-%d') # datetime package is available by default
+      - column_name: easter_date
+        data: dateutil.easter.easter(2025).strftime('%Y-%m-%d') # python package you need to import in python_import
+      - column_name: discount_eligibility
+        data: |
+          if age < 25 or age > 60:
+            return True
+          else:
+            return False
+  - table_name: employee
+    row_count: 10
+    export_file_row_count: 5                      # you can set export file row count
+    columns:
+      - column_name: id
+        data: row_id
+      - column_name: person_id
+        data: foreign_key("person", "id")          # get primary key from another table
+      - column_name: full_name
+        data: foreign_key("person", "full_name")
+      - column_name: hire_date
+        data: fake.date_between()
+        type: string
+      - column_name: title
+        data: random.choice(["engineer", "senior engineer", "principal engineer", "director", "senior director", "manager", "vice president", "president"])
+      - column_name: salary
+        data: None #NULL
+        type: float
+      - column_name: height
+        data: r"170 cm" #string
+      - column_name: weight
+        data: 150 #number
+      - column_name: school
+        data: fake.school_district() # custom provider
+ 
+         
