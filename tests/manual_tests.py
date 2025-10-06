@@ -10,9 +10,11 @@ def get_level():
     return f"level {fake.random_int(1, 5)}"
 
 directory_path = 'tests/exports'
-if os.path.isdir(directory_path):
+if not os.path.exists(directory_path):
+    os.makedirs(directory_path)
+elif os.path.isdir(directory_path):
     shutil.rmtree(directory_path)
-    os.mkdir(directory_path)
+    os.makedirs(directory_path)
 
 os.system('clear')
 

@@ -70,8 +70,8 @@ class LLMClient:
         """Lazy initialization of OpenAI client."""
         if self._client is None:
             try:
-                from openai import OpenAI
-                self._client = OpenAI(
+                openai = __import__("openai")
+                self._client = openai.OpenAI(
                     api_key=self.api_key,
                     base_url=self.base_url
                 )
