@@ -1,0 +1,132 @@
+version: 1
+config:
+  locale: en_US
+
+# sample bank database schema
+tables:
+  - table_name: customer
+    row_count: 1000
+    start_row_id: 1
+    columns:
+      - column_name: customer_id
+        data: row_id
+        is_primary_key: true
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: email
+        data: fake.email()
+      - column_name: phone
+        data: fake.phone_number()
+      - column_name: address
+        data: fake.street_address()
+      - column_name: city
+        data: fake.city()
+      - column_name: state
+        data: fake.state()
+      - column_name: zip_code
+        data: fake.zipcode()
+      - column_name: date_of_birth
+        data: fake.date_of_birth(tzinfo=None, minimum_age=18, maximum_age=90)
+      - column_name: created_at
+        data: fake.date_time_this_decade(before_now=True, after_now=False, tzinfo=None)
+  - table_name: account
+    row_count: 1500
+    start_row_id: 1001
+    columns:
+      - column_name: account_id
+        data: row_id
+        is_primary_key: true
+      - column_name: customer_id
+        data: foreign_key("customer", "customer_id")
+      - column_name: account_type
+        data: random.choice(["Checking", "Savings", "Credit"])
+      - column_name: balance
+        data: round(random.uniform(100.0, 10000.0), 2)
+      - column_name: opened_date
+        data: fake.date_between(start_date='-5y', end_date='today')
+      - column_name: status
+        data: random.choice(["Active", "Closed", "Suspended"])
+  - table_name: transaction
+    row_count: 5000
+    start_row_id: 5001
+    columns:
+      - column_name: transaction_id
+        data: row_id
+        is_primary_key: true
+      - column_name: account_id
+        data: foreign_key("account", "account_id")
+      - column_name: transaction_type
+        data: random.choice(["Deposit", "Withdrawal", "Transfer", "Payment"])
+      - column_name: amount
+        data: round(random.uniform(10.0, 5000.0), 2)
+      - column_name: transaction_date
+        data: fake.date_time_between(start_date='-2y', end_date='now', tzinfo=None)
+      - column_name: description
+        data: fake.sentence(nb_words=6)
+  - table_name: branch
+    row_count: 50
+    start_row_id: 2001
+    columns:
+      - column_name: branch_id
+        data: row_id
+        is_primary_key: true
+      - column_name: name
+        data: fake.company() + " Branch"
+      - column_name: address
+        data: fake.street_address()
+      - column_name: city
+        data: fake.city()
+      - column_name: state
+        data: fake.state()
+      - column_name: zip_code
+        data: fake.zipcode()
+      - column_name: phone
+        data: fake.phone_number()
+      - column_name: manager_name
+        data: fake.name()
+  - table_name: loan
+    row_count: 300
+    start_row_id: 3001
+    columns:
+      - column_name: loan_id
+        data: row_id
+        is_primary_key: true
+      - column_name: customer_id
+        data: foreign_key("customer", "customer_id")
+      - column_name: loan_type
+        data: random.choice(["Personal", "Mortgage", "Auto", "Student"])
+      - column_name: amount
+        data: round(random.uniform(5000.0, 50000.0), 2)
+      - column_name: interest_rate
+        data: round(random.uniform(3.0, 15.0), 2)
+      - column_name: start_date
+        data: fake.date_between(start_date='-5y', end_date='today')
+      - column_name: end_date
+        data: fake.date_between(start_date='today', end_date='+5y')
+      - column_name: status
+        data: random.choice(["Active", "Closed", "Defaulted"])
+  - table_name: credit_card
+    row_count: 800
+    start_row_id: 4001
+    columns:
+      - column_name: card_id
+        data: row_id
+        is_primary_key: true
+      - column_name: customer_id
+        data: foreign_key("customer", "customer_id")
+      - column_name: card_number
+        data: fake.credit_card_number(card_type=None)
+      - column_name: card_type
+        data: random.choice(["Visa", "MasterCard", "American Express", "Discover"])
+      - column_name: expiration_date
+        data: fake.credit_card_expire(start='now', end='+5y', date_format='%m/%y')
+      - column_name: cvv
+        data: fake.credit_card_security_code(card_type=None)
+      - column_name: credit_limit
+        data: round(random.uniform(1000.0, 20000.0), 2)
+      - column_name: balance
+        data: round(random.uniform(0.0, 5000.0), 2)
+      - column_name: status
+        data: random.choice(["Active", "Inactive", "Blocked"])

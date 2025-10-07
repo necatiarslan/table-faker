@@ -1,0 +1,98 @@
+version: 1
+config:
+  locale: en_US
+
+tables:
+  - table_name: author
+    row_count: 50
+    start_row_id: 100
+    columns:
+      - column_name: author_id
+        data: row_id
+        is_primary_key: true
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: birth_date
+        data: fake.date_of_birth(tzinfo=None, minimum_age=25, maximum_age=80)
+  - table_name: publisher
+    row_count: 20
+    start_row_id: 4000
+    columns:
+      - column_name: publisher_id
+        data: row_id
+        is_primary_key: true
+      - column_name: name
+        data: fake.company()
+      - column_name: address
+        data: fake.street_address()
+      - column_name: city
+        data: fake.city()
+      - column_name: country
+        data: fake.country()
+      - column_name: phone
+        data: fake.phone_number()
+      - column_name: email
+        data: fake.company_email()
+      - column_name: website
+        data: fake.url()
+  - table_name: book
+    row_count: 200
+    start_row_id: 1000
+    columns:
+      - column_name: book_id
+        data: row_id
+        is_primary_key: true
+      - column_name: title
+        data: fake.sentence(nb_words=4)
+      - column_name: author_id
+        data: foreign_key("author", "author_id")
+      - column_name: published_date
+        data: fake.date_between(start_date='-30y', end_date='today')
+      - column_name: isbn
+        data: fake.isbn13(separator="-")
+      - column_name: pages
+        data: random.randint(100, 1000)
+      - column_name: language
+        data: random.choice(["English", "Spanish", "French", "German", "Chinese"])
+      - column_name: publisher_id
+        data: foreign_key("publisher", "publisher_id")
+  - table_name: member
+    row_count: 100
+    start_row_id: 2000
+    columns:
+      - column_name: member_id
+        data: row_id
+        is_primary_key: true
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: join_date
+        data: fake.date_between(start_date='-5y', end_date='today')
+      - column_name: email
+        data: fake.email()
+      - column_name: phone
+        data: fake.phone_number()
+      - column_name: address
+        data: fake.street_address()
+      - column_name: city
+        data: fake.city()
+      - column_name: country
+        data: fake.country()
+  - table_name: loan
+    row_count: 300
+    start_row_id: 3000
+    columns:
+      - column_name: loan_id
+        data: row_id
+        is_primary_key: true
+      - column_name: book_id
+        data: foreign_key("book", "book_id")
+      - column_name: member_id
+        data: foreign_key("member", "member_id")
+      - column_name: loan_date
+        data: fake.date_between(start_date='-2y', end_date='today')
+      - column_name: return_date
+        data: random.choice([fake.date_between(start_date='-1y', end_date='today'), None])
