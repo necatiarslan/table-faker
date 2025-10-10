@@ -11,7 +11,11 @@ setup(
     long_description_content_type = "text/markdown",
     author='Necati Arslan',
     author_email='necatia@gmail.com',
+    keywords='faker, fake data, tabular data, data generation, pandas, parquet, csv, json, excel, sqllite, delta lake',
     packages=find_packages(),
+    python_requires=">=3.9",
+    license='Apache License 2.0',
+    url="https://github.com/necatiarslan/table-faker",
     install_requires=[
         'faker',
         'pyyaml',
@@ -33,7 +37,10 @@ setup(
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
         'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14',
         'Topic :: Software Development :: Libraries',
+        'Topic :: Utilities',
+        'Operating System :: OS Independent',
     ],
     project_urls={
         "Documentation": "https://github.com/necatiarslan/table-faker/blob/main/README.md",
