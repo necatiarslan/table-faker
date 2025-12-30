@@ -1,0 +1,214 @@
+version: 1
+config:
+  locale: en_US
+# Sample webstore domain (ASCII only)
+tables:
+  # customer
+  - table_name: customer
+    row_count: 1000
+    start_row_id: 1000
+    columns:
+      - column_name: customer_id
+        data: row_id
+        is_primary_key: true
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: email
+        data: fake.email()
+      - column_name: phone
+        data: fake.phone_number()
+      - column_name: address
+        data: fake.address()
+
+  # category
+  - table_name: category
+    row_count: 30
+    start_row_id: 2000
+    columns:
+      - column_name: category_id
+        data: row_id
+        is_primary_key: true
+      - column_name: name
+        data: random.choice(["Electronics", "Books", "Home", "Sports", "Toys", "Beauty", "Fashion", "Groceries", "Pet", "Office", "Garden", "Automotive", "Health", "Outdoors", "Jewelry", "Music", "Movies", "Games", "Baby", "Tools", "Art", "Crafts", "Kitchen", "Shoes", "Bags", "Accessories", "Lighting", "Furniture", "Fitness", "Collectibles"])
+      - column_name: description
+        data: fake.sentence(nb_words=12)
+
+  # product
+  - table_name: product
+    row_count: 500
+    start_row_id: 3000
+    columns:
+      - column_name: product_id
+        data: row_id
+        is_primary_key: true
+      - column_name: name
+        data: fake.word().title()
+      - column_name: description
+        data: fake.sentence(nb_words=10)
+      - column_name: category_id
+        data: foreign_key("category", "category_id")
+      - column_name: price
+        data: round(random.uniform(5.0, 500.0), 2)
+        type: float32
+      - column_name: stock_quantity
+        data: random.randint(0, 100)
+        type: int32
+      - column_name: status
+        data: random.choice(["active", "backorder", "discontinued"])
+
+  # order
+  - table_name: order
+    row_count: 2000
+    start_row_id: 4000
+    columns:
+      - column_name: order_id
+        data: row_id
+        is_primary_key: true
+      - column_name: customer_id
+        data: foreign_key("customer", "customer_id")
+      - column_name: order_date
+        data: fake.date_time_between(start_date='-1y', end_date='now', tzinfo=None)
+      - column_name: status
+        data: random.choice(["pending", "paid", "shipped", "delivered", "cancelled", "returned"])
+      - column_name: shipping_address
+        data: copy_from_fk("customer", "customer_id", "address")
+      - column_name: subtotal
+        data: round(random.uniform(20.0, 600.0), 2)
+        type: float32
+      - column_name: shipping_fee
+        data: random.choice([0.0, 4.99, 7.99, 14.99])
+        type: float32
+      - column_name: tax_amount
+        data: round(subtotal * random.uniform(0.05, 0.10), 2)
+        type: float32
+      - column_name: total_amount
+        data: round(subtotal + shipping_fee + tax_amount, 2)
+        type: float32
+
+  # order_item
+  - table_name: order_item
+    row_count: 8000
+    start_row_id: 7000
+    columns:
+      - column_name: order_item_id
+        data: row_id
+        is_primary_key: true
+      - column_name: order_id
+        data: foreign_key("order", "order_id")
+      - column_name: product_id
+        data: foreign_key("product", "product_id")
+      - column_name: quantity
+        data: random.randint(1, 5)
+        type: int32
+      - column_name: unit_price
+        data: copy_from_fk("product", "product_id", "price")
+        type: float32
+      - column_name: line_total
+        data: round(unit_price * quantity, 2)
+        type: float32
+
+  # review
+  - table_name: review
+    row_count: 3000
+    start_row_id: 15000
+    columns:
+      - column_name: review_id
+        data: row_id
+        is_primary_key: true
+      - column_name: product_id
+        data: foreign_key("product", "product_id")
+      - column_name: customer_id
+        data: foreign_key("customer", "customer_id")
+      - column_name: rating
+        data: random.randint(1, 5)
+        type: int32
+      - column_name: title
+        data: fake.sentence(nb_words=6)
+      - column_name: body
+        data: fake.paragraph(nb_sentences=3)
+      - column_name: created_at
+        data: fake.date_time_between(start_date='-1y', end_date='now', tzinfo=None)
+
+  # cart
+  - table_name: cart
+    row_count: 400
+    start_row_id: 12000
+    columns:
+      - column_name: cart_id
+        data: row_id
+        is_primary_key: true
+      - column_name: customer_id
+        data: foreign_key("customer", "customer_id")
+      - column_name: status
+        data: random.choice(["open", "converted", "abandoned"])
+      - column_name: created_at
+        data: fake.date_time_between(start_date='-90d', end_date='now', tzinfo=None)
+      - column_name: updated_at
+        data: created_at
+
+  # cart_item
+  - table_name: cart_item
+    row_count: 1200
+    start_row_id: 13000
+    columns:
+      - column_name: cart_item_id
+        data: row_id
+        is_primary_key: true
+      - column_name: cart_id
+        data: foreign_key("cart", "cart_id")
+      - column_name: product_id
+        data: foreign_key("product", "product_id")
+      - column_name: quantity
+        data: random.randint(1, 4)
+        type: int32
+      - column_name: unit_price
+        data: copy_from_fk("product", "product_id", "price")
+        type: float32
+      - column_name: line_total
+        data: round(unit_price * quantity, 2)
+        type: float32
+
+  # payment
+  - table_name: payment
+    row_count: 2000
+    start_row_id: 18000
+    columns:
+      - column_name: payment_id
+        data: row_id
+        is_primary_key: true
+      - column_name: order_id
+        data: foreign_key("order", "order_id")
+      - column_name: amount
+        data: copy_from_fk("order", "order_id", "total_amount")
+        type: float32
+      - column_name: method
+        data: random.choice(["card", "paypal", "bank_transfer", "gift_card"])
+      - column_name: status
+        data: random.choice(["pending", "captured", "refunded", "failed"])
+      - column_name: transaction_reference
+        data: '"PMT" + str(random.randint(1000000, 9999999))'
+      - column_name: paid_at
+        data: fake.date_time_between(start_date='-1y', end_date='now', tzinfo=None)
+
+  # shipment
+  - table_name: shipment
+    row_count: 2000
+    start_row_id: 20000
+    columns:
+      - column_name: shipment_id
+        data: row_id
+        is_primary_key: true
+      - column_name: order_id
+        data: foreign_key("order", "order_id")
+      - column_name: carrier
+        data: random.choice(["UPS", "FedEx", "USPS", "DHL", "Royal Mail"])
+      - column_name: tracking_number
+        data: '"TRK" + str(random.randint(1000000000, 9999999999))'
+      - column_name: shipped_at
+        data: fake.date_time_between(start_date='-1y', end_date='now', tzinfo=None)
+      - column_name: delivery_status
+        data: random.choice(["label_created", "in_transit", "out_for_delivery", "delivered", "delayed", "lost"])
+      - column_name: estimated_delivery_date
+        data: fake.date_between(start_date='+2d', end_date='+10d')
