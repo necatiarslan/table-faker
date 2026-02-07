@@ -2,7 +2,7 @@
 ![screenshoot](https://raw.githubusercontent.com/necatiarslan/table-faker/main/media/terminal.png)
 **tablefaker** is a versatile Python package that enables effortless generation of realistic yet synthetic table data for various applications. Whether you need test data for software development, this tool simplifies the process with an intuitive schema definition in YAML format.
 
-## Key Features
+## ✨ Key Features
 - **Schema Definition**: Define your table schema using a simple YAML file, specifying column names, data types, fake data generation logic, and relationships.
 - **Faker & Randomization**: Utilize the **Faker** library and random data generation to create authentic-looking synthetic data.
 - **Multiple Table Support**: Create multiple tables with different schemas and data generation logic in a single YAML file. Define relationships between tables for foreign keys and primary keys.
@@ -15,12 +15,12 @@
   - Excel
   - Delta Lake
 
-## Installation
+## 📦 Installation
 ```bash
 pip install tablefaker
 ```
 
-## YAML schema reference 
+## 🧾 YAML schema reference 
 
 ```yaml
 version: 1
@@ -74,7 +74,7 @@ Notes:
 - Two-phase evaluation resolves columns that reference other columns correctly.
 - For a full example, see [`tests/test_table.yaml`](tests/test_table.yaml).
 
-## Sample Yaml File Minimal
+## 🧩 Sample Yaml File Minimal
 ```yaml
 tables:
   - table_name: person
@@ -86,7 +86,7 @@ tables:
       - column_name: last_name
         data: fake.last_name()
 ```
-## Sample Yaml File Advanced
+## 🧪 Sample Yaml File Advanced
 ```yaml
 version: 1
 config:
@@ -169,9 +169,9 @@ tables:
 ```
 [full yml example](tests/test_table.yaml)
 
-## Configuration: Determinism & Attribute Inference
+## ⚙️ Configuration: Determinism & Attribute Inference
 
-### Seed (deterministic)
+### 🎯 Seed (deterministic)
 ```yaml
 config:
   locale: en_US
@@ -181,7 +181,7 @@ config:
 - The seed is applied to Python's `random`, NumPy (when available), and the `Faker` instance used by tablefaker.
 - Use cases: repeatable tests, CI snapshots, and reproducible examples.
 
-### Attribute name inference
+### 🧠 Attribute name inference
 ```yaml
 config:
   infer_entity_attrs_by_name: true  # Optional: auto-infer FK attributes
@@ -189,9 +189,9 @@ config:
 - When enabled, columns named with the pattern `<fkprefix>_<attr>` will be automatically bound to the referenced parent row if a sibling `<fkprefix>_id` exists and is a foreign key.
 - Example: `customer_email` will be auto-resolved from the row referenced by `customer_id` (if `customer_id` is a FK to `customers.customer_id`).
 
-## Cross-Table Relationships
+## 🔗 Cross-Table Relationships
 
-### Using copy_from_fk()
+### 📎 Using copy_from_fk()
 ```yaml
 - column_name: customer_email
   data: copy_from_fk("customers", "customer_id", "email")
@@ -224,7 +224,7 @@ tables:
         data: copy_from_fk("customers", "customer_id", "email")
 ```
 
-### Automatic attribute inference in action
+### ⚡ Automatic attribute inference in action
 ```yaml
 config:
   infer_entity_attrs_by_name: true
@@ -245,16 +245,16 @@ tables:
 ```
 - `data: auto` indicates that the value will be inferred by name from the referenced parent row when `infer_entity_attrs_by_name` is true.
 
-## Foreign Key Distributions
+## 📈 Foreign Key Distributions
 Foreign keys support different sampling distributions to model realistic parent usage patterns.
 
-### Uniform distribution (default)
+### 🎲 Uniform distribution (default)
 ```yaml
 data: foreign_key("customers", "customer_id")
 ```
 - Backward compatible: selects parent keys uniformly at random.
 
-### Zipf (power-law) distribution
+### 🏔️ Zipf (power-law) distribution
 ```yaml
 data: foreign_key("customers", "customer_id", distribution="zipf", param=1.2)
 ```
@@ -262,7 +262,7 @@ data: foreign_key("customers", "customer_id", distribution="zipf", param=1.2)
 - `param` controls concentration: higher values concentrate more on top-ranked parents.
 - Useful for modeling popular customers, trending products, or social-systems with power-law behavior.
 
-### Weighted parent distribution (attribute-based)
+### ⚖️ Weighted parent distribution (attribute-based)
 ```yaml
 data: foreign_key(
   "customers",
@@ -276,7 +276,7 @@ data: foreign_key(
 - Any parent attribute value not listed in `weights` defaults to weight `1.0`.
 - Useful to prefer high-rated customers, VIP tiers, or any attribute-driven bias.
 
-## Complete example (seed, inference, weighted FK)
+## 🧩 Complete example (seed, inference, weighted FK)
 ```yaml
 version: 1
 config:
@@ -314,13 +314,13 @@ tables:
         data: auto  # Inferred from customer_id FK
 ```
 
-## Notes
+## 📝 Notes
 - Parent tables must be defined before child tables (no automatic backfilling/topological sort yet).
 - Two-phase row evaluation ensures column order within a table does not affect correctness (you can reference other columns freely).
 - `fake.unique` behavior is deterministic only when the same `Faker` instance is reused and `config.seed` is fixed.
 - All sampling distributions are deterministic given a fixed seed.
  
-## Data Generation
+## 🏗️ Data Generation
 You can define your dummy data generation logic in a Python function. The Faker, random and datetime packages are pre-imported and ready to use.
 
 - Use the Faker package for realistic data, e.g., `fake.first_name()` or `fake.random_int(1, 10)`.
@@ -350,7 +350,7 @@ datetime.today()
 r"170 cm" # string
 
 ```
-## Example Code
+## 💻 Example Code
 ```python
 import tablefaker
 
@@ -381,7 +381,7 @@ person_df = df_dict["person"]
 print(person_df.head(5))
 ```
 
-## Sample CLI Command
+## 🖥️ Sample CLI Command
 You can use tablefaker in your terminal for ad-hoc needs or in shell scripts to automate fake data generation. The CLI reads the YAML config and supports importing Python modules via `config.python_import` and adding Faker community providers declared under `config.community_providers` (see "Custom Faker Providers" below). Custom Python functions (passed via the `custom_function` parameter) are only supported when using the Python API programmatically.
 
 Supported CLI flags:
@@ -411,7 +411,7 @@ tablefaker --config tests/test_table.yaml --file_type parquet --target ./target_
 tablefaker --config tests/test_table.yaml --seed 42 --infer-attrs true
 ```
 
-## Sample CSV Output
+## 📄 Sample CSV Output
 ```
 id,first_name,last_name,age,dob,salary,height,weight
 1,John,Smith,35,1992-01-11,,170 cm,150
@@ -421,7 +421,7 @@ id,first_name,last_name,age,dob,salary,height,weight
 5,Matthew,Johnson,31,1940-03-31,,170 cm,150
 ```
 
-## Sample Sql Output
+## 🧾 Sample Sql Output
 ```sql
 INSERT INTO employee
 (id,person_id,hire_date,title,salary,height,weight,school,level)
@@ -430,7 +430,7 @@ VALUES
 (2, 9, '2002-12-20', 'principal engineer', NULL, '170 cm', 150, 'GUY-PERKINS HIGH SCHOOL', 'level 1'),
 (3, 2, '1996-01-06', 'principal engineer', NULL, '170 cm', 150, 'SPRINGLAKE-EARTH ELEM/MIDDLE SCHOOL', 'level 3');
 ```
-## Custom Faker Providers
+## 🧰 Custom Faker Providers
 You can add and use custom / community faker providers with table faker.\
 Here is a list of these community providers.\
 https://faker.readthedocs.io/en/master/communityproviders.html#
@@ -465,7 +465,7 @@ tablefaker.to_csv("test_table.yaml", "./target_folder", fake_provider=SchoolProv
 # this works with all other to_ methods as well.
 ```
 
-## Custom Functions
+## 🧩 Custom Functions
 With Table Faker, you have the flexibility to provide your own custom functions to generate column data. This advanced feature empowers developers to create custom fake data generation logic that can pull data from a database, API, file, or any other source as needed.\
 You can also supply multiple functions in a list, allowing for even more versatility. \
 The custom function you provide should return a single value, giving you full control over your synthetic data generation.
@@ -498,7 +498,7 @@ tables:
       - column_name: level
         data: get_level() # custom function
 ```
-## Generate Yaml File From Avro Schema or Csv
+## 🧬 Generate Yaml File From Avro Schema or Csv
 If you have an [avro schema](https://avro.apache.org/docs/++version++/specification/), you can generate a yaml file using avro_to_yaml function.
 
 ```python
@@ -513,7 +513,7 @@ from tablefaker import tablefaker
 tablefaker.csv_to_yaml("tests/test_person.csv", "tests/exports/person.yaml")
 ```
 
-Sample Csv file
+📄 Sample Csv file
 ```
 column_name,description,data,type,null_percentage
 id,Unique identifier for the person,row_id,,
@@ -525,16 +525,24 @@ is_active,Indicates if the person is active,fake.pybool(),boolean,0.2
 signup_date,Date when the person signed up,fake.date(),,0.3
 ```
 
-## Support & Donation
+## 🤖 Agent Skills
+Agent skills are enable AI agents to generate tablefaker YAML configurations and generate data on the fly. You can use these skills in your AI agents to create synthetic data for testing, development, or any other purpose without manually writing YAML files.
+
+To install tablefaker agent skills, use the following command:
+```bash
+npx skills add necatiarslan/table-faker
+```
+
+## ❤️ Support & Donation
 If you find Table Faker useful and would like to support its development, consider making a [donation](https://github.com/sponsors/necatiarslan).
 
-## Additional Resources
+## 📚 Additional Resources
 - **Faker Functions**: [Faker Providers](https://faker.readthedocs.io/en/master/providers.html#)
 - **Bug Reports & Feature Requests**: [GitHub Issues](https://github.com/necatiarslan/table-faker/issues/new)
 
 
-## Roadmap
-### TODO
+## 🗺️ Roadmap
+### ✅ TODO
 - Support composite primary key
   - composite keys are not unique
   - composite keys are not stored together
@@ -546,7 +554,7 @@ If you find Table Faker useful and would like to support its development, consid
 - use an ai service to generate data generation logic
 - make openpyxl package optional to export to excel
 
-### Future Enhancements
+### 🔮 Future Enhancements
 - PyArrow table support
 - Avro file support
 - Add target file name to YAML
