@@ -1,3 +1,8 @@
+---
+name: tablefaker
+description: Generate YAML configs for Tablefaker to create synthetic datasets with tables, relationships, and faker data.
+---
+
 # Skill: Tablefaker YAML Generator
 
 ## Purpose
