@@ -7,11 +7,12 @@ from faker import Faker
 import random
 from os import path
 from datetime import date, datetime, timedelta, time, timezone, tzinfo, UTC, MINYEAR, MAXYEAR
+import importlib
 import importlib.util
 import sys, math, gc, psutil, string
 import hashlib
+import ast
 import yaml
-
 
 class TableFaker:
     def __init__(self):
@@ -97,9 +98,9 @@ class TableFaker:
         tables = configurator.config["tables"]
         
         for table in tables:
-            if table_name != None and table["table_name"] != table_name:
+            if table_name is not None and table["table_name"] != table_name:
                 continue #skip other tables
-        
+
             row_count = table['row_count'] if "row_count" in table else 10
             export_file_count = table["export_file_count"] if "export_file_count" in table else 1
             export_file_row_count = table["export_file_row_count"] if "export_file_row_count" in table else sys.maxsize
@@ -131,7 +132,7 @@ class TableFaker:
         self._apply_seed(seed)
         tables = configurator.config["tables"]
         for table in tables:
-            if table_name != None and table["table_name"] != table_name:
+            if table_name is not None and table["table_name"] != table_name:
                 continue #skip other tables
             self.reset_start_time()
             df = self.generate_table(table, configurator, **kwargs)
@@ -189,18 +190,19 @@ class TableFaker:
     def to_sql_internal(self, data_frame: pd.DataFrame, target_file_path):
 
         table_name = data_frame.Name
-        # Generate insert script file
-        column_names = ','.join(data_frame.columns)
-        insert_script = f"INSERT INTO {table_name}\n({column_names})\nVALUES\n"
+        # Generate insert script file - quote identifiers to prevent injection
+        quoted_columns = ', '.join(f'"{col}"' for col in data_frame.columns)
+        insert_script = f'INSERT INTO "{table_name}"\n({quoted_columns})\nVALUES\n'
 
         # Iterate over DataFrame rows and create insert statements
         for _, row in data_frame.iterrows():
             value_list = []
             for value in row:
-                if isinstance(value, (str, date, datetime)):
-                    value_list.append(f"'{value}'")
-                elif value == None:
+                if value is None:
                     value_list.append("NULL")
+                elif isinstance(value, (str, date, datetime)):
+                    escaped = str(value).replace("'", "''")
+                    value_list.append(f"'{escaped}'")
                 else:
                     value_list.append(str(value))
 
@@ -232,7 +234,6 @@ class TableFaker:
         community_providers = configurator.get_community_providers()
         for module_name, class_name in community_providers:
             try:
-                import importlib
                 module = importlib.import_module(module_name)
                 provider_class = getattr(module, class_name)
                 fake.add_provider(provider_class)
@@ -311,8 +312,8 @@ class TableFaker:
                         if end_idx != -1:
                             # Extract the arguments from foreign_key("table", "column")
                             args_str = cmd[idx+len('foreign_key('):end_idx]
-                            # Evaluate as a tuple: ("table", "column")
-                            fk_sources[c["column_name"]] = eval(f"({args_str})")
+                            # Evaluate as a tuple: ("table", "column") - use literal_eval for safety
+                            fk_sources[c["column_name"]] = ast.literal_eval(f"({args_str})")
                     except:
                         pass  # Skip if parsing fails
  
@@ -369,15 +370,15 @@ class TableFaker:
                     self.parent_rows[table_name][new_row[pk_col]] = new_row
 
         df = pd.DataFrame(rows)
+        df = df.convert_dtypes()  # auto set best fitting type
         df.Name = table['table_name']
-        df.convert_dtypes() # auto set best fitting type
         for column in columns:
             column_name = column['column_name']
             if "type" in column:
                 util.log(f"Converting Column {column_name} to {column['type']}", util.FOREGROUND_COLOR.MAGENTA)
                 df[column_name] = df[column_name].astype(column['type'])
             if "null_percentage" in column:
-                null_percentage = util.parse_null_percentge(column["null_percentage"])
+                null_percentage = util.parse_null_percentage(column["null_percentage"])
                 num_nulls = int(row_count * null_percentage)
                 null_indices = np.random.choice(df.index, size=num_nulls, replace=False)
                 df.loc[null_indices, column_name] = None

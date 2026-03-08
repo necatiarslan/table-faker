@@ -1,4 +1,5 @@
 import yaml, json
+import pandas as pd
 from os import path
 from . import util
 import sys  # NEW
@@ -106,6 +107,7 @@ class Config:
         return []
     
 
+    @staticmethod
     def avro_type_to_tablefaker_type(avro_type):
         """Map Avro field type to a tablefaker column type hint."""
         # avro_type can be a string (e.g., "string") or a list (union) or dict for complex
@@ -138,6 +140,7 @@ class Config:
         return "string"
 
 
+    @staticmethod
     def avro_to_yaml(avro_file_path, target_file_path=None):
         """Read an Avro schema JSON file and produce a tablefaker YAML config.
 
@@ -230,6 +233,7 @@ class Config:
 
         return target_file_path
     
+    @staticmethod
     def csv_to_yaml(csv_file_path, target_file_path=None):
         """Read a CSV file and produce a tablefaker YAML config.
 
@@ -263,7 +267,6 @@ class Config:
             ]
         }
 
-        import pandas as pd
         df = pd.read_csv(csv_file_path)
         util.log("csv columns:" + ", ".join(df.columns), util.FOREGROUND_COLOR.GREEN)
 
@@ -292,7 +295,7 @@ class Config:
                     null_perc = float(null_perc)
                     if 0.0 <= null_perc <= 1.0:
                         col_struct["null_percentage"] = null_perc
-                except:
+                except (ValueError, TypeError):
                     util.log(f"invalid null_percentage value {null_perc} for column {col_struct['column_name']}. 0.0 <= null_percentage <= 1.0", util.FOREGROUND_COLOR.YELLOW)
             if "description" in df.columns and isinstance(getattr(row, "description"), str):
                 desc = getattr(row, "description")

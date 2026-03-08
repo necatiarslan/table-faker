@@ -1,3 +1,4 @@
+import ast
 import yaml
 from os import path, makedirs
 from . import config
@@ -43,7 +44,7 @@ def generate_relationships(config_source, target_file_path=None):
                     end_idx = cmd.find(')', idx)
                     if end_idx != -1:
                         args_str = cmd[idx + len('foreign_key('):end_idx]
-                        parsed = eval(f"({args_str})")
+                        parsed = ast.literal_eval(f"({args_str})")
                         # parsed: ("right_table", "right_col", ...)
                         if len(parsed) >= 2:
                             right_table = parsed[0]
