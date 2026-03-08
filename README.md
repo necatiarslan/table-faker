@@ -1,4 +1,6 @@
 # ![icon](https://raw.githubusercontent.com/necatiarslan/table-faker/main/media/tablefaker-icon-32.png) Table Faker
+[🌐 Web Site](https://necatiarslan.github.io/table-faker/website/)
+
 ![screenshoot](https://raw.githubusercontent.com/necatiarslan/table-faker/main/media/terminal.png)
 **tablefaker** is a versatile Python package that enables effortless generation of realistic yet synthetic table data for various applications. Whether you need test data for software development, this tool simplifies the process with an intuitive schema definition in YAML format.
 

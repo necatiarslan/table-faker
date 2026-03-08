@@ -49,7 +49,7 @@ pre {
   z-index: 20;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
   padding: 0.9rem 1.2rem;
   border-bottom: 1px solid var(--line);
@@ -75,6 +75,11 @@ pre {
   align-items: center;
   gap: 1.1rem;
   list-style: none;
+  margin: 0 auto;
+}
+
+.nav-github-mobile {
+  display: none;
 }
 
 .nav-links a {
@@ -83,7 +88,10 @@ pre {
   transition: color 0.2s ease;
 }
 
-.nav-links a:hover,
+.nav-links a:hover {
+  color: #f5d547;
+}
+
 .nav-links a.active {
   color: var(--text);
 }
@@ -127,6 +135,37 @@ pre {
 .nav-cta {
   padding: 0.55rem 0.95rem;
   font-size: 0.85rem;
+}
+
+.nav-support {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.nav-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.nav-github svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  fill: currentColor;
+}
+
+.nav-github:hover {
+  color: #f5d547;
+}
+
+.nav-support:hover {
+  color: #f5d547;
 }
 
 .hero {
@@ -367,6 +406,71 @@ pre {
   font-size: 0.92rem;
 }
 
+.accordion {
+  margin-top: 1.4rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.accordion-item {
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+}
+
+.accordion-trigger {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  font: inherit;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.95rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.accordion-trigger:hover {
+  background: rgba(47, 196, 141, 0.08);
+}
+
+.accordion-trigger:focus-visible {
+  outline: 2px solid rgba(47, 196, 141, 0.7);
+  outline-offset: -2px;
+}
+
+.accordion-icon {
+  color: var(--accent);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.accordion-panel {
+  padding: 0 1rem 1rem;
+}
+
+.accordion-note {
+  color: var(--text-muted);
+  font-size: 0.91rem;
+  margin-bottom: 0.65rem;
+}
+
+.accordion-panel pre {
+  margin: 0;
+  overflow: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(47, 196, 141, 0.3);
+  background: #0c1113;
+  padding: 0.9rem;
+  font-size: 0.82rem;
+}
+
 .cta {
   background:
     radial-gradient(circle at 85% 20%, rgba(0, 167, 214, 0.2), transparent 35%),
@@ -489,6 +593,18 @@ footer {
   .nav-cta {
     display: none;
   }
+
+  .nav-support {
+    display: none;
+  }
+
+  .nav-github {
+    display: none;
+  }
+
+  .nav-github-mobile {
+    display: list-item;
+  }
 }
 
 @media (max-width: 560px) {
@@ -509,5 +625,24 @@ footer {
 
   .section {
     padding: 3.6rem 1rem;
+  }
+
+  .accordion-trigger {
+    padding: 0.82rem 0.8rem;
+    font-size: 0.94rem;
+  }
+
+  .accordion-panel {
+    padding: 0 0.8rem 0.8rem;
+  }
+
+  .accordion-note {
+    font-size: 0.86rem;
+    margin-bottom: 0.55rem;
+  }
+
+  .accordion-panel pre {
+    font-size: 0.76rem;
+    padding: 0.75rem;
   }
 }

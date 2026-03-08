@@ -38,11 +38,19 @@
       <li><a href="#features">Features</a></li>
       <li><a href="#formats">Formats</a></li>
       <li><a href="#examples">Examples</a></li>
+      <li><a href="#advanced-features">Advanced</a></li>
       <li><a href="#domains">Domains</a></li>
       <li><a href="#quickstart">Quick Start</a></li>
       <li><a href="#faq">FAQ</a></li>
-      <li><a href="https://github.com/necatiarslan/table-faker" target="_blank" rel="noopener">GitHub</a></li>
+      <li class="nav-github-mobile"><a href="https://github.com/necatiarslan/table-faker" target="_blank" rel="noopener">GitHub</a></li>
     </ul>
+    <a class="nav-github" href="https://github.com/necatiarslan/table-faker" target="_blank" rel="noopener" aria-label="GitHub repository">
+      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.66 7.66 0 0 1 8 4.67c.68 0 1.37.09 2.01.26 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+      </svg>
+      <span>GitHub</span>
+    </a>
+    <a class="nav-support" href="https://github.com/sponsors/necatiarslan" target="_blank" rel="noopener">❤️ Support</a>
     <a class="btn btn-primary nav-cta" href="https://pypi.org/project/tablefaker/" target="_blank" rel="noopener">View on PyPI</a>
   </nav>
 
@@ -149,6 +157,414 @@
   --target ./exports \
   --seed 42</code></pre>
             <p class="code-note">Use <code>--infer-attrs true</code> to override attribute inference from the command line.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="advanced-features" class="section">
+      <div class="container">
+        <p class="eyebrow">Advanced Features</p>
+        <h2>YAML and Code snippets for power users</h2>
+        <p class="section-copy">Expand each item to copy focused YAML and Code examples for advanced generation patterns.</p>
+        <div class="accordion" aria-label="Advanced YAML and Code feature snippets">
+          <article class="accordion-item reveal">
+            <h3>
+              <button class="accordion-trigger" id="adv-seed-trigger" aria-expanded="false" aria-controls="adv-seed-panel">
+                <span><code>seed</code></span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-seed-panel" role="region" aria-labelledby="adv-seed-trigger" hidden>
+              <p class="accordion-note">Use <code>seed</code> to generate the same rows on repeated runs.</p>
+              <pre><code>config:
+  locale: en_US
+  seed: 123
+tables:
+  - table_name: person
+    row_count: 3
+    columns:
+      - column_name: id
+        data: row_id
+      - column_name: first_name
+        data: fake.first_name()</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal delay-1">
+            <h3>
+              <button class="accordion-trigger" id="adv-python-import-trigger" aria-expanded="false" aria-controls="adv-python-import-panel">
+                <span><code>python_import</code></span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-python-import-panel" role="region" aria-labelledby="adv-python-import-trigger" hidden>
+              <p class="accordion-note">Use <code>python_import</code> to call external Python modules/functions in column expressions.</p>
+              <pre><code>config:
+  locale: en_US
+  python_import:
+    - dateutil
+    - hotel_custom_calendar_utils
+tables:
+  - table_name: person
+    row_count: 2
+    columns:
+      - column_name: id
+        data: row_id
+      - column_name: easter_date
+        data: dateutil.easter.easter(2026).strftime('%Y-%m-%d')</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal delay-2">
+            <h3>
+              <button class="accordion-trigger" id="adv-export-count-trigger" aria-expanded="false" aria-controls="adv-export-count-panel">
+                <span><code>export_file_count</code></span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-export-count-panel" role="region" aria-labelledby="adv-export-count-trigger" hidden>
+              <p class="accordion-note">Set <code>export_file_count</code> to split one table into a fixed number of output files.</p>
+              <pre><code>tables:
+  - table_name: person
+    row_count: 100
+    export_file_count: 2
+    columns:
+      - column_name: id
+        data: row_id
+      - column_name: first_name
+        data: fake.first_name()</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal">
+            <h3>
+              <button class="accordion-trigger" id="adv-export-row-count-trigger" aria-expanded="false" aria-controls="adv-export-row-count-panel">
+                <span><code>export_file_row_count</code></span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-export-row-count-panel" role="region" aria-labelledby="adv-export-row-count-trigger" hidden>
+              <p class="accordion-note">Use <code>export_file_row_count</code> to cap rows per exported file.</p>
+              <pre><code>tables:
+  - table_name: employee
+    row_count: 10
+    export_file_row_count: 5
+    columns:
+      - column_name: id
+        data: row_id
+      - column_name: title
+        data: fake.job()</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal delay-1">
+            <h3>
+              <button class="accordion-trigger" id="adv-start-row-id-trigger" aria-expanded="false" aria-controls="adv-start-row-id-panel">
+                <span><code>start_row_id</code></span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-start-row-id-panel" role="region" aria-labelledby="adv-start-row-id-trigger" hidden>
+              <p class="accordion-note">Start generated row IDs from a custom value using <code>start_row_id</code>.</p>
+              <pre><code>tables:
+  - table_name: hotel
+    row_count: 3
+    start_row_id: 100
+    columns:
+      - column_name: hotel_id
+        data: row_id
+        is_primary_key: true
+      - column_name: name
+        data: fake.company() + " Hotel"</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal delay-2">
+            <h3>
+              <button class="accordion-trigger" id="adv-keys-trigger" aria-expanded="false" aria-controls="adv-keys-panel">
+                <span><code>is_primary_key</code> and <code>foreign_key</code></span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-keys-panel" role="region" aria-labelledby="adv-keys-trigger" hidden>
+              <p class="accordion-note">Mark parent keys with <code>is_primary_key</code> and reference them from child rows using <code>foreign_key(...)</code>.</p>
+              <pre><code>tables:
+  - table_name: customers
+    row_count: 50
+    columns:
+      - column_name: customer_id
+        data: row_id
+        is_primary_key: true
+
+  - table_name: orders
+    row_count: 1000
+    columns:
+      - column_name: order_id
+        data: row_id
+      - column_name: customer_id
+        data: foreign_key("customers", "customer_id")
+      - column_name: total_amount
+        data: round(random.uniform(10, 500), 2)</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal">
+            <h3>
+              <button class="accordion-trigger" id="adv-copy-from-fk-trigger" aria-expanded="false" aria-controls="adv-copy-from-fk-panel">
+                <span><code>copy_from_fk</code></span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-copy-from-fk-panel" role="region" aria-labelledby="adv-copy-from-fk-trigger" hidden>
+              <p class="accordion-note">Use <code>copy_from_fk(...)</code> to copy related parent attributes into child records.</p>
+              <pre><code>tables:
+  - table_name: customers
+    row_count: 3
+    columns:
+      - column_name: customer_id
+        data: row_id
+        is_primary_key: true
+      - column_name: email
+        data: fake.email()
+
+  - table_name: orders
+    row_count: 5
+    columns:
+      - column_name: order_id
+        data: row_id
+      - column_name: customer_id
+        data: foreign_key("customers", "customer_id")
+      - column_name: customer_email
+        data: copy_from_fk("customers", "customer_id", "email")</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal delay-1">
+            <h3>
+              <button class="accordion-trigger" id="adv-inline-function-trigger" aria-expanded="false" aria-controls="adv-inline-function-panel">
+                <span>Inline function with <code>data: |</code></span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-inline-function-panel" role="region" aria-labelledby="adv-inline-function-trigger" hidden>
+              <p class="accordion-note">Write multi-line Python logic in <code>data: |</code> when expressions become too complex for one line.</p>
+              <pre><code>tables:
+  - table_name: person
+    row_count: 10
+    columns:
+      - column_name: id
+        data: row_id
+      - column_name: age
+        data: fake.random_int(18, 90)
+      - column_name: discount_eligibility           # custom python function
+        data: |
+          if age &lt; 25 or age &gt; 60:
+            return True
+          else:
+            return False</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal delay-2">
+            <h3>
+              <button class="accordion-trigger" id="adv-python-api-exports-trigger" aria-expanded="false" aria-controls="adv-python-api-exports-panel">
+                <span>python api export methods</span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-python-api-exports-panel" role="region" aria-labelledby="adv-python-api-exports-trigger" hidden>
+              <p class="accordion-note">Use the Python API to export datasets in multiple formats or load generated tables as pandas dataframes.</p>
+              <pre><code>import tablefaker
+
+# exports to current folder in csv format
+tablefaker.to_csv("test_table.yaml")
+
+# exports to sql insert into scripts to insert to your database
+tablefaker.to_sql("test_table.yaml")
+
+# exports all tables in json format
+tablefaker.to_json("test_table.yaml", "./target_folder")
+
+# exports all tables in parquet format
+tablefaker.to_parquet("test_table.yaml", "./target_folder")
+
+# exports all tables in deltalake format
+tablefaker.to_deltalake("test_table.yaml", "./target_folder")
+
+# export single table to the provided folder
+tablefaker.to_deltalake("test_table.yaml", "./target_folder/person/", table_name="person")
+
+# exports only the first table in excel format
+tablefaker.to_excel("test_table.yaml", "./target_folder/target_file.xlsx")
+
+# get as pandas dataframes
+df_dict = tablefaker.to_pandas("test_table.yaml")
+person_df = df_dict["person"]
+print(person_df.head(5))</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal">
+            <h3>
+              <button class="accordion-trigger" id="adv-cli-usage-trigger" aria-expanded="false" aria-controls="adv-cli-usage-panel">
+                <span>cli usage samples</span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-cli-usage-panel" role="region" aria-labelledby="adv-cli-usage-trigger" hidden>
+              <p class="accordion-note">Use CLI flags to control output type, target path, seed values, and attribute inference from the command line.</p>
+              <pre><code># exports to current folder in csv format (reads community_providers from config)
+tablefaker --config tests/test_table.yaml
+
+# exports as sql insert script files
+tablefaker --config tests/test_table.yaml --file_type sql --target ./out
+
+# exports to current folder in excel format
+tablefaker --config tests/test_table.yaml --file_type excel
+
+# exports all tables in json format to a folder
+tablefaker --config tests/test_table.yaml --file_type json --target ./target_folder
+
+# exports a single table to a parquet file
+tablefaker --config tests/test_table.yaml --file_type parquet --target ./target_folder/target_file.parquet
+
+# pass an explicit seed and enable attribute inference
+tablefaker --config tests/test_table.yaml --seed 42 --infer-attrs true</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal delay-1">
+            <h3>
+              <button class="accordion-trigger" id="adv-custom-functions-trigger" aria-expanded="false" aria-controls="adv-custom-functions-panel">
+                <span>custom functions</span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-custom-functions-panel" role="region" aria-labelledby="adv-custom-functions-trigger" hidden>
+              <p class="accordion-note">Define your own Python function and pass it with <code>custom_function</code>, then call it inside YAML (for example: <code>get_level()</code>).</p>
+              <pre><code>from tablefaker import tablefaker
+from faker import Faker
+
+fake = Faker()
+
+def get_level():
+    return f"level {fake.random_int(1, 5)}"
+
+tablefaker.to_csv("test_table.yaml", "./target_folder", custom_function=get_level)
+
+# yaml snippet
+tables:
+  - table_name: employee
+    row_count: 5
+    columns:
+      - column_name: id
+        data: row_id
+      - column_name: level
+        data: get_level() # custom function</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal delay-2">
+            <h3>
+              <button class="accordion-trigger" id="adv-yaml-from-avro-csv-trigger" aria-expanded="false" aria-controls="adv-yaml-from-avro-csv-panel">
+                <span>generate yaml from avro or csv</span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-yaml-from-avro-csv-panel" role="region" aria-labelledby="adv-yaml-from-avro-csv-trigger" hidden>
+              <p class="accordion-note">Generate starter YAML configs directly from an Avro schema or a CSV column definition file.</p>
+              <pre><code>from tablefaker import tablefaker
+
+# generate yaml from avro schema
+tablefaker.avro_to_yaml("tests/test_person.avsc", "tests/exports/person.yaml")
+
+# generate yaml from csv definition
+tablefaker.csv_to_yaml("tests/test_person.csv", "tests/exports/person.yaml")</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal">
+            <h3>
+              <button class="accordion-trigger" id="adv-fk-uniform-trigger" aria-expanded="false" aria-controls="adv-fk-uniform-panel">
+                <span>foreign key distribution: <code>uniform</code></span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-fk-uniform-panel" role="region" aria-labelledby="adv-fk-uniform-trigger" hidden>
+              <p class="accordion-note">Use <code>distribution="uniform"</code> for evenly distributed parent key sampling.</p>
+              <pre><code>tables:
+  - table_name: customers
+    row_count: 50
+    columns:
+      - column_name: customer_id
+        data: row_id
+        is_primary_key: true
+
+  - table_name: orders_uniform
+    row_count: 1000
+    columns:
+      - column_name: order_id
+        data: row_id
+      - column_name: customer_id
+        data: foreign_key("customers", "customer_id", distribution="uniform")</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal delay-1">
+            <h3>
+              <button class="accordion-trigger" id="adv-fk-zipf-trigger" aria-expanded="false" aria-controls="adv-fk-zipf-panel">
+                <span>foreign key distribution: <code>zipf</code></span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-fk-zipf-panel" role="region" aria-labelledby="adv-fk-zipf-trigger" hidden>
+              <p class="accordion-note">Use <code>distribution="zipf"</code> to create popularity skew where a small set of parent rows appears more often.</p>
+              <pre><code>tables:
+  - table_name: customers
+    row_count: 50
+    columns:
+      - column_name: customer_id
+        data: row_id
+        is_primary_key: true
+
+  - table_name: orders_zipf
+    row_count: 1000
+    columns:
+      - column_name: order_id
+        data: row_id
+      - column_name: customer_id
+        data: foreign_key("customers", "customer_id", distribution="zipf", param=1.1)</code></pre>
+            </div>
+          </article>
+
+          <article class="accordion-item reveal delay-2">
+            <h3>
+              <button class="accordion-trigger" id="adv-fk-weighted-trigger" aria-expanded="false" aria-controls="adv-fk-weighted-panel">
+                <span>foreign key distribution: <code>weighted_parent</code></span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-fk-weighted-panel" role="region" aria-labelledby="adv-fk-weighted-trigger" hidden>
+              <p class="accordion-note">Use <code>weighted_parent</code> to bias foreign keys using a parent attribute and explicit weights.</p>
+              <pre><code>tables:
+  - table_name: customers
+    row_count: 50
+    columns:
+      - column_name: customer_id
+        data: row_id
+        is_primary_key: true
+      - column_name: rating
+        data: random.choice([5,4,3])
+
+  - table_name: orders_weighted
+    row_count: 3000
+    columns:
+      - column_name: order_id
+        data: row_id
+      - column_name: customer_id
+        data: foreign_key("customers", "customer_id", distribution="weighted_parent", parent_attr="rating", weights={"5":3,"4":2,"3":1})</code></pre>
+            </div>
           </article>
         </div>
       </div>

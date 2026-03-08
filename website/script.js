@@ -49,3 +49,26 @@ const sectionObserver = new IntersectionObserver(
 );
 
 sections.forEach((section) => sectionObserver.observe(section));
+
+const accordionTriggers = document.querySelectorAll('.accordion-trigger');
+
+accordionTriggers.forEach((trigger) => {
+  const panelId = trigger.getAttribute('aria-controls');
+  const panel = panelId ? document.getElementById(panelId) : null;
+  const icon = trigger.querySelector('.accordion-icon');
+
+  if (!panel) {
+    return;
+  }
+
+  trigger.addEventListener('click', () => {
+    const expanded = trigger.getAttribute('aria-expanded') === 'true';
+    const nextExpanded = !expanded;
+    trigger.setAttribute('aria-expanded', String(nextExpanded));
+    panel.hidden = expanded;
+
+    if (icon) {
+      icon.textContent = nextExpanded ? '-' : '+';
+    }
+  });
+});
