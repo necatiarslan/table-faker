@@ -70,20 +70,24 @@ def get_temp_filename(file_name=None):
 
     return f"{file_name}_{file_name_date_ext}"
 
-def parse_null_percentge(null_percentage):
+def parse_null_percentage(null_percentage):
     if isinstance(null_percentage, str) and null_percentage[-1] == "%":
         null_percentage = float(null_percentage[0:-1])
-    
+
     if isinstance(null_percentage, str) and null_percentage[0] == "%":
         null_percentage = float(null_percentage[1:])
 
-    if isinstance(null_percentage, int) or isinstance(null_percentage, float):
-        if null_percentage >= 0 and null_percentage <= 1:
+    if isinstance(null_percentage, (int, float)):
+        if 0 <= null_percentage <= 1:
             return float(null_percentage)
-        elif null_percentage >= 0 and null_percentage<= 100:
+        elif 0 <= null_percentage <= 100:
             return float(null_percentage / 100)
 
     return float(0)
+
+
+# Backward-compatible alias for the misspelled name
+parse_null_percentge = parse_null_percentage
 
 def get_file_extension(file_type):
     if file_type == "csv":
