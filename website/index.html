@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tablefaker | Synthetic Tabular Data from YAML</title>
+  <meta
+    name="description"
+    content="Tablefaker generates realistic synthetic tabular data from YAML schemas. Export to CSV, JSON, Parquet, Excel, SQL, Delta Lake, or Pandas."
+  />
+  <meta property="og:title" content="Tablefaker | Synthetic Tabular Data from YAML" />
+  <meta
+    property="og:description"
+    content="Define tables once in YAML. Generate realistic synthetic data with relationships, deterministic seeds, and multiple export formats."
+  />
+  <meta
+    property="og:image"
+    content="https://raw.githubusercontent.com/necatiarslan/table-faker/main/media/terminal.png"
+  />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/png" href="../media/tablefaker-icon-32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="site-nav">
+    <a class="nav-brand" href="#top" aria-label="Tablefaker Home">
+      <img src="../media/tablefaker-icon-64.png" alt="Tablefaker logo" />
+      <span>tablefaker</span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">Menu</button>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#formats">Formats</a></li>
+      <li><a href="#examples">Examples</a></li>
+      <li><a href="#domains">Domains</a></li>
+      <li><a href="#quickstart">Quick Start</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="https://github.com/necatiarslan/table-faker" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <a class="btn btn-primary nav-cta" href="https://pypi.org/project/tablefaker/" target="_blank" rel="noopener">View on PyPI</a>
+  </nav>
+
+  <main id="top">
+    <header class="hero">
+      <div class="hero-inner reveal">
+        <p class="eyebrow">Open Source Python Package</p>
+        <h1>Synthetic table data that behaves like the real world</h1>
+        <p class="hero-copy">
+          Define your schema in YAML once, then generate realistic multi-table data with Faker,
+          relationships, deterministic seeds, and export targets for analytics and testing pipelines.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://pypi.org/project/tablefaker/" target="_blank" rel="noopener">Install from PyPI</a>
+          <a class="btn btn-secondary" href="https://github.com/necatiarslan/table-faker" target="_blank" rel="noopener">Star on GitHub</a>
+        </div>
+        <div class="install-pill" aria-label="Install command">
+          <code>pip install tablefaker</code>
+        </div>
+      </div>
+      <div class="hero-visual hero-flow reveal delay-1">
+        <img src="../media/bank_yaml.png" alt="Bank YAML configuration example" loading="lazy" />
+      </div>
+      <div class="hero-bottom-image reveal delay-2">
+        <img src="../media/bank_yaml_generate.png" alt="Bank data generated from YAML configuration" loading="lazy" />
+      </div>
+    </header>
+
+    <section id="features" class="section section-alt">
+      <div class="container">
+        <p class="eyebrow">Features</p>
+        <h2>Everything needed for realistic synthetic datasets</h2>
+        <div class="feature-grid">
+          <article class="card reveal">
+            <h3>YAML-first schema design</h3>
+            <p>Define columns, types, and generation logic in a readable config that works well in repos and CI.</p>
+          </article>
+          <article class="card reveal delay-1">
+            <h3>Cross-table relationships</h3>
+            <p>Use <code>foreign_key(...)</code> and <code>copy_from_fk(...)</code> for realistic parent-child data.</p>
+          </article>
+          <article class="card reveal delay-2">
+            <h3>Deterministic generation</h3>
+            <p>Set <code>config.seed</code> for reproducible datasets across local runs, tests, and pipelines.</p>
+          </article>
+          <article class="card reveal">
+            <h3>Flexible distributions</h3>
+            <p>Model skewed behavior with uniform, zipf, and weighted parent foreign-key sampling.</p>
+          </article>
+          <article class="card reveal delay-1">
+            <h3>Custom logic support</h3>
+            <p>Use Python expressions, imports, and community Faker providers when built-in generators are not enough.</p>
+          </article>
+          <article class="card reveal delay-2">
+            <h3>CLI and Python API</h3>
+            <p>Run from terminal or import as a package for notebooks, scripts, and app-level test tooling.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="formats" class="section">
+      <div class="container">
+        <p class="eyebrow">Output Formats</p>
+        <h2>One schema, many targets</h2>
+        <p class="section-copy">Export in the format your workflow already expects.</p>
+        <div class="pill-grid reveal">
+          <span class="pill">Pandas DataFrame</span>
+          <span class="pill">CSV</span>
+          <span class="pill">JSON</span>
+          <span class="pill">Parquet</span>
+          <span class="pill">Excel</span>
+          <span class="pill">SQL Inserts</span>
+          <span class="pill">Delta Lake</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="examples" class="section section-alt">
+      <div class="container">
+        <p class="eyebrow">Examples</p>
+        <h2>Start in minutes with YAML and CLI</h2>
+        <div class="code-grid">
+          <article class="code-card reveal">
+            <h3>Minimal YAML</h3>
+            <pre><code>tables:
+  - table_name: person
+    columns:
+      - column_name: id
+        data: row_id
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()</code></pre>
+          </article>
+          <article class="code-card reveal delay-1">
+            <h3>CLI command</h3>
+            <pre><code>tablefaker \
+  --config tests/test_table.yaml \
+  --file_type csv \
+  --target ./exports \
+  --seed 42</code></pre>
+            <p class="code-note">Use <code>--infer-attrs true</code> to override attribute inference from the command line.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="domains" class="section">
+      <div class="container">
+        <p class="eyebrow">Sample Domains</p>
+        <h2>Production-style examples included</h2>
+        <div class="domain-grid">
+          <a class="domain-card reveal" href="https://github.com/necatiarslan/table-faker/tree/main/samples/bank" target="_blank" rel="noopener">Banking</a>
+          <a class="domain-card reveal delay-1" href="https://github.com/necatiarslan/table-faker/tree/main/samples/hospital" target="_blank" rel="noopener">Hospital</a>
+          <a class="domain-card reveal delay-2" href="https://github.com/necatiarslan/table-faker/tree/main/samples/hotel" target="_blank" rel="noopener">Hotel</a>
+          <a class="domain-card reveal" href="https://github.com/necatiarslan/table-faker/tree/main/samples/library" target="_blank" rel="noopener">Library</a>
+          <a class="domain-card reveal delay-1" href="https://github.com/necatiarslan/table-faker/tree/main/samples/northwind" target="_blank" rel="noopener">Northwind</a>
+          <a class="domain-card reveal delay-2" href="https://github.com/necatiarslan/table-faker/tree/main/samples/school" target="_blank" rel="noopener">School</a>
+          <a class="domain-card reveal" href="https://github.com/necatiarslan/table-faker/tree/main/samples/webstore" target="_blank" rel="noopener">Webstore</a>
+          <a class="domain-card reveal delay-1" href="https://github.com/necatiarslan/table-faker/tree/main/samples/experiment" target="_blank" rel="noopener">Experiment</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="quickstart" class="section section-alt">
+      <div class="container">
+        <p class="eyebrow">Quick Start</p>
+        <h2>Up and running in three steps</h2>
+        <div class="steps">
+          <article class="step reveal">
+            <span class="step-num">1</span>
+            <div>
+              <h3>Install package</h3>
+              <p>Install from PyPI with <code>pip install tablefaker</code>.</p>
+            </div>
+          </article>
+          <article class="step reveal delay-1">
+            <span class="step-num">2</span>
+            <div>
+              <h3>Create YAML schema</h3>
+              <p>Define tables, columns, and generation expressions in a single config file.</p>
+            </div>
+          </article>
+          <article class="step reveal delay-2">
+            <span class="step-num">3</span>
+            <div>
+              <h3>Generate data</h3>
+              <p>Use CLI or Python API to export data into CSV, JSON, Parquet, SQL, Excel, or Delta Lake.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="section">
+      <div class="container">
+        <p class="eyebrow">FAQ</p>
+        <h2>Common questions</h2>
+        <div class="faq-grid">
+          <article class="faq-item reveal">
+            <h3>Can I generate deterministic data?</h3>
+            <p>Yes. Set <code>config.seed</code> or pass <code>--seed</code> to generate reproducible output.</p>
+          </article>
+          <article class="faq-item reveal delay-1">
+            <h3>Can I model table relationships?</h3>
+            <p>Yes. Define primary keys and use <code>foreign_key()</code> and <code>copy_from_fk()</code> in child tables.</p>
+          </article>
+          <article class="faq-item reveal delay-2">
+            <h3>Does it support custom Faker providers?</h3>
+            <p>Yes. Add providers through <code>config.community_providers</code> or Python API options.</p>
+          </article>
+          <article class="faq-item reveal">
+            <h3>Where can I report issues?</h3>
+            <p>Use the GitHub repository issues page for bug reports and feature requests.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta">
+      <div class="container cta-inner reveal">
+        <h2>Build better test data pipelines with tablefaker</h2>
+        <p>Open source, scriptable, and ready for local development, CI, and analytics workflows.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://pypi.org/project/tablefaker/" target="_blank" rel="noopener">Get tablefaker on PyPI</a>
+          <a class="btn btn-secondary" href="https://github.com/necatiarslan/table-faker/issues" target="_blank" rel="noopener">Report an Issue</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="../media/tablefaker-icon-32.png" alt="Tablefaker icon" />
+        <span>tablefaker</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://pypi.org/project/tablefaker/" target="_blank" rel="noopener">PyPI</a>
+        <a href="https://github.com/necatiarslan/table-faker" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/necatiarslan/table-faker/issues" target="_blank" rel="noopener">Issues</a>
+        <a href="https://github.com/necatiarslan/table-faker/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
+      </div>
+      <p class="footer-copy">Copyright 2026 Necati Arslan. Open source under Apache 2.0.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
