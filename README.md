@@ -64,7 +64,7 @@ tables:
 #
 # Special helper functions:
 #   foreign_key(parent_table, parent_column, distribution="uniform", param=None, parent_attr=None, weights=None)
-#   copy_from_fk(parent_table, fk_column, parent_attr)
+#   copy_from_fk(parent_table, foreign_key_column (this table), parent_attr)
 #
 # Multi-line Python block:
 # Use YAML block scalar `|` and include a final `return <value>` statement.
@@ -198,7 +198,7 @@ config:
 - column_name: customer_email
   data: copy_from_fk("customers", "customer_id", "email")
 ```
-- `copy_from_fk(fk_column, parent_table, parent_attr)` copies an attribute from the parent row referenced by the foreign key.
+- `copy_from_fk(parent_table, foreign_key_column (this table), parent_attr)` copies an attribute from the parent row referenced by the foreign key. foreign_key_column is the column in the current table that is a foreign key to the parent table's primary key. parent_attr is the column in the parent table whose value you want to copy.
 - Useful when you need to duplicate a value from the parent instead of generating it again.
 - Parent tables must be defined before child tables in the YAML (no automatic backfilling).
 
