@@ -76,5 +76,11 @@ tables:
         data: 150 #number
       - column_name: school
         data: fake.school_district() # custom provider
- 
+  - table_name: person_address
+    row_count: 100
+    columns:
+      - column_name: person_id
+        data: foreign_key("person", "id", is_unique=True) # unique foreign key
+      - column_name: address
+        data: fake.street_address() + ", " + fake.city() + ", " + fake.state_abbr() + " " + fake.postcode()
          

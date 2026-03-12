@@ -63,7 +63,7 @@ tables:
 #   fake, random, datetime, date, timedelta, time, timezone, tzinfo, UTC, MINYEAR, MAXYEAR, math, string, row_id
 #
 # Special helper functions:
-#   foreign_key(parent_table, parent_column, distribution="uniform", param=None, parent_attr=None, weights=None)
+#   foreign_key(parent_table, parent_column, distribution="uniform", param=None, parent_attr=None, weights=None, is_unique=False)
 #   copy_from_fk(parent_table, foreign_key_column (this table), parent_attr)
 #
 # Multi-line Python block:
@@ -277,6 +277,39 @@ data: foreign_key(
 - Weights are applied based on a parent attribute (here `rating`) so parents with certain attribute values are preferred.
 - Any parent attribute value not listed in `weights` defaults to weight `1.0`.
 - Useful to prefer high-rated customers, VIP tiers, or any attribute-driven bias.
+
+### 🔒 Unique foreign key (one-to-one relationship)
+```yaml
+data: foreign_key("departments", "dept_id", is_unique=True)
+```
+- When `is_unique=True`, each parent key value is selected **at most once** per child table, enforcing a one-to-one relationship.
+- The child table's `row_count` must not exceed the parent table's row count; otherwise an error is raised.
+- Each child table maintains its own independent pool — two different child tables can both use `is_unique=True` on the same parent without interfering with each other.
+- Works with all distribution types (`uniform`, `zipf`, `weighted_parent`).
+
+Full example:
+```yaml
+tables:
+  - table_name: departments
+    row_count: 20
+    columns:
+      - column_name: dept_id
+        data: row_id
+        is_primary_key: true
+      - column_name: dept_name
+        data: fake.company()
+
+  - table_name: managers
+    row_count: 20
+    columns:
+      - column_name: manager_id
+        data: row_id
+        is_primary_key: true
+      - column_name: dept_id
+        data: foreign_key("departments", "dept_id", is_unique=True)
+      - column_name: manager_name
+        data: fake.name()
+```
 
 ## 🧩 Complete example (seed, inference, weighted FK)
 ```yaml
@@ -549,7 +582,7 @@ If you find Table Faker useful and would like to support its development, consid
   - composite keys are not unique
   - composite keys are not stored together
   - copy_from_fk do not support composite primary key
-- is_unique support
+- ~~is_unique support~~ ✅
 - Provide foreign keys (dictionary, array etc) as an external source
 - Variables
 - Generate template yaml file from sample data

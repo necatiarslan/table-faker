@@ -1,0 +1,23 @@
+version: 1
+config:
+  locale: en_US
+  seed: 42
+tables:
+  - table_name: departments
+    row_count: 20
+    columns:
+      - column_name: dept_id
+        data: row_id
+        is_primary_key: true
+      - column_name: dept_name
+        data: fake.company()
+  - table_name: managers
+    row_count: 20
+    columns:
+      - column_name: manager_id
+        data: row_id
+        is_primary_key: true
+      - column_name: dept_id
+        data: foreign_key("departments", "dept_id", is_unique=True)
+      - column_name: manager_name
+        data: fake.name()

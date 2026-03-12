@@ -121,6 +121,19 @@ tables:
         )
 ```
 
+### Unique foreign key (one-to-one relationship)
+```yaml
+  - table_name: managers
+    row_count: 20
+    columns:
+      - column_name: manager_id
+        data: row_id
+        is_primary_key: true
+      - column_name: dept_id
+        data: foreign_key("departments", "dept_id", is_unique=True)
+```
+When `is_unique=True`, each parent key value is selected at most once per child table, enforcing a one-to-one relationship. The child table's `row_count` must not exceed the parent table's row count.
+
 ### Automatic attribute inference (data: auto)
 ```yaml
 config:

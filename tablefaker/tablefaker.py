@@ -23,6 +23,8 @@ class TableFaker:
         self.fake_by_locale = {}       # locale -> Faker
         self._current_row = None       # for copy_from_fk access during phase B
         self.generated_rows = {}       # table_name -> list of row dicts (for get_table)
+        self.unique_fk_used = {}       # (child_table, parent_table, parent_column) -> set of used PK values
+        self._current_child_table = None  # set during generate_table for is_unique tracking
     
     def reset_start_time(self):
         self.start_time = datetime.now()
@@ -357,6 +359,9 @@ class TableFaker:
         # Initialize generated_rows for this table
         self.generated_rows[table_name] = rows
         
+        # Track current child table for is_unique foreign key support
+        self._current_child_table = table_name
+        
         for row_id in range(start_row_id, start_row_id+row_count):
             util.progress_bar(row_id-start_row_id+1, row_count, f"Table:{table_name}")
             variables["row_id"] = row_id
@@ -387,7 +392,7 @@ class TableFaker:
         return df
 
     def foreign_key(self, table_name, column_name, distribution="uniform",
-                    param=None, parent_attr=None, weights=None):
+                    param=None, parent_attr=None, weights=None, is_unique=False):
         """
         Select a foreign key value with configurable distribution.
         
@@ -398,6 +403,7 @@ class TableFaker:
             param: Parameter for zipf distribution (default 1.2)
             parent_attr: Parent attribute for weighted_parent distribution
             weights: Weight mapping for weighted_parent distribution
+            is_unique: If True, each parent key is used at most once per child table
         """
         if table_name not in self.primary_key_cache:
             raise Exception(f"Table {table_name} not found while looking for primary key")
@@ -405,32 +411,43 @@ class TableFaker:
             raise Exception(f"Column {column_name} not found in table {table_name} while looking for primary key")
         
         pk_values = self.primary_key_cache[table_name][column_name]
+        
+        # Filter out already-used values when is_unique is enabled
+        if is_unique:
+            unique_key = (self._current_child_table, table_name, column_name)
+            used = self.unique_fk_used.setdefault(unique_key, set())
+            pk_values = [v for v in pk_values if v not in used]
+            if len(pk_values) == 0:
+                raise Exception(
+                    f"All primary key values in {table_name}.{column_name} have been used. "
+                    f"Child table has more rows than available unique parent keys."
+                )
+        
         n = len(pk_values)
         if n == 0:
             raise Exception(f"No keys in {table_name}.{column_name}")
         
         # Create independent RNG per FK call for determinism
-        seed = self._stable_seed(self.primary_key_seed, table_name, column_name, distribution, param, parent_attr)
+        seed = self._stable_seed(self.primary_key_seed, table_name, column_name, distribution, param, parent_attr, is_unique)
         rnd = random.Random(seed)
         
         if distribution == "uniform":
             idx = rnd.randrange(n)
-            return pk_values[idx]
-        
-        if distribution == "zipf":
+            selected = pk_values[idx]
+        elif distribution == "zipf":
             a = float(param) if param is not None else 1.2
             # weights proportional to 1/(i+1)^a over existing order
             w = [1.0 / ((i + 1) ** a) for i in range(n)]
             total = sum(w)
             r = rnd.random() * total
             cum = 0.0
+            selected = pk_values[-1]
             for i, wi in enumerate(w):
                 cum += wi
                 if r <= cum:
-                    return pk_values[i]
-            return pk_values[-1]
-        
-        if distribution == "weighted_parent":
+                    selected = pk_values[i]
+                    break
+        elif distribution == "weighted_parent":
             if parent_attr is None or weights is None:
                 raise Exception("weighted_parent requires parent_attr and weights")
             parent_map = self.parent_rows.get(table_name, {})
@@ -443,13 +460,20 @@ class TableFaker:
             total = sum(mapped)
             r = rnd.random() * total
             cum = 0.0
+            selected = pk_values[-1]
             for i, wi in enumerate(mapped):
                 cum += wi
                 if r <= cum:
-                    return pk_values[i]
-            return pk_values[-1]
+                    selected = pk_values[i]
+                    break
+        else:
+            raise Exception(f"Unknown distribution {distribution}")
         
-        raise Exception(f"Unknown distribution {distribution}")
+        # Track used value for is_unique
+        if is_unique:
+            used.add(selected)
+        
+        return selected
 
     def generate_fake_row(self, table_name:str, columns:dict, variables:dict, compiled_commands:dict=None):
         """
