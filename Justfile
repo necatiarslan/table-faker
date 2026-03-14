@@ -75,10 +75,10 @@ test:
     pipenv run coverage xml -i
 
 build:
-    python setup.py sdist bdist_wheel
+    pipenv run python setup.py sdist bdist_wheel
     
-publish version:
-	twine upload dist/tablefaker-{{version}}*
+publish:
+	pipenv run twine upload dist/tablefaker-1.9.1*
 
 # After you run the command, it will ask username and password
 # Set your username to __token__
