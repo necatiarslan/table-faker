@@ -127,14 +127,31 @@ class Config:
             return Config.avro_type_to_tablefaker_type(t)
 
         # primitive strings
-        if avro_type in ("string", "bytes"):
+        # Assuming avro_type comes from the schema's 'type' or 'logicalType' field
+        if avro_type == "string":
             return "string"
-        if avro_type in ("int", "long"):
-            return "int32" if avro_type == "int" else "int64"
-        if avro_type == "float" or avro_type == "double":
-            return "float"
-        if avro_type == "boolean":
-            return "bool"
+        elif avro_type == "uuid":
+            return "string"  # Best for standard UUID text representation
+        elif avro_type == "bytes":
+            return "object"  # Preserves raw binary data
+        elif avro_type == "decimal":
+            return "object"  # Preserves decimal.Decimal precision (pandas dtypes don't support fixed-point)
+        elif avro_type == "int":
+            return "Int32"
+        elif avro_type == "date":
+            return "datetime64[ns]"  # Days since epoch -> pandas standard datetime
+        elif avro_type == "long":
+            return "Int64"
+        elif avro_type in ("timestamp-millis", "timestamp-micros"):
+            return "datetime64[ns]"  # Time since epoch -> pandas standard datetime
+        elif avro_type == "float":
+            return "float32"
+        elif avro_type == "double":
+            return "float64"
+        elif avro_type == "boolean":
+            return "boolean"  # Correct nullable boolean alias
+        elif avro_type == "enum":
+            return "category"  # Best for low-cardinality fixed choice sets
 
         # default fallback
         return "string"

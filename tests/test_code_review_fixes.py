@@ -85,13 +85,13 @@ class TestConfigStaticMethods:
         assert Config.avro_type_to_tablefaker_type("string") == "string"
 
     def test_avro_type_int(self):
-        assert Config.avro_type_to_tablefaker_type("int") == "int32"
+        assert Config.avro_type_to_tablefaker_type("int") == "Int32"
 
     def test_avro_type_long(self):
-        assert Config.avro_type_to_tablefaker_type("long") == "int64"
+        assert Config.avro_type_to_tablefaker_type("long") == "Int64"
 
     def test_avro_type_boolean(self):
-        assert Config.avro_type_to_tablefaker_type("boolean") == "bool"
+        assert Config.avro_type_to_tablefaker_type("boolean") == "boolean"
 
     def test_avro_type_nullable_union(self):
         assert Config.avro_type_to_tablefaker_type(["null", "string"]) == "string"
