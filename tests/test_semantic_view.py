@@ -1,187 +1,110 @@
-import sys, os, shutil
+import sys
+import os
+import yaml
+
 sys.path.append(os.path.abspath("."))
+
 from tablefaker import semantic_view as sv
-import importlib
-import inspect
-import pytest
 
-def test_importable():
-	"""Module should import without syntax/runtime errors."""
-	assert sv is not None
-	assert inspect.ismodule(sv)
 
-def test_public_callables_have_docstrings():
-	"""All public callables exported by the module should have a non-empty docstring."""
-	public_names = [n for n in dir(sv) if not n.startswith("_")]
-	# Ensure the module exports something public (helps catch accidental empty modules)
-	assert public_names, "No public attributes exported from tablefaker.semantic_view"
-	for name in public_names:
-		obj = getattr(sv, name)
-		if callable(obj):
-			doc = getattr(obj, "__doc__", None)
-			assert doc and doc.strip(), f"Public callable '{name}' is missing a docstring"
+class DisabledLLM:
+    def is_enabled(self):
+        return False
 
-def test_public_classes_have_docstrings():
-	"""Public classes should have a class docstring or an __init__ docstring."""
-	public_names = [n for n in dir(sv) if not n.startswith("_")]
-	for name in public_names:
-		obj = getattr(sv, name)
-		if inspect.isclass(obj):
-			cls_doc = getattr(obj, "__doc__", None)
-			init_doc = getattr(obj.__init__, "__doc__", None) if hasattr(obj, "__init__") else None
-			assert (cls_doc and cls_doc.strip()) or (init_doc and init_doc.strip()), (
-				f"Public class '{name}' has no class or __init__ docstring"
-			)
 
-def _dummy_for_name(name, tmp_path):
-	"""Return a sensible dummy value based on parameter name."""
-	n = name.lower()
-	if "path" in n or "dir" in n or "file" in n:
-		return str(tmp_path)
-	if "schema" in n or "table" in n or "name" in n or "column" in n:
-		return "test"
-	if "rows" in n or n in ("n", "count", "num", "size"):
-		return 1
-	if "cols" in n or "columns" in n:
-		return ["a", "b"]
-	if "config" in n or "opts" in n or "options" in n or "settings" in n:
-		return {}
-	if "seed" in n:
-		return 0
-	if "verbose" in n or "debug" in n:
-		return False
-	if "data" in n or "value" in n or "values" in n:
-		return "x"
-	# fallback
-	return None
+def _sample_tables():
+    return [
+        {
+            "table_name": "customers",
+            "columns": [
+                {"column_name": "id", "type": "int64", "is_primary_key": True, "data": "1"},
+                {"column_name": "name", "type": "string", "data": "fake.name()"},
+            ],
+        },
+        {
+            "table_name": "orders",
+            "columns": [
+                {"column_name": "id", "type": "int64", "is_primary_key": True, "data": "1"},
+                {
+                    "column_name": "customer_id",
+                    "type": "int64",
+                    "data": 'foreign_key("customers", "id")',
+                },
+                {"column_name": "total_amount", "type": "float", "data": "100.0"},
+                {"column_name": "created_at", "type": "datetime", "data": "fake.date_time()"},
+            ],
+        },
+    ]
 
-def _build_call_args(func, tmp_path):
-	"""Try to build positional args and kwargs for func. Return (can_call, args, kwargs)."""
-	sig = inspect.signature(func)
-	args = []
-	kwargs = {}
-	for name, param in sig.parameters.items():
-		# Skip VAR_POSITIONAL / VAR_KEYWORD (we'll pass nothing)
-		if param.kind in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD):
-			continue
-		# If parameter has a default, we can skip providing it.
-		if param.default is not inspect._empty:
-			continue
-		# If the parameter is positional-only or positional-or-keyword and has no default, try to provide a dummy.
-		val = None
-		# Prefer annotation-based simple values if available
-		if param.annotation is not inspect._empty:
-			ann = param.annotation
-			try:
-				if ann is str:
-					val = "test"
-				elif ann is int:
-					val = 1
-				elif ann is bool:
-					val = False
-				elif ann is list:
-					val = []
-				elif ann is dict:
-					val = {}
-			except Exception:
-				val = None
-		# Fallback to name-based heuristics
-		if val is None:
-			val = _dummy_for_name(name, tmp_path)
-		# If still None, we cannot safely call
-		if val is None:
-			return False, (), {}
-		# Place value according to parameter kind
-		if param.kind == inspect.Parameter.POSITIONAL_ONLY or param.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD:
-			args.append(val)
-		elif param.kind == inspect.Parameter.KEYWORD_ONLY:
-			kwargs[name] = val
-		else:
-			# unexpected kind
-			return False, (), {}
-	return True, tuple(args), kwargs
 
-# def test_generate_semantic_view_basic(tmp_path):
-# 	"""generate_semantic_view should exist, be callable, and have a docstring.
-# 	If it accepts no required parameters we also call it and assert a non-None result.
-# 	"""
-# 	func = getattr(sv, "generate_semantic_view", None)
-# 	assert func is not None and callable(func), "generate_semantic_view is missing or not callable"
-# 	doc = getattr(func, "__doc__", None)
-# 	assert doc and doc.strip(), "generate_semantic_view is missing a docstring"
+def test_extract_table_metadata_includes_fk_details():
+    metadata = sv._extract_table_metadata(_sample_tables())
 
-# 	can_call, args, kwargs = _build_call_args(func, tmp_path)
-# 	if can_call:
-# 		# call and ensure it doesn't raise
-# 		result = func(*args, **kwargs)
-# 		assert result is not None
+    assert "orders" in metadata
+    fk_col = [c for c in metadata["orders"]["columns"] if c["column_name"] == "customer_id"][0]
+    assert fk_col["is_foreign_key"] is True
+    assert fk_col["fk_table"] == "customers"
+    assert fk_col["fk_column"] == "id"
+    assert metadata["orders"]["primary_keys"] == ["id"]
 
-def test_call_public_callables_with_dummy_args(tmp_path):
-	"""Attempt to call public callables when safe dummy arguments can be built."""
-	public_names = [n for n in dir(sv) if not n.startswith("_")]
-	assert public_names, "No public attributes exported from tablefaker.semantic_view"
-	for name in public_names:
-		obj = getattr(sv, name)
-		if callable(obj):
-			# Skip classes here (handled separately)
-			if inspect.isclass(obj):
-				continue
-			# ensure docstring
-			doc = getattr(obj, "__doc__", None)
-			assert doc and doc.strip(), f"Public callable '{name}' is missing a docstring"
-			can_call, args, kwargs = _build_call_args(obj, tmp_path)
-			if can_call:
-				# calling should not raise unexpected exceptions
-				try:
-					res = obj(*args, **kwargs)
-				except Exception as e:
-					# If calling raises a TypeError or ValueError related to invalid dummy input,
-					# it's acceptable to skip—treat as a skip rather than a hard failure.
-					# Other exceptions should propagate.
-					if isinstance(e, (TypeError, ValueError)):
-						pytest.skip(f"Callable {name} raised {type(e).__name__} with dummy args: {e}")
-					else:
-						raise
-				# basic assertion to ensure something returned or the callable completed
-				assert res is not None or res is None  # explicit no-op check; ensures call completed
 
-# def test_instantiate_public_classes_and_call_noarg_methods(tmp_path):
-# 	"""Instantiate public classes when possible and call their public no-arg methods."""
-# 	public_names = [n for n in dir(sv) if not n.startswith("_")]
-# 	for name in public_names:
-# 		obj = getattr(sv, name)
-# 		if inspect.isclass(obj):
-# 			# ensure docstring
-# 			cls_doc = getattr(obj, "__doc__", None)
-# 			init_doc = getattr(obj.__init__, "__doc__", None) if hasattr(obj, "__init__") else None
-# 			assert (cls_doc and cls_doc.strip()) or (init_doc and init_doc.strip()), (
-# 				f"Public class '{name}' has no class or __init__ docstring"
-# 			)
-# 			# Try to build constructor args
-# 			can_call, args, kwargs = _build_call_args(obj, tmp_path)
-# 			if not can_call:
-# 				# skip instantiation when we can't build safe args
-# 				continue
-# 			instance = obj(*args, **kwargs)
-# 			# Call public methods that require no required params
-# 			for meth_name, member in inspect.getmembers(instance, predicate=inspect.ismethod):
-# 				if meth_name.startswith("_"):
-# 					continue
-# 				sig = inspect.signature(member)
-# 				# check required parameters aside from 'self'
-# 				required = [
-# 					p for p in list(sig.parameters.values())[1:]
-# 					if p.default is inspect._empty and p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
-# 				]
-# 				if required:
-# 					continue
-# 				# call the method
-# 				try:
-# 					out = member()
-# 				except Exception as e:
-# 					# allow TypeError/ValueError caused by dummy data; otherwise propagate
-# 					if isinstance(e, (TypeError, ValueError)):
-# 						pytest.skip(f"Method {name}.{meth_name} raised {type(e).__name__} with dummy args: {e}")
-# 					else:
-# 						raise
-# 				assert out is not None or out is None
+def test_extract_relationships_only_uses_fk_to_pk():
+    tables = _sample_tables()
+    # Add FK to non-PK column; this one should be ignored.
+    tables[1]["columns"].append(
+        {"column_name": "customer_name", "type": "string", "data": 'foreign_key("customers", "name")'}
+    )
+
+    rels = sv._extract_relationships(tables)
+
+    assert len(rels) == 1
+    assert rels[0]["left_table"] == "orders"
+    assert rels[0]["right_table"] == "customers"
+    assert rels[0]["left_column"] == "customer_id"
+    assert rels[0]["right_column"] == "id"
+
+
+def test_classify_column_and_infer_data_type_branches():
+    llm_client = DisabledLLM()
+
+    assert sv._classify_column({"column_name": "id", "type": "int64", "is_primary_key": True}, "t", llm_client) == "dimension"
+    assert sv._classify_column({"column_name": "customer_id", "type": "int64", "is_foreign_key": True}, "t", llm_client) == "dimension"
+    assert sv._classify_column({"column_name": "created_at", "type": "datetime"}, "t", llm_client) == "time_dimension"
+    assert sv._classify_column({"column_name": "total_amount", "type": "float"}, "t", llm_client) == "fact"
+    assert sv._classify_column({"column_name": "status", "type": "string"}, "t", llm_client) == "dimension"
+
+    assert sv._infer_data_type("int64") == "NUMBER"
+    assert sv._infer_data_type("datetime") == "TIMESTAMP"
+    assert sv._infer_data_type("string") == "VARCHAR"
+
+
+def test_build_semantic_model_without_llm():
+    metadata = sv._extract_table_metadata(_sample_tables())
+    relationships = sv._extract_relationships(_sample_tables())
+    model = sv._build_semantic_model(metadata, relationships, DisabledLLM())
+
+    assert model["name"].endswith("_semantic_model")
+    assert "Semantic model containing" in model["description"]
+    assert len(model["tables"]) == 2
+
+    customers = [t for t in model["tables"] if t["name"] == "customers"][0]
+    pk_dimension = [d for d in customers.get("dimensions", []) if d["name"] == "id"][0]
+    assert pk_dimension["unique"] is True
+
+    assert "relationships" in model
+    assert model["relationships"][0]["relationship_columns"][0] == {
+        "left_column": "customer_id",
+        "right_column": "id",
+    }
+
+
+def test_generate_semantic_view_writes_file_with_dict_source(monkeypatch, tmp_path):
+    monkeypatch.setattr(sv, "LLMClient", lambda *_args, **_kwargs: DisabledLLM())
+
+    config_dict = {"tables": _sample_tables()}
+    out_path = sv.generate_semantic_view(config_dict, str(tmp_path), llm_config_path="ignored.yaml")
+
+    assert out_path == str(tmp_path / "semantic_view.yml")
+    written = yaml.safe_load((tmp_path / "semantic_view.yml").read_text(encoding="utf-8"))
+    assert "tables" in written
+    assert written["tables"][0]["base_table"]["database"] == "<database>"
