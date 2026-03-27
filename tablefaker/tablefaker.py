@@ -115,14 +115,17 @@ class TableFaker:
                 if file_type == "deltalake" and table["table_name"] == table_name and not path.exists(target_file_path) and path.exists(path.dirname(path.normpath(target_file_path)) + "/"):
                     # in delta lake format, if the latest folder does not exists, assume it is requested delta lake folder
                     temp_file_path = target_file_path.rstrip('/')
+                    export_base_name = None
                 else:
-                    file_name = util.get_temp_filename(table["table_name"]) + util.get_file_extension(file_type)
+                    export_base_name = table.get("export_file_name") or table["table_name"]
+                    file_name = util.get_temp_filename(export_base_name) + util.get_file_extension(file_type)
                     temp_file_path = path.join(target_file_path, file_name)
 
-                self.to_target_file(file_type, temp_file_path, table_name, kwargs, result, configurator, table, export_file_row_count, row_count)
+                self.to_target_file(file_type, temp_file_path, table_name, kwargs, result, configurator, table, export_file_row_count, row_count, export_base_name)
                 result[table_name] = temp_file_path
             else:
-                self.to_target_file(file_type, target_file_path, table_name, kwargs, result, configurator, table, export_file_row_count, row_count)
+                export_base_name = table.get("export_file_name") or table["table_name"]
+                self.to_target_file(file_type, target_file_path, table_name, kwargs, result, configurator, table, export_file_row_count, row_count, export_base_name)
                 break # if single table is requested
         
         return result
@@ -142,7 +145,7 @@ class TableFaker:
             result[table["table_name"]] = df
         return result
 
-    def to_target_file(self, file_type, target_file_path, table_name, kwargs, result, configurator, table, export_file_row_count, row_count):
+    def to_target_file(self, file_type, target_file_path, table_name, kwargs, result, configurator, table, export_file_row_count, row_count, export_base_name=None):
         internal_row_id = 0
         internal_row_count = min(export_file_row_count, sys.maxsize)
         file_count = math.ceil(row_count / export_file_row_count)
@@ -153,8 +156,9 @@ class TableFaker:
             self.reset_start_time()
             df = self.generate_table(table, configurator, internal_row_id, internal_row_count, **kwargs)
             if file_count > 1:
-                file_name, file_extension = path.splitext(target_file_path)
-                temp_file_path = file_name + "_" + str(i+1) + file_extension
+                file_extension = util.get_file_extension(file_type)
+                target_dir = path.dirname(target_file_path)
+                temp_file_path = path.join(target_dir, export_base_name + "_" + str(i+1) + file_extension)
             else:
                 temp_file_path = target_file_path
             self.call_export_function(df, file_type, temp_file_path)

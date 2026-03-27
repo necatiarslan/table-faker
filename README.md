@@ -42,6 +42,7 @@ tables:
     start_row_id: <integer>
     export_file_count: <integer>
     export_file_row_count: <integer>
+    export_file_name: <string>                 # optional: custom name for exported file (without extension)
 
     columns:
       - column_name: <column_name>              # string (required)

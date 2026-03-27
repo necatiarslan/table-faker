@@ -11,6 +11,7 @@ tables:
     row_count: 100
     start_row_id: 10                               # you can set row_id starting point
     export_file_count: 2                           # you can set export file count (dominant to export_file_row_count)
+    export_file_name: person_list
     columns:
       - column_name: id
         data: row_id                                # row_id is a built-in function

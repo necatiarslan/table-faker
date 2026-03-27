@@ -1,0 +1,33 @@
+version: 1
+
+config:
+  locale: en_US
+  seed: 42
+
+tables:
+  - table_name: products
+    row_count: 25
+    export_file_name: product_catalog
+    columns:
+      - column_name: product_id
+        data: row_id
+        is_primary_key: true
+      - column_name: name
+        data: fake.word()
+      - column_name: price
+        data: fake.pyfloat(left_digits=4, right_digits=2, positive=True)
+
+  - table_name: customers
+    row_count: 100
+    export_file_count: 3
+    export_file_name: customer_list
+    columns:
+      - column_name: customer_id
+        data: row_id
+        is_primary_key: true
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: email
+        data: fake.email()

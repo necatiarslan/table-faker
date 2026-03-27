@@ -22,6 +22,7 @@ Help an agent generate valid Tablefaker YAML configurations that follow the actu
 - `is_primary_key: true` columns cannot use `null_percentage`.
 - `data: auto` only works when `config.infer_entity_attrs_by_name` is true.
 - Community providers use the format `module(ClassName)`.
+- Optional `export_file_name` field controls exported filename (without extension); when chunked exports, files are named `{export_file_name}_1.ext`, `{export_file_name}_2.ext`, etc.
 
 ## Schema Cheat Sheet
 ```yaml
@@ -41,6 +42,7 @@ tables:
     start_row_id: 1
     export_file_count: 1
     export_file_row_count: 100
+    export_file_name: custom_output
     columns:
       - column_name: id
         data: row_id
