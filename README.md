@@ -396,6 +396,10 @@ tablefaker.to_csv("test_table.yaml")
 # exports to sql insert into scripts to insert to your database
 tablefaker.to_sql("test_table.yaml")
 
+# SQL identifiers are emitted as provided by table_name and column_name
+# so you can use database-specific styles like [schema].[dbo].[table_name].
+# If your database requires escaping/quoting, provide names in that format.
+
 # exports all tables in json format
 tablefaker.to_json("test_table.yaml", "./target_folder")
 

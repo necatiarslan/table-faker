@@ -161,14 +161,13 @@ class TestSQLExport:
         files = list(tmp_path.glob("*.sql"))
         assert len(files) > 0
 
-    def test_sql_quoted_identifiers(self, tmp_path):
+    def test_sql_preserves_identifiers(self, tmp_path):
         result = tablefaker.to_sql(self._config, str(tmp_path))
         sql_file = list(tmp_path.glob("*.sql"))[0]
         content = sql_file.read_text()
-        # Table name and column names should be double-quoted
-        assert '"orders"' in content
-        assert '"order_id"' in content
-        assert '"description"' in content
+        # Table and column identifiers should be emitted as provided.
+        assert "INSERT INTO orders" in content
+        assert "(order_id, description)" in content
 
     def test_sql_string_values_escaped(self, tmp_path):
         """Single quotes inside string values must be escaped."""
@@ -190,6 +189,25 @@ class TestSQLExport:
         content = sql_file.read_text()
         # The single quote in "it's" must be escaped as ''
         assert "''" in content
+
+    def test_sql_mssql_style_table_name_preserved(self, tmp_path):
+        cfg = {
+            "version": 1,
+            "config": {"locale": "en_US"},
+            "tables": [
+                {
+                    "table_name": "[schema].[dbo].[orders]",
+                    "row_count": 1,
+                    "columns": [
+                        {"column_name": "order_id", "data": "row_id"},
+                    ],
+                }
+            ],
+        }
+        result = tablefaker.to_sql(cfg, str(tmp_path))
+        sql_file = list(tmp_path.glob("*.sql"))[0]
+        content = sql_file.read_text()
+        assert "INSERT INTO [schema].[dbo].[orders]" in content
 
 
 # ---------------------------------------------------------------------------

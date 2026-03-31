@@ -196,9 +196,8 @@ class TableFaker:
     def to_sql_internal(self, data_frame: pd.DataFrame, target_file_path):
 
         table_name = data_frame.Name
-        # Generate insert script file - quote identifiers to prevent injection
-        quoted_columns = ', '.join(f'"{col}"' for col in data_frame.columns)
-        insert_script = f'INSERT INTO "{table_name}"\n({quoted_columns})\nVALUES\n'
+        # Keep identifier formatting as provided by config for DB-dialect compatibility.
+        insert_script = f'INSERT INTO {table_name}\n({", ".join(data_frame.columns)})\nVALUES\n'
 
         # Iterate over DataFrame rows and create insert statements
         for _, row in data_frame.iterrows():
