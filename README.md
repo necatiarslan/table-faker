@@ -209,7 +209,7 @@ tables:
   - table_name: customers
     row_count: 10
     columns:
-      - column_name: customer_id
+      - column_name: id
         is_primary_key: true
         data: row_id
       - column_name: email
@@ -222,9 +222,9 @@ tables:
         data: row_id
         is_primary_key: true
       - column_name: customer_id
-        data: foreign_key("customers", "customer_id")
+        data: foreign_key("customers", "id")
       - column_name: customer_email
-        data: copy_from_fk("customers", "customer_id", "email")
+        data: copy_from_fk("customers", "customer_id", "email") # second paremeter is the column in this table that is a foreign key to the parent table
 ```
 
 ### ⚡ Automatic attribute inference in action
