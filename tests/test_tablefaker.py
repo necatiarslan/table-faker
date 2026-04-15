@@ -82,13 +82,13 @@ def test_csv_to_yaml(tmp_path):
     assert output_file.exists()
 
 def test_export_file_name_attribute_csv(tmp_path):
-    """Test that export_file_name attribute is used in exported filename."""
+    """Test that export_file_name attribute is used in exported filename without timestamp."""
     result = tablefaker.to_csv("tests/test_yaml_configs/export_file_name.yaml", str(tmp_path), table_name="products")
     assert result is not None
     
-    # Check that the file uses the custom export_file_name
-    files = list(tmp_path.glob("product_catalog*.csv"))
-    assert len(files) > 0, "Expected files with 'product_catalog' in name"
+    # Check that the file uses the custom export_file_name without timestamp
+    expected_file = tmp_path / "product_catalog.csv"
+    assert expected_file.exists(), f"Expected exact file 'product_catalog.csv', got: {[f.name for f in tmp_path.iterdir()]}"
     
     # Verify table_name is NOT used in filename
     wrong_files = list(tmp_path.glob("products*.csv"))
@@ -111,22 +111,22 @@ def test_export_file_name_with_chunked_export(tmp_path):
     assert any("customer_list_3" in name for name in file_names), "Expected customer_list_3 file"
 
 def test_export_file_name_with_json(tmp_path):
-    """Test that export_file_name works with JSON exports."""
+    """Test that export_file_name works with JSON exports without timestamp."""
     result = tablefaker.to_json("tests/test_yaml_configs/export_file_name.yaml", str(tmp_path), table_name="products")
     assert result is not None
     
-    # Check that the JSON file uses the custom export_file_name
-    files = list(tmp_path.glob("product_catalog*.json"))
-    assert len(files) > 0, "Expected JSON files with 'product_catalog' in name"
+    # Check that the JSON file uses the custom export_file_name without timestamp
+    expected_file = tmp_path / "product_catalog.json"
+    assert expected_file.exists(), f"Expected exact file 'product_catalog.json', got: {[f.name for f in tmp_path.iterdir()]}"
 
 def test_export_file_name_with_parquet(tmp_path):
-    """Test that export_file_name works with Parquet exports."""
+    """Test that export_file_name works with Parquet exports without timestamp."""
     result = tablefaker.to_parquet("tests/test_yaml_configs/export_file_name.yaml", str(tmp_path), table_name="products")
     assert result is not None
     
-    # Check that the Parquet file uses the custom export_file_name
-    files = list(tmp_path.glob("product_catalog*.parquet"))
-    assert len(files) > 0, "Expected Parquet files with 'product_catalog' in name"
+    # Check that the Parquet file uses the custom export_file_name without timestamp
+    expected_file = tmp_path / "product_catalog.parquet"
+    assert expected_file.exists(), f"Expected exact file 'product_catalog.parquet', got: {[f.name for f in tmp_path.iterdir()]}"
 
 def test_backward_compatibility_no_export_file_name(tmp_path):
     """Test that tables without export_file_name still export with table_name (backward compatibility)."""

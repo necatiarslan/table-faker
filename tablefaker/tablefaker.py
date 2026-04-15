@@ -117,8 +117,12 @@ class TableFaker:
                     temp_file_path = target_file_path.rstrip('/')
                     export_base_name = None
                 else:
-                    export_base_name = table.get("export_file_name") or table["table_name"]
-                    file_name = util.get_temp_filename(export_base_name) + util.get_file_extension(file_type)
+                    custom_export_name = table.get("export_file_name")
+                    export_base_name = custom_export_name or table["table_name"]
+                    if custom_export_name:
+                        file_name = export_base_name + util.get_file_extension(file_type)
+                    else:
+                        file_name = util.get_temp_filename(export_base_name) + util.get_file_extension(file_type)
                     temp_file_path = path.join(target_file_path, file_name)
 
                 self.to_target_file(file_type, temp_file_path, table_name, kwargs, result, configurator, table, export_file_row_count, row_count, export_base_name)

@@ -587,7 +587,7 @@ If you find Table Faker useful and would like to support its development, consid
   - composite keys are not unique
   - composite keys are not stored together
   - copy_from_fk do not support composite primary key
-- ~~is_unique support~~ ✅
+- add python support to export_file_name
 - Provide foreign keys (dictionary, array etc) as an external source
 - Variables
 - Generate template yaml file from sample data

@@ -78,7 +78,7 @@ build:
     pipenv run python setup.py sdist bdist_wheel
     
 publish:
-	pipenv run twine upload dist/tablefaker-1.10.2*
+	pipenv run twine upload dist/tablefaker-1.10.3*
 
 # After you run the command, it will ask username and password
 # Set your username to __token__
