@@ -88,12 +88,64 @@ def test_avro_to_yaml(tmp_path):
     first_name_col = next(col for col in columns if col["column_name"] == "first_name")
     assert first_name_col["type"] == "string"
     assert first_name_col["parquet_type"] == "string"
+    assert first_name_col["data"] == "fake.first_name()"
+
+    last_name_col = next(col for col in columns if col["column_name"] == "last_name")
+    assert last_name_col["data"] == "fake.last_name()"
+
+    age_col = next(col for col in columns if col["column_name"] == "age")
+    assert age_col["data"] == "fake.random_int(18, 90)"
+
+    street_col = next(col for col in columns if col["column_name"] == "street_address")
+    assert street_col["data"] == "fake.street_address()"
+
+    city_col = next(col for col in columns if col["column_name"] == "city")
+    assert city_col["data"] == "fake.city()"
+
+    state_col = next(col for col in columns if col["column_name"] == "state_abbr")
+    assert state_col["data"] == "fake.state_abbr()"
+
+    postcode_col = next(col for col in columns if col["column_name"] == "postcode")
+    assert postcode_col["data"] == "fake.postcode()"
 
 def test_csv_to_yaml(tmp_path):
     """Test CSV to YAML conversion."""
     output_file = tmp_path / "person.yaml"
     tablefaker.csv_to_yaml("tests/test_person.csv", str(output_file))
     assert output_file.exists()
+
+
+def test_csv_to_yaml_infers_data_when_missing(tmp_path):
+    """Test CSV to YAML infers data expressions when CSV rows omit data."""
+    csv_file = tmp_path / "schema.csv"
+    csv_file.write_text(
+        "column_name,type,data\n"
+        "first_name,string,\n"
+        "age,int32,\n"
+        "status,string,\n"
+        "notes,,\n",
+        encoding="utf-8",
+    )
+
+    output_file = tmp_path / "schema.yaml"
+    tablefaker.csv_to_yaml(str(csv_file), str(output_file))
+    assert output_file.exists()
+
+    with open(output_file, "r", encoding="utf-8") as file:
+        cfg = yaml.safe_load(file)
+
+    columns = cfg["tables"][0]["columns"]
+    first_name_col = next(col for col in columns if col["column_name"] == "first_name")
+    assert first_name_col["data"] == "fake.first_name()"
+
+    age_col = next(col for col in columns if col["column_name"] == "age")
+    assert age_col["data"] == "fake.random_int(18, 90)"
+
+    status_col = next(col for col in columns if col["column_name"] == "status")
+    assert status_col["data"] == "fake.word()"
+
+    notes_col = next(col for col in columns if col["column_name"] == "notes")
+    assert notes_col["data"] == "fake.word()"
 
 def test_export_file_name_attribute_csv(tmp_path):
     """Test that export_file_name attribute is used in exported filename without timestamp."""

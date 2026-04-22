@@ -81,6 +81,12 @@ class TestConfigStaticMethods:
             staticmethod,
         )
 
+    def test_infer_data_expression_from_column_name_is_static(self):
+        assert isinstance(
+            inspect.getattr_static(Config, "_infer_data_expression_from_column_name"),
+            staticmethod,
+        )
+
     def test_avro_type_string(self):
         assert Config.avro_type_to_tablefaker_type("string") == "string"
 
@@ -98,6 +104,15 @@ class TestConfigStaticMethods:
 
     def test_avro_type_unknown_fallback(self):
         assert Config.avro_type_to_tablefaker_type("unknown_type") == "string"
+
+    def test_name_inference_first_name(self):
+        assert Config._infer_data_expression_from_column_name("first_name", "string") == "fake.first_name()"
+
+    def test_name_inference_street_address(self):
+        assert Config._infer_data_expression_from_column_name("street_address", "string") == "fake.street_address()"
+
+    def test_name_inference_ambiguous_falls_back_to_none(self):
+        assert Config._infer_data_expression_from_column_name("status", "string") is None
 
 
 # ---------------------------------------------------------------------------

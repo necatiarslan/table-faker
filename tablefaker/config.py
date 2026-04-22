@@ -206,6 +206,84 @@ class Config:
 
         return "string"
 
+    @staticmethod
+    def _default_data_expression_by_type(pandas_type):
+        """Return conservative fallback data expression by pandas type."""
+        type_name = (pandas_type or "").lower()
+        if "string" in type_name or "str" in type_name:
+            return "fake.word()"
+        if "date" in type_name or "time" in type_name:
+            return "fake.date()"
+        if "int" in type_name:
+            return "fake.random_int(0, 100)"
+        if "float" in type_name:
+            return "fake.pyfloat()"
+        if "boolean" in type_name or "bool" in type_name:
+            return "fake.pybool()"
+        return "None"
+
+    @staticmethod
+    def _infer_data_expression_from_column_name(column_name, pandas_type=""):
+        """Infer faker expression from common column naming conventions.
+
+        Returns None when no high-confidence mapping exists.
+        """
+        name = (column_name or "").strip().lower().replace("-", "_").replace(" ", "_")
+
+        exact_map = {
+            "first_name": "fake.first_name()",
+            "last_name": "fake.last_name()",
+            "full_name": "fake.name()",
+            "email": "fake.email()",
+            "phone": "fake.phone_number()",
+            "phone_number": "fake.phone_number()",
+            "street_address": "fake.street_address()",
+            "address": "fake.street_address()",
+            "city": "fake.city()",
+            "state": "fake.state()",
+            "state_abbr": "fake.state_abbr()",
+            "postcode": "fake.postcode()",
+            "postal_code": "fake.postcode()",
+            "zip": "fake.zipcode()",
+            "zip_code": "fake.zipcode()",
+            "date_of_birth": "fake.date_of_birth(minimum_age=18, maximum_age=90)",
+            "dob": "fake.date_of_birth(minimum_age=18, maximum_age=90)",
+            "age": "fake.random_int(18, 90)",
+            "gender": "random.choice(['male', 'female'])",
+        }
+
+        #look for exact match
+        if name in exact_map:
+            return exact_map[name]
+
+        # Conservative suffix/pattern rules for strongly standardized names.
+        if name.endswith("_email"):
+            return "fake.email()"
+        if name.endswith("_phone") or name.endswith("_phone_number"):
+            return "fake.phone_number()"
+        if name.endswith("_first_name"):
+            return "fake.first_name()"
+        if name.endswith("_last_name"):
+            return "fake.last_name()"
+        if name.endswith("_city"):
+            return "fake.city()"
+        if name.endswith("_state"):
+            return "fake.state()"
+        if name.endswith("_state_abbr"):
+            return "fake.state_abbr()"
+        if name.endswith("_postcode") or name.endswith("_postal_code"):
+            return "fake.postcode()"
+        if name.endswith("_zip") or name.endswith("_zip_code"):
+            return "fake.zipcode()"
+
+        # Check if any key in exact_map contains the name as a substring
+        for key in exact_map:
+            if name in key:
+                return exact_map[key]
+
+        # Keep ambiguous names conservative; fall back to type-based default.
+        return None
+
 
     @staticmethod
     def avro_to_yaml(avro_file_path, target_file_path=None):
@@ -272,21 +350,10 @@ class Config:
             if parquet_mapped:
                 col["parquet_type"] = parquet_mapped
 
-            # add a default data generator placeholder based on type
+            # Prefer high-confidence name inference, then type-based fallback.
             pandas_type = col.get("type", "").lower()
-            if "string" in pandas_type or "str" in pandas_type:
-                col["data"] = "fake.word()"
-            elif "date" in pandas_type or "time" in pandas_type:
-                col["data"] = "fake.date()"
-            elif "int" in pandas_type:
-                col["data"] = "fake.random_int(0, 100)"
-            elif "float" in pandas_type:
-                col["data"] = "fake.pyfloat()"
-            elif "boolean" in pandas_type or "bool" in pandas_type:
-                col["data"] = "fake.pybool()"
-            else:
-                # fallback
-                col.setdefault("data", "None")
+            inferred = Config._infer_data_expression_from_column_name(name, pandas_type)
+            col["data"] = inferred if inferred is not None else Config._default_data_expression_by_type(pandas_type)
 
             if isinstance(ftype, list) and "null" in ftype:
                 col["null_percentage"] = 0.1  # default 10% nulls for nullable fields
@@ -363,6 +430,18 @@ class Config:
                 col_struct["type"] = getattr(row, "type")
             if "data" in df.columns and isinstance(getattr(row, "data"), str):
                 col_struct["data"] = getattr(row, "data")
+            if "data" not in col_struct:
+                inferred = Config._infer_data_expression_from_column_name(
+                    col_struct["column_name"],
+                    col_struct.get("type", ""),
+                )
+                if inferred is not None:
+                    col_struct["data"] = inferred
+                elif "type" in col_struct:
+                    col_struct["data"] = Config._default_data_expression_by_type(col_struct.get("type", ""))
+                else:
+                    # Keep CSV conversion runnable even when type is omitted.
+                    col_struct["data"] = "fake.word()"
             if "null_percentage" in df.columns and isinstance(getattr(row, "null_percentage"), (float, int)):
                 null_perc = getattr(row, "null_percentage")
                 try:

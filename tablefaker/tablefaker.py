@@ -12,7 +12,6 @@ import importlib.util
 import sys, math, gc, psutil, string
 import hashlib
 import ast
-import yaml
 
 class TableFaker:
     def __init__(self):

@@ -433,6 +433,27 @@ datetime.today()
 r"170 cm" # string
 
 ```
+## 📖 Built In Fake Data Generators
+Table faker has several build in functions based on Faker and Random packages.
+You can find these functions in the 
+- [Built In Functions](BUILT_IN_FUNCTIONS.md)
+- [Faker documentation](https://faker.readthedocs.io/en/master/) 
+- [Random module documentation](https://docs.python.org/3/library/random.html).
+
+Other build in functions
+- datetime
+- date
+- timedelta
+- time
+- timezone
+- tzinfo
+- UTC
+- MINYEAR
+- MAXYEAR
+- math
+- string
+
+
 ## 💻 Example Code
 ```python
 import tablefaker
