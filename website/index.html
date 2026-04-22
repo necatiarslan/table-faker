@@ -111,6 +111,10 @@
             <h3>CLI and Python API</h3>
             <p>Run from terminal or import as a package for notebooks, scripts, and app-level test tooling.</p>
           </article>
+          <article class="card reveal">
+            <h3>Parquet schema control</h3>
+            <p>Use <code>parquet_type</code> per column to write explicit Arrow types such as <code>decimal128(10, 2)</code> and <code>timestamp[us]</code>.</p>
+          </article>
         </div>
       </div>
     </section>
@@ -119,7 +123,7 @@
       <div class="container">
         <p class="eyebrow">Output Formats</p>
         <h2>One schema, many targets</h2>
-        <p class="section-copy">Export in the format your workflow already expects.</p>
+        <p class="section-copy">Export in the format your workflow already expects. For parquet exports, you can enforce exact column types with <code>parquet_type</code>.</p>
         <div class="pill-grid reveal">
           <span class="pill">Pandas DataFrame</span>
           <span class="pill">CSV</span>
@@ -426,6 +430,32 @@ print(person_df.head(5))</code></pre>
             </div>
           </article>
 
+          <article class="accordion-item reveal delay-2">
+            <h3>
+              <button class="accordion-trigger" id="adv-parquet-type-trigger" aria-expanded="false" aria-controls="adv-parquet-type-panel">
+                <span><code>parquet_type</code> for explicit parquet schema</span>
+                <span class="accordion-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="accordion-panel" id="adv-parquet-type-panel" role="region" aria-labelledby="adv-parquet-type-trigger" hidden>
+              <p class="accordion-note">Use <code>parquet_type</code> on columns when exporting parquet to enforce Arrow types. It is silently ignored for CSV, JSON, Excel, SQL, and Delta Lake exports.</p>
+              <pre><code>tables:
+  - table_name: transactions
+    row_count: 5
+    columns:
+      - column_name: id
+        data: row_id
+        is_primary_key: true
+        parquet_type: int32
+      - column_name: amount
+        data: round(random.uniform(1.0, 9999.99), 2)
+        parquet_type: decimal128(10, 2)
+      - column_name: created_at
+        data: datetime.today()
+        parquet_type: timestamp[us]</code></pre>
+            </div>
+          </article>
+
           <article class="accordion-item reveal">
             <h3>
               <button class="accordion-trigger" id="adv-cli-usage-trigger" aria-expanded="false" aria-controls="adv-cli-usage-panel">
@@ -658,6 +688,10 @@ tablefaker.csv_to_yaml("tests/test_person.csv", "tests/exports/person.yaml")</co
           <article class="faq-item reveal">
             <h3>Where can I report issues?</h3>
             <p>Use the GitHub repository issues page for bug reports and feature requests.</p>
+          </article>
+          <article class="faq-item reveal delay-1">
+            <h3>How do I force parquet column types?</h3>
+            <p>Set <code>parquet_type</code> in column definitions, for example <code>int32</code>, <code>timestamp[us]</code>, or <code>decimal128(10, 2)</code>. This applies only to parquet output.</p>
           </article>
         </div>
       </div>

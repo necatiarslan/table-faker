@@ -156,6 +156,56 @@ class Config:
         # default fallback
         return "string"
 
+    @staticmethod
+    def avro_type_to_parquet_type(avro_type):
+        """Map Avro field type to a parquet_type value for tablefaker YAML."""
+        if isinstance(avro_type, list):
+            non_null = [t for t in avro_type if t != "null"]
+            if len(non_null) == 1:
+                return Config.avro_type_to_parquet_type(non_null[0])
+            return "string"
+
+        if isinstance(avro_type, dict):
+            logical_type = avro_type.get("logicalType")
+            if logical_type == "date":
+                return "date32"
+            if logical_type == "timestamp-millis":
+                return "timestamp[ms]"
+            if logical_type == "timestamp-micros":
+                return "timestamp[us]"
+            if logical_type == "decimal":
+                precision = int(avro_type.get("precision", 10))
+                scale = int(avro_type.get("scale", 2))
+                return f"decimal128({precision}, {scale})"
+            if logical_type == "uuid":
+                return "string"
+            return Config.avro_type_to_parquet_type(avro_type.get("type"))
+
+        if avro_type in ("string", "uuid", "enum"):
+            return "string"
+        if avro_type == "bytes":
+            return "binary"
+        if avro_type == "int":
+            return "int32"
+        if avro_type == "long":
+            return "int64"
+        if avro_type == "float":
+            return "float32"
+        if avro_type == "double":
+            return "float64"
+        if avro_type == "boolean":
+            return "boolean"
+        if avro_type == "date":
+            return "date32"
+        if avro_type == "timestamp-millis":
+            return "timestamp[ms]"
+        if avro_type == "timestamp-micros":
+            return "timestamp[us]"
+        if avro_type == "decimal":
+            return "decimal128(10, 2)"
+
+        return "string"
+
 
     @staticmethod
     def avro_to_yaml(avro_file_path, target_file_path=None):
@@ -218,14 +268,21 @@ class Config:
                 else:
                     col["type"] = col_type
 
+            parquet_mapped = Config.avro_type_to_parquet_type(ftype)
+            if parquet_mapped:
+                col["parquet_type"] = parquet_mapped
+
             # add a default data generator placeholder based on type
-            if col.get("type") in ("string", "date"):
+            pandas_type = col.get("type", "").lower()
+            if "string" in pandas_type or "str" in pandas_type:
                 col["data"] = "fake.word()"
-            elif col.get("type") in ("int32", "int64"):
+            elif "date" in pandas_type or "time" in pandas_type:
+                col["data"] = "fake.date()"
+            elif "int" in pandas_type:
                 col["data"] = "fake.random_int(0, 100)"
-            elif col.get("type") == "float":
+            elif "float" in pandas_type:
                 col["data"] = "fake.pyfloat()"
-            elif col.get("type") == "boolean":
+            elif "boolean" in pandas_type or "bool" in pandas_type:
                 col["data"] = "fake.pybool()"
             else:
                 # fallback

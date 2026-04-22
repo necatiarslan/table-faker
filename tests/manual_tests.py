@@ -20,12 +20,12 @@ os.system('clear')
 
 # tablefaker.to_csv("tests/test_basic_table.yaml", "./tests/exports", fake_provider=[SchoolProvider], custom_function=get_level)
 # tablefaker.to_csv("tests/test_table.json", "./tests/exports", fake_provider=[SchoolProvider], custom_function=get_level)
-tablefaker.to_csv("tests/manual_test.yaml", "./tests/exports", fake_provider=[SchoolProvider], custom_function=get_level)
+# tablefaker.to_csv("tests/manual_test.yaml", "./tests/exports", fake_provider=[SchoolProvider], custom_function=get_level)
 # tablefaker.to_csv("tests/manual_test.yaml", "./tests/exports", table_name="person", fake_provider=[SchoolProvider], custom_function=get_level)
 # tablefaker.to_csv("tests/manual_test.yaml", "./tests/exports/person.csv", table_name="person", fake_provider=[SchoolProvider], custom_function=get_level)
 # tablefaker.to_json("tests/manual_test.yaml", "./tests/exports", fake_provider=SchoolProvider, custom_function=get_level)
 # tablefaker.to_sql("tests/manual_test.yaml", "./tests/exports", fake_provider=SchoolProvider, custom_function=get_level)
-# tablefaker.to_parquet("tests/manual_test.yaml", "./tests/exports", fake_provider=SchoolProvider, custom_function=get_level)
+# tablefaker.to_parquet("tests/manual_test.yaml", "./tests/exports", table_name="person", fake_provider=SchoolProvider, custom_function=get_level)
 # tablefaker.to_deltalake("tests/manual_test.yaml", "./tests/exports/", fake_provider=[SchoolProvider], custom_function=get_level)
 # tablefaker.to_deltalake("tests/manual_test.yaml", "./tests/exports/person/", table_name="person", fake_provider=[SchoolProvider], custom_function=get_level)
 
@@ -37,7 +37,7 @@ tablefaker.to_csv("tests/manual_test.yaml", "./tests/exports", fake_provider=[Sc
 # employee_df = df_dict["employee"]
 # print(employee_df.head(5))
 
-# tablefaker.avro_to_yaml("tests/test_person.avsc", "tests/exports/person.yaml")
+tablefaker.avro_to_yaml("tests/test_person.avsc", "tests/exports/person.yaml")
 # tablefaker.to_csv("tests/exports/person.yaml", "./tests/exports/")
 
 # tablefaker.csv_to_yaml("tests/test_person.csv", "tests/exports/person.yaml")

@@ -182,13 +182,80 @@ class TableFaker:
         elif file_type == "excel":
             data_frame.to_excel(target_file_path, index=False)
         elif file_type == "parquet":
-            data_frame.to_parquet(target_file_path, index=False)
+            self._to_parquet_internal(data_frame, target_file_path)
         elif file_type == "sql":
             self.to_sql_internal(data_frame, target_file_path)
         elif file_type == "deltalake":
             self.to_deltalake_internal(data_frame, target_file_path)
         else:
             raise Exception(f"Wrong file_type = {file_type}")
+
+    def _to_parquet_internal(self, data_frame: pd.DataFrame, target_file_path):
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+        table = pa.Table.from_pandas(data_frame, preserve_index=False)
+        parquet_schema_map = data_frame.attrs.get('parquet_schema')
+        if parquet_schema_map:
+            pa_schema = self._build_parquet_schema(data_frame, parquet_schema_map)
+            table = table.cast(pa_schema, safe=False)
+        pq.write_table(table, target_file_path)
+
+    def _build_parquet_schema(self, data_frame: pd.DataFrame, schema_map: dict):
+        import pyarrow as pa
+        inferred = pa.Schema.from_pandas(data_frame, preserve_index=False)
+        fields = []
+        for i in range(len(inferred)):
+            field = inferred.field(i)
+            if field.name in schema_map:
+                new_type = self._parse_parquet_type(schema_map[field.name])
+                fields.append(pa.field(field.name, new_type, nullable=field.nullable))
+            else:
+                fields.append(field)
+        return pa.schema(fields)
+
+    @staticmethod
+    def _parse_parquet_type(type_str: str):
+        import pyarrow as pa
+        import re
+        type_str = type_str.strip()
+        simple = {
+            "int8": pa.int8(),
+            "int16": pa.int16(),
+            "int32": pa.int32(),
+            "int64": pa.int64(),
+            "uint8": pa.uint8(),
+            "uint16": pa.uint16(),
+            "uint32": pa.uint32(),
+            "uint64": pa.uint64(),
+            "float16": pa.float16(),
+            "float32": pa.float32(),
+            "float64": pa.float64(),
+            "double": pa.float64(),
+            "string": pa.string(),
+            "utf8": pa.string(),
+            "large_string": pa.large_string(),
+            "large_utf8": pa.large_string(),
+            "binary": pa.binary(),
+            "large_binary": pa.large_binary(),
+            "bool": pa.bool_(),
+            "boolean": pa.bool_(),
+            "date32": pa.date32(),
+            "date64": pa.date64(),
+            "time32[s]": pa.time32("s"),
+            "time32[ms]": pa.time32("ms"),
+            "time64[us]": pa.time64("us"),
+            "time64[ns]": pa.time64("ns"),
+            "timestamp[s]": pa.timestamp("s"),
+            "timestamp[ms]": pa.timestamp("ms"),
+            "timestamp[us]": pa.timestamp("us"),
+            "timestamp[ns]": pa.timestamp("ns"),
+        }
+        if type_str in simple:
+            return simple[type_str]
+        m = re.fullmatch(r"decimal128\(\s*(\d+)\s*,\s*(\d+)\s*\)", type_str)
+        if m:
+            return pa.decimal128(int(m.group(1)), int(m.group(2)))
+        raise Exception(f"Unknown parquet_type '{type_str}'. Supported types: {list(simple.keys())} and decimal128(precision, scale)")
 
     def to_deltalake_internal(self, data_frame: pd.DataFrame, target_file_path):
         if importlib.util.find_spec("deltalake"):
@@ -394,6 +461,10 @@ class TableFaker:
                 num_nulls = int(row_count * null_percentage)
                 null_indices = np.random.choice(df.index, size=num_nulls, replace=False)
                 df.loc[null_indices, column_name] = None
+
+        parquet_schema_map = {col['column_name']: col['parquet_type'] for col in columns if 'parquet_type' in col}
+        if parquet_schema_map:
+            df.attrs['parquet_schema'] = parquet_schema_map
 
         util.log(f"{table_name} pandas dataframe created", util.FOREGROUND_COLOR.GREEN)
         return df

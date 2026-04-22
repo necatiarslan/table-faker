@@ -43,7 +43,8 @@ tables:
       - column_name: left_handed
         data: fake.pybool()
       - column_name: today
-        data: datetime.today().strftime('%Y-%m-%d') # datetime package is available by default
+        data: datetime.today()
+        parquet_type: date32
       - column_name: easter_date
         data: dateutil.easter.easter(2025).strftime('%Y-%m-%d') # python package you need to import in python_import
       - column_name: discount_eligibility

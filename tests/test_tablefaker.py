@@ -1,6 +1,7 @@
 import sys, os, shutil
 sys.path.append(os.path.abspath("."))
 import pytest
+import yaml
 from tablefaker import tablefaker
 from faker_education import SchoolProvider
 from faker import Faker
@@ -74,6 +75,19 @@ def test_avro_to_yaml(tmp_path):
     output_file = tmp_path / "person.yaml"
     tablefaker.avro_to_yaml("tests/test_person.avsc", str(output_file))
     assert output_file.exists()
+
+    with open(output_file, "r", encoding="utf-8") as file:
+        cfg = yaml.safe_load(file)
+
+    assert "tables" in cfg and len(cfg["tables"]) == 1
+    columns = cfg["tables"][0]["columns"]
+    id_col = next(col for col in columns if col["column_name"] == "id")
+    assert id_col["type"] == "Int64"
+    assert id_col["parquet_type"] == "int64"
+
+    first_name_col = next(col for col in columns if col["column_name"] == "first_name")
+    assert first_name_col["type"] == "string"
+    assert first_name_col["parquet_type"] == "string"
 
 def test_csv_to_yaml(tmp_path):
     """Test CSV to YAML conversion."""

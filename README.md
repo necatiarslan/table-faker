@@ -56,6 +56,7 @@ tables:
               #   multi-line Python block using | (must return a value)
         is_primary_key: <true|false>
         type: string | int32 | int64 | float | boolean # a NumPy dtype object, a pandas ExtensionDtype, or a Python type
+        parquet_type: int32 | int64 | string | timestamp[us] | decimal128(10, 2) # optional: explicit Parquet/Arrow type, only used for parquet export
         null_percentage: <float between 0.0 and 1.0>
         description: <string>
 
@@ -75,6 +76,7 @@ tables:
 Notes:
 - Parent tables must be defined before child tables.
 - Two-phase evaluation resolves columns that reference other columns correctly.
+- `parquet_type` is silently ignored for non-parquet exports such as CSV, JSON, Excel, SQL, and Delta Lake.
 - For a full example, see [`tests/test_table.yaml`](tests/test_table.yaml).
 
 ## 🧩 Sample Yaml File Minimal
@@ -120,6 +122,9 @@ tables:
       - column_name: age
         data: fake.random_int(18, 90)
         type: int32
+      - column_name: annual_income
+        data: round(random.uniform(40000, 120000), 2)
+        parquet_type: decimal128(10, 2)         # controls the parquet file schema only
       - column_name: street_address
         data: fake.street_address()
       - column_name: city
@@ -135,6 +140,9 @@ tables:
         data: fake.pybool()
       - column_name: today
         data: datetime.today().strftime('%Y-%m-%d') # datetime package is available by default
+      - column_name: created_at
+        data: datetime.today()
+        parquet_type: date32
       - column_name: easter_date
         data: dateutil.easter.easter(2025).strftime('%Y-%m-%d') # python package you need to import in python_import
       - column_name: discount_eligibility           # custom python function
@@ -375,6 +383,45 @@ In addition, you have control over how your data is exported:
 
 
 Columns will automatically have the best-fitting data type. However, if you'd like to specify a data type, use the `type` keyword. You can assign data types using NumPy dtypes, Pandas Extension Dtypes, or Python native types.
+
+If you are exporting to Parquet and need exact physical column types in the final `.parquet` file, use `parquet_type`. This uses PyArrow schema control during parquet export.
+
+- `type` controls the pandas DataFrame dtype used during generation.
+- `parquet_type` controls the Arrow/Parquet type written to the parquet file.
+- You can use both on the same column.
+- If `parquet_type` is omitted, tablefaker keeps the current behavior and infers the parquet type from the generated data.
+
+Supported `parquet_type` values include:
+
+- `int8`, `int16`, `int32`, `int64`
+- `uint8`, `uint16`, `uint32`, `uint64`
+- `float16`, `float32`, `float64`, `double`
+- `string`, `utf8`, `large_string`
+- `binary`, `large_binary`
+- `bool`, `boolean`
+- `date32`, `date64`
+- `time32[s]`, `time32[ms]`, `time64[us]`, `time64[ns]`
+- `timestamp[s]`, `timestamp[ms]`, `timestamp[us]`, `timestamp[ns]`
+- `decimal128(precision, scale)`
+
+Example:
+
+```yaml
+tables:
+  - table_name: transactions
+    row_count: 100
+    columns:
+      - column_name: transaction_id
+        data: row_id
+        is_primary_key: true
+        parquet_type: int32
+      - column_name: amount
+        data: round(random.uniform(1.0, 9999.99), 2)
+        parquet_type: decimal128(10, 2)
+      - column_name: created_at
+        data: datetime.today()
+        parquet_type: timestamp[us]
+```
 
 Here are some examples:
 ```

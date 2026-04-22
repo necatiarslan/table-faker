@@ -23,6 +23,7 @@ Help an agent generate valid Tablefaker YAML configurations that follow the actu
 - `data: auto` only works when `config.infer_entity_attrs_by_name` is true.
 - Community providers use the format `module(ClassName)`.
 - Optional `export_file_name` field controls exported filename (without extension); when chunked exports, files are named `{export_file_name}_1.ext`, `{export_file_name}_2.ext`, etc.
+- Optional `parquet_type` column attribute sets the explicit Parquet/Arrow type when exporting to parquet. Silently ignored for other export formats. Supported values: `int8`, `int16`, `int32`, `int64`, `uint8`–`uint64`, `float16`/`float32`/`float64`, `double`, `string`/`utf8`, `large_string`, `binary`, `large_binary`, `bool`/`boolean`, `date32`, `date64`, `timestamp[s/ms/us/ns]`, `time32[s/ms]`, `time64[us/ns]`, `decimal128(precision, scale)`. Can coexist with `type` (which controls the pandas dtype); they are independent.
 
 ## Schema Cheat Sheet
 ```yaml
@@ -50,6 +51,12 @@ tables:
       - column_name: name
         data: fake.name()
         type: string
+      - column_name: salary
+        data: random.uniform(40000, 120000)
+        parquet_type: decimal128(10, 2)   # only applied when exporting to parquet
+      - column_name: age
+        data: random.randint(18, 65)
+        parquet_type: int32
       - column_name: created_at
         data: datetime.today().strftime('%Y-%m-%d')
 ```
