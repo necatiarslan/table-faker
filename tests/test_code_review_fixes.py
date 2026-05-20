@@ -224,6 +224,27 @@ class TestSQLExport:
         content = sql_file.read_text()
         assert "INSERT INTO [schema].[dbo].[orders]" in content
 
+    def test_sql_export_has_nulls_with_null_percentage(self, tmp_path):
+        cfg = {
+            "version": 1,
+            "config": {"locale": "en_US", "seed": 19},
+            "tables": [
+                {
+                    "table_name": "[schema].[dbo].[orders]",
+                    "row_count": 5,
+                    "columns": [
+                        {"column_name": "order_id", "data": "row_id"},
+                        {"column_name": "order_date", "data": "fake.date()", "null_percentage": 0.5}
+                    ],
+                }
+            ],
+        }
+        result = tablefaker.to_sql(cfg, str(tmp_path))
+        sql_file = list(tmp_path.glob("*.sql"))[0]
+        content = sql_file.read_text()
+        assert "NULL" in content
+
+
 
 # ---------------------------------------------------------------------------
 # null_percentage applies correctly (is None comparison)

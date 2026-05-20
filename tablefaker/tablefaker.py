@@ -275,6 +275,8 @@ class TableFaker:
             for value in row:
                 if value is None:
                     value_list.append("NULL")
+                elif value is pd.NA:
+                    value_list.append("NULL")
                 elif isinstance(value, (str, date, datetime)):
                     escaped = str(value).replace("'", "''")
                     value_list.append(f"'{escaped}'")
