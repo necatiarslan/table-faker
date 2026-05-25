@@ -1,0 +1,212 @@
+version: 1
+config:
+  locale: en_US
+  seed: 42
+
+# Sample CRM domain
+tables:
+  - table_name: account
+    row_count: 300
+    start_row_id: 1000
+    columns:
+      - column_name: account_id
+        data: row_id
+        is_primary_key: true
+      - column_name: account_name
+        data: fake.company()
+      - column_name: industry
+        data: random.choice(["Technology", "Healthcare", "Finance", "Retail", "Manufacturing", "Education", "Hospitality", "Logistics"])
+      - column_name: company_size
+        data: random.choice(["SMB", "Mid-Market", "Enterprise"])
+      - column_name: annual_revenue
+        data: round(random.uniform(50000, 50000000), 2)
+        type: float
+      - column_name: country
+        data: fake.country()
+      - column_name: city
+        data: fake.city()
+      - column_name: created_at
+        data: fake.date_time_between(start_date='-5y', end_date='now', tzinfo=None)
+
+  - table_name: contact
+    row_count: 1200
+    start_row_id: 2000
+    columns:
+      - column_name: contact_id
+        data: row_id
+        is_primary_key: true
+      - column_name: account_id
+        data: foreign_key("account", "account_id")
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: full_name
+        data: first_name + " " + last_name
+      - column_name: job_title
+        data: fake.job()
+      - column_name: is_decision_maker
+        data: random.choice([True, False])
+      - column_name: lifecycle_stage
+        data: random.choice(["Lead", "MQL", "SQL", "Customer", "Evangelist"])
+      - column_name: created_at
+        data: fake.date_time_between(start_date='-4y', end_date='now', tzinfo=None)
+
+  - table_name: contact_address
+    row_count: 2400
+    start_row_id: 3200
+    columns:
+      - column_name: address_id
+        data: row_id
+        is_primary_key: true
+      - column_name: contact_id
+        data: foreign_key("contact", "contact_id")
+      - column_name: address_type
+        data: random.choice(["Home", "Work", "Billing", "Shipping", "Other"])
+      - column_name: line1
+        data: fake.street_address()
+      - column_name: line2
+        data: random.choice([fake.secondary_address(), "", "", ""])
+      - column_name: city
+        data: fake.city()
+      - column_name: state
+        data: fake.state()
+      - column_name: postal_code
+        data: fake.postcode()
+      - column_name: country
+        data: fake.country()
+      - column_name: is_primary
+        data: random.choice([True, False, False])
+      - column_name: created_at
+        data: fake.date_time_between(start_date='-4y', end_date='now', tzinfo=None)
+
+  - table_name: contact_communication_channel
+    row_count: 3600
+    start_row_id: 5600
+    columns:
+      - column_name: communication_channel_id
+        data: row_id
+        is_primary_key: true
+      - column_name: contact_id
+        data: foreign_key("contact", "contact_id")
+      - column_name: channel_type
+        data: random.choice(["email", "phone", "mobile", "whatsapp", "linkedin", "x", "website"])
+      - column_name: channel_value
+        data: |
+          ctype = channel_type
+          if ctype == "email":
+            return fake.email()
+          if ctype in ["phone", "mobile", "whatsapp"]:
+            return fake.phone_number()
+          if ctype == "linkedin":
+            return "https://www.linkedin.com/in/" + fake.user_name()
+          if ctype == "x":
+            return "@" + fake.user_name()
+          return fake.url()
+      - column_name: is_primary
+        data: random.choice([True, False, False])
+      - column_name: channel_status
+        data: random.choice(["verified", "unverified", "bounced", "inactive"])
+      - column_name: consent_opt_in
+        data: random.choice([True, False])
+      - column_name: created_at
+        data: fake.date_time_between(start_date='-4y', end_date='now', tzinfo=None)
+
+  - table_name: lead
+    row_count: 900
+    start_row_id: 4000
+    columns:
+      - column_name: lead_id
+        data: row_id
+        is_primary_key: true
+      - column_name: contact_id
+        data: foreign_key("contact", "contact_id")
+      - column_name: source
+        data: random.choice(["Website", "Referral", "LinkedIn", "Event", "Outbound", "Email Campaign"])
+      - column_name: score
+        data: random.randint(1, 100)
+        type: int32
+      - column_name: status
+        data: random.choice(["New", "Working", "Qualified", "Unqualified", "Nurturing"])
+      - column_name: owner_name
+        data: fake.name()
+      - column_name: created_at
+        data: fake.date_time_between(start_date='-3y', end_date='now', tzinfo=None)
+
+  - table_name: opportunity
+    row_count: 700
+    start_row_id: 5000
+    columns:
+      - column_name: opportunity_id
+        data: row_id
+        is_primary_key: true
+      - column_name: account_id
+        data: foreign_key("account", "account_id")
+      - column_name: primary_contact_id
+        data: foreign_key("contact", "contact_id")
+      - column_name: opportunity_name
+        data: fake.bs().title()
+      - column_name: stage
+        data: random.choice(["Prospecting", "Discovery", "Proposal", "Negotiation", "Closed Won", "Closed Lost"])
+      - column_name: probability_percent
+        data: random.choice([10, 20, 30, 40, 50, 60, 70, 80, 90])
+        type: int32
+      - column_name: amount
+        data: round(random.uniform(2000, 750000), 2)
+        type: float
+      - column_name: expected_close_date
+        data: fake.date_between(start_date='today', end_date='+180d')
+      - column_name: created_at
+        data: fake.date_time_between(start_date='-2y', end_date='now', tzinfo=None)
+
+  - table_name: activity
+    row_count: 3500
+    start_row_id: 7000
+    columns:
+      - column_name: activity_id
+        data: row_id
+        is_primary_key: true
+      - column_name: contact_id
+        data: foreign_key("contact", "contact_id")
+      - column_name: opportunity_id
+        data: foreign_key("opportunity", "opportunity_id")
+      - column_name: activity_type
+        data: random.choice(["Call", "Email", "Meeting", "Demo", "Task", "Note"])
+      - column_name: subject
+        data: fake.sentence(nb_words=5)
+      - column_name: activity_status
+        data: random.choice(["Planned", "Completed", "Canceled"])
+      - column_name: owner_name
+        data: fake.name()
+      - column_name: due_at
+        data: fake.date_time_between(start_date='-60d', end_date='+60d', tzinfo=None)
+      - column_name: created_at
+        data: fake.date_time_between(start_date='-2y', end_date='now', tzinfo=None)
+
+  - table_name: support_ticket
+    row_count: 1100
+    start_row_id: 9000
+    columns:
+      - column_name: ticket_id
+        data: row_id
+        is_primary_key: true
+      - column_name: account_id
+        data: foreign_key("account", "account_id")
+      - column_name: contact_id
+        data: foreign_key("contact", "contact_id")
+      - column_name: channel
+        data: random.choice(["Email", "Phone", "Chat", "Portal"])
+      - column_name: priority
+        data: random.choice(["Low", "Medium", "High", "Urgent"])
+      - column_name: status
+        data: random.choice(["Open", "Pending", "Resolved", "Closed"])
+      - column_name: subject
+        data: fake.sentence(nb_words=6)
+      - column_name: first_response_minutes
+        data: random.randint(5, 720)
+        type: int32
+      - column_name: resolution_minutes
+        data: random.randint(30, 10080)
+        type: int32
+      - column_name: created_at
+        data: fake.date_time_between(start_date='-1y', end_date='now', tzinfo=None)

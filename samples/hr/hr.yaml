@@ -1,0 +1,255 @@
+version: 1
+config:
+  locale: en_US
+  seed: 77
+
+# Sample HR domain for managing company employees
+tables:
+  - table_name: location
+    row_count: 8
+    start_row_id: 100
+    columns:
+      - column_name: location_id
+        data: row_id
+        is_primary_key: true
+      - column_name: location_name
+        data: random.choice(["HQ", "Regional Office", "Tech Campus", "Operations Hub", "Sales Office", "Support Center", "Plant A", "Plant B"])
+      - column_name: city
+        data: fake.city()
+      - column_name: state
+        data: fake.state()
+      - column_name: country
+        data: fake.country()
+
+  - table_name: department
+    row_count: 15
+    start_row_id: 1000
+    columns:
+      - column_name: department_id
+        data: row_id
+        is_primary_key: true
+      - column_name: department_name
+        data: random.choice(["Engineering", "Product", "Design", "Data", "IT", "HR", "Finance", "Legal", "Marketing", "Sales", "Customer Success", "Operations", "Procurement", "Security", "Facilities"])
+      - column_name: cost_center
+        data: '"CC-" + str(random.randint(100, 999))'
+      - column_name: location_id
+        data: foreign_key("location", "location_id")
+
+  - table_name: job_title
+    row_count: 40
+    start_row_id: 2000
+    columns:
+      - column_name: job_title_id
+        data: row_id
+        is_primary_key: true
+      - column_name: title
+        data: random.choice(["Software Engineer", "Senior Software Engineer", "Staff Engineer", "Product Manager", "Data Analyst", "Data Engineer", "UX Designer", "HR Specialist", "Recruiter", "Account Executive", "Sales Manager", "Finance Analyst", "Legal Counsel", "Support Engineer", "Operations Manager", "Security Analyst"])
+      - column_name: job_level
+        data: random.choice(["L1", "L2", "L3", "L4", "L5", "M1", "M2"])
+      - column_name: exempt
+        data: random.choice([True, False])
+
+  - table_name: employee
+    row_count: 1200
+    start_row_id: 5000
+    columns:
+      - column_name: employee_id
+        data: row_id
+        is_primary_key: true
+      - column_name: employee_number
+        data: '"EMP" + str(row_id)'
+      - column_name: first_name
+        data: fake.first_name()
+      - column_name: last_name
+        data: fake.last_name()
+      - column_name: full_name
+        data: first_name + " " + last_name
+      - column_name: date_of_birth
+        data: fake.date_of_birth(minimum_age=21, maximum_age=65)
+      - column_name: gender
+        data: random.choice(["Female", "Male", "Non-binary", "Prefer not to say"])
+      - column_name: marital_status
+        data: random.choice(["Single", "Married", "Divorced", "Widowed"])
+      - column_name: department_id
+        data: foreign_key("department", "department_id")
+      - column_name: job_title_id
+        data: foreign_key("job_title", "job_title_id")
+      - column_name: location_id
+        data: foreign_key("location", "location_id")
+      - column_name: manager_id
+        data: random.choice([None, foreign_key("employee", "employee_id")])
+      - column_name: hire_date
+        data: fake.date_between(start_date='-12y', end_date='today')
+      - column_name: employment_type
+        data: random.choice(["Full-Time", "Part-Time", "Contractor", "Intern"])
+      - column_name: employment_status
+        data: random.choice(["Active", "On Leave", "Terminated"])
+      - column_name: termination_date
+        data: random.choice([None, None, None, fake.date_between(start_date='-3y', end_date='today')])
+
+  - table_name: employee_address
+    row_count: 1800
+    start_row_id: 7000
+    columns:
+      - column_name: address_id
+        data: row_id
+        is_primary_key: true
+      - column_name: employee_id
+        data: foreign_key("employee", "employee_id")
+      - column_name: address_type
+        data: random.choice(["Home", "Mailing", "Emergency"])
+      - column_name: line1
+        data: fake.street_address()
+      - column_name: line2
+        data: random.choice(["", "", fake.secondary_address()])
+      - column_name: city
+        data: fake.city()
+      - column_name: state
+        data: fake.state()
+      - column_name: postal_code
+        data: fake.postcode()
+      - column_name: country
+        data: fake.country()
+      - column_name: is_primary
+        data: random.choice([True, False, False])
+
+  - table_name: employee_communication_channel
+    row_count: 4200
+    start_row_id: 9000
+    columns:
+      - column_name: communication_channel_id
+        data: row_id
+        is_primary_key: true
+      - column_name: employee_id
+        data: foreign_key("employee", "employee_id")
+      - column_name: channel_type
+        data: random.choice(["work_email", "personal_email", "work_phone", "mobile_phone", "slack", "teams"])
+      - column_name: channel_value
+        data: |
+          ctype = channel_type
+          if ctype in ["work_email", "personal_email"]:
+            return fake.email()
+          if ctype in ["work_phone", "mobile_phone"]:
+            return fake.phone_number()
+          if ctype == "slack":
+            return "@" + fake.user_name()
+          return fake.user_name() + "@company.example"
+      - column_name: is_primary
+        data: random.choice([True, False, False])
+      - column_name: verified
+        data: random.choice([True, True, False])
+
+  - table_name: compensation
+    row_count: 1500
+    start_row_id: 13000
+    columns:
+      - column_name: compensation_id
+        data: row_id
+        is_primary_key: true
+      - column_name: employee_id
+        data: foreign_key("employee", "employee_id")
+      - column_name: effective_date
+        data: fake.date_between(start_date='-8y', end_date='today')
+      - column_name: pay_type
+        data: random.choice(["Salary", "Hourly"])
+      - column_name: base_pay
+        data: round(random.uniform(25000, 260000), 2)
+        type: float
+      - column_name: bonus_target_percent
+        data: random.choice([0, 5, 10, 12, 15, 20, 25, 30])
+        type: int32
+      - column_name: currency_code
+        data: random.choice(["USD", "EUR", "GBP", "CAD", "AUD"])
+
+  - table_name: payroll_run
+    row_count: 8000
+    start_row_id: 15000
+    columns:
+      - column_name: payroll_id
+        data: row_id
+        is_primary_key: true
+      - column_name: employee_id
+        data: foreign_key("employee", "employee_id")
+      - column_name: pay_period_start
+        data: fake.date_between(start_date='-2y', end_date='today')
+      - column_name: pay_period_end
+        data: fake.date_between(start_date='today', end_date='+15d')
+      - column_name: gross_pay
+        data: round(random.uniform(1200, 12000), 2)
+        type: float
+      - column_name: tax_amount
+        data: round(gross_pay * random.uniform(0.12, 0.35), 2)
+        type: float
+      - column_name: benefit_deduction
+        data: round(gross_pay * random.uniform(0.01, 0.08), 2)
+        type: float
+      - column_name: net_pay
+        data: round(gross_pay - tax_amount - benefit_deduction, 2)
+        type: float
+
+  - table_name: attendance
+    row_count: 25000
+    start_row_id: 25000
+    columns:
+      - column_name: attendance_id
+        data: row_id
+        is_primary_key: true
+      - column_name: employee_id
+        data: foreign_key("employee", "employee_id")
+      - column_name: attendance_date
+        data: fake.date_between(start_date='-1y', end_date='today')
+      - column_name: status
+        data: random.choice(["Present", "Absent", "Remote", "Sick", "Vacation"])
+      - column_name: check_in_time
+        data: random.choice(["08:00", "08:30", "09:00", "09:30", "10:00"])
+      - column_name: check_out_time
+        data: random.choice(["16:30", "17:00", "17:30", "18:00", "18:30"])
+      - column_name: hours_worked
+        data: round(random.uniform(0, 10), 2)
+        type: float
+
+  - table_name: leave_request
+    row_count: 3200
+    start_row_id: 52000
+    columns:
+      - column_name: leave_request_id
+        data: row_id
+        is_primary_key: true
+      - column_name: employee_id
+        data: foreign_key("employee", "employee_id")
+      - column_name: leave_type
+        data: random.choice(["Annual", "Sick", "Maternity", "Paternity", "Unpaid", "Bereavement"])
+      - column_name: start_date
+        data: fake.date_between(start_date='-2y', end_date='today')
+      - column_name: end_date
+        data: fake.date_between(start_date='today', end_date='+30d')
+      - column_name: days_requested
+        data: random.randint(1, 20)
+        type: int32
+      - column_name: approval_status
+        data: random.choice(["Pending", "Approved", "Rejected", "Cancelled"])
+      - column_name: approved_by_employee_id
+        data: random.choice([None, foreign_key("employee", "employee_id")])
+
+  - table_name: performance_review
+    row_count: 2000
+    start_row_id: 60000
+    columns:
+      - column_name: review_id
+        data: row_id
+        is_primary_key: true
+      - column_name: employee_id
+        data: foreign_key("employee", "employee_id")
+      - column_name: reviewer_employee_id
+        data: random.choice([None, foreign_key("employee", "employee_id")])
+      - column_name: review_period
+        data: random.choice(["2024-H1", "2024-H2", "2025-H1", "2025-H2", "2026-H1"])
+      - column_name: overall_rating
+        data: random.choice([1, 2, 3, 4, 5])
+        type: int32
+      - column_name: strengths
+        data: fake.sentence(nb_words=8)
+      - column_name: improvement_areas
+        data: fake.sentence(nb_words=8)
+      - column_name: review_date
+        data: fake.date_between(start_date='-2y', end_date='today')
