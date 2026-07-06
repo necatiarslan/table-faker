@@ -661,6 +661,7 @@ If you find Table Faker useful and would like to support its development, consid
 - Generate template yaml file from sample data
 - use an ai service to generate data generation logic
 - make openpyxl package optional to export to excel
+- Use an external tabular data file (csv, parquet, json, excel) as a source for foreign keys
 
 ### 🔮 Future Enhancements
 - PyArrow table support
